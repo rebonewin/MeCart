@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+
+import { CommandPalette } from "@/components/admin/command-palette";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -139,6 +141,8 @@ export function AdminShell({ children, username }: { children: React.ReactNode; 
           ))}
         </nav>
       </aside>
+
+      <CommandPalette />
 
       <div className={`transition-all duration-300 ${collapsed ? "md:ml-20" : "md:ml-72"}`}>
         <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-950/60 px-4 py-4 backdrop-blur-2xl sm:px-6">
