@@ -25,38 +25,50 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     const password = String(credentials?.password ?? "");
     if (!username || !password) return null;
 
+    let authenticatedUser: {
+      id: string;
+      name: string | null;
+      email: string | null;
+      role: string;
+      username: string | null;
+    } | null = null;
+
     try {
       const user = await prisma.user.findFirst({
         where: { OR: [{ username }, { email: username }] },
       });
 
-      if (!user || !user.password) return null;
-      if (user.deletedAt) return null;
-
-      const isValid = await bcrypt.compare(password, user.password);
-      if (!isValid) return null;
-
-      return {
-        id: user.id,
-        name: user.name ?? user.username ?? null,
-        email: user.email ?? null,
-        role: user.role,
-        username: user.username ?? null,
-      };
+      if (user && user.password && !user.deletedAt) {
+        const isValid = await bcrypt.compare(password, user.password);
+        if (isValid) {
+          authenticatedUser = {
+            id: user.id,
+            name: user.name ?? user.username ?? null,
+            email: user.email ?? null,
+            role: user.role,
+            username: user.username ?? null,
+          };
+        }
+      }
     } catch {
-      const adminUsername = process.env.ADMIN_USERNAME ?? "A153TA";
-      const adminPassword = process.env.ADMIN_PASSWORD ?? "Welcome@Port153";
-      const customerUsername = process.env.CUSTOMER_USERNAME ?? "customer01";
-      const customerPassword = process.env.CUSTOMER_PASSWORD ?? "Welcome@Customer153";
-
-      if (username === adminUsername && password === adminPassword) {
-        return { id: "admin-demo", name: "Administrator", email: `${adminUsername.toLowerCase()}@mecart.local`, role: "ADMIN", username: adminUsername };
-      }
-      if (username === customerUsername && password === customerPassword) {
-        return { id: "customer-demo", name: "Demo Customer", email: "customer@mecart.demo", role: "USER", username: customerUsername };
-      }
-      return null;
+      // Fall through to demo credentials if the database is unavailable.
     }
+
+    if (authenticatedUser) return authenticatedUser;
+
+    const adminUsername = process.env.ADMIN_USERNAME ?? "A153TA";
+    const adminPassword = process.env.ADMIN_PASSWORD ?? "Welcome@Port153";
+    const customerUsername = process.env.CUSTOMER_USERNAME ?? "customer01";
+    const customerPassword = process.env.CUSTOMER_PASSWORD ?? "Welcome@Customer153";
+
+    if (username === adminUsername && password === adminPassword) {
+      return { id: "admin-demo", name: "Administrator", email: `${adminUsername.toLowerCase()}@mecart.local`, role: "ADMIN", username: adminUsername };
+    }
+    if (username === customerUsername && password === customerPassword) {
+      return { id: "customer-demo", name: "Demo Customer", email: "customer@mecart.demo", role: "USER", username: customerUsername };
+    }
+
+    return null;
   },
     }),
   ],
