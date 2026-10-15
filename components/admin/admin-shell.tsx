@@ -36,6 +36,7 @@ const navGroups = [
     items: [
       { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
       { href: "/admin/ai-insights", label: "AI Insights", icon: Brain },
+      { href: "/admin/notifications", label: "Notifications", icon: Bell },
       { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
       { href: "/admin/reports", label: "Reports", icon: ClipboardList },
     ],
