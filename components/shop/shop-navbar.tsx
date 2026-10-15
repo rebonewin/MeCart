@@ -16,8 +16,9 @@ export function ShopNavbar() {
   useEffect(() => {
     const stored = localStorage.getItem("mecart_theme");
     const enabled = stored === "dark" || (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches);
-    setDark(enabled);
     document.documentElement.classList.toggle("dark", enabled);
+    const timer = window.setTimeout(() => setDark(enabled), 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   const toggleTheme = () => {

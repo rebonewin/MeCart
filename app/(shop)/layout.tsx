@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ShopNavbar } from "@/components/shop/shop-navbar";
 
 export default function ShopLayout({ children }: { children: React.ReactNode }) {
@@ -14,24 +15,24 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
           <div>
             <p className="font-semibold text-gray-900 dark:text-white">Shop</p>
             <div className="mt-3 flex flex-col gap-2">
-              <a href="/products">All Products</a>
-              <a href="/categories">Categories</a>
-              <a href="/search">Search</a>
+              <Link href="/products">All Products</Link>
+              <Link href="/categories">Categories</Link>
+              <Link href="/search">Search</Link>
             </div>
           </div>
           <div>
             <p className="font-semibold text-gray-900 dark:text-white">Support</p>
             <div className="mt-3 flex flex-col gap-2">
-              <a href="/contact">Contact</a>
-              <a href="/about">About</a>
-              <a href="/login">Account</a>
+              <Link href="/contact">Contact</Link>
+              <Link href="/about">About</Link>
+              <Link href="/login">Account</Link>
             </div>
           </div>
           <div>
             <p className="font-semibold text-gray-900 dark:text-white">Policies</p>
             <div className="mt-3 flex flex-col gap-2">
-              <a href="/privacy">Privacy Policy</a>
-              <a href="/terms">Terms</a>
+              <Link href="/privacy">Privacy Policy</Link>
+              <Link href="/terms">Terms</Link>
             </div>
           </div>
         </div>
