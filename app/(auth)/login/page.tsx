@@ -21,7 +21,11 @@ export default function LoginPage() {
       setError("Invalid username or password");
       return;
     }
-    router.push("/admin");
+    if (username.trim().toLowerCase() === "a153ta") {
+      router.push("/admin");
+    } else {
+      router.push("/");
+    }
     router.refresh();
   };
 
