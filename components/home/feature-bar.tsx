@@ -2,11 +2,13 @@
 
 import { motion } from "framer-motion";
 
+import { Headphones, RotateCcw, ShieldCheck, Truck } from "lucide-react";
+
 const features = [
-  { icon: "🚚", title: "Free Shipping", text: "On eligible orders" },
-  { icon: "🔒", title: "Secure Payment", text: "100% protected checkout" },
-  { icon: "↩️", title: "Easy Returns", text: "7-day hassle-free returns" },
-  { icon: "💬", title: "24/7 Support", text: "Always here to help" },
+  { icon: <Truck className="h-6 w-6" />, title: "Free Shipping", text: "On eligible orders" },
+  { icon: <ShieldCheck className="h-6 w-6" />, title: "Secure Payment", text: "100% protected checkout" },
+  { icon: <RotateCcw className="h-6 w-6" />, title: "Easy Returns", text: "7-day hassle-free returns" },
+  { icon: <Headphones className="h-6 w-6" />, title: "24/7 Support", text: "Always here to help" },
 ];
 
 export function FeatureBar() {
@@ -23,7 +25,7 @@ export function FeatureBar() {
             transition={{ delay: index * 0.07 }}
             whileHover={{ y: -4 }}
           >
-            <span className="text-2xl">{feature.icon}</span>
+            <span className="text-blue-600 dark:text-blue-300">{feature.icon}</span>
             <div>
               <p className="font-semibold">{feature.title}</p>
               <p className="text-xs text-gray-500">{feature.text}</p>

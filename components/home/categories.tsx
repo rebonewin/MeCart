@@ -2,16 +2,26 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import {
+  Baby,
+  Footprints,
+  Gamepad2,
+  Heart,
+  Shirt,
+  Smartphone,
+  Sparkles,
+  Watch,
+} from "lucide-react";
 
 const categories = [
-  { name: "Men", slug: "men", icon: "👔", tone: "from-blue-500/20 to-indigo-500/10" },
-  { name: "Women", slug: "women", icon: "👗", tone: "from-pink-500/20 to-rose-500/10" },
-  { name: "Girls", slug: "girls", icon: "🎀", tone: "from-fuchsia-500/20 to-pink-500/10" },
-  { name: "Baby Boy", slug: "baby-boy", icon: "👶", tone: "from-cyan-500/20 to-blue-500/10" },
-  { name: "Electronics", slug: "electronics", icon: "📱", tone: "from-indigo-500/20 to-violet-500/10" },
-  { name: "Shoes", slug: "shoes", icon: "👟", tone: "from-amber-500/20 to-orange-500/10" },
-  { name: "Fashion", slug: "fashion", icon: "✨", tone: "from-emerald-500/20 to-teal-500/10" },
-  { name: "Accessories", slug: "accessories", icon: "⌚", tone: "from-slate-500/20 to-gray-500/10" },
+  { name: "Men", slug: "men", icon: Shirt, tone: "from-blue-500/20 to-indigo-500/10" },
+  { name: "Women", slug: "women", icon: Sparkles, tone: "from-pink-500/20 to-rose-500/10" },
+  { name: "Girls", slug: "girls", icon: Heart, tone: "from-fuchsia-500/20 to-pink-500/10" },
+  { name: "Baby Boy", slug: "baby-boy", icon: Baby, tone: "from-cyan-500/20 to-blue-500/10" },
+  { name: "Electronics", slug: "electronics", icon: Smartphone, tone: "from-indigo-500/20 to-violet-500/10" },
+  { name: "Shoes", slug: "shoes", icon: Footprints, tone: "from-amber-500/20 to-orange-500/10" },
+  { name: "Fashion", slug: "fashion", icon: Shirt, tone: "from-emerald-500/20 to-teal-500/10" },
+  { name: "Accessories", slug: "accessories", icon: Watch, tone: "from-slate-500/20 to-gray-500/10" },
 ];
 
 export function CategorySection() {
@@ -34,8 +44,8 @@ export function CategorySection() {
             >
               <Link href={`/categories/${category.slug}`} className="group block">
                 <div className="relative overflow-hidden rounded-3xl border border-white/50 bg-white/70 p-5 text-center shadow-sm backdrop-blur transition hover:-translate-y-2 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900/70">
-                  <div className={`mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br ${category.tone} text-3xl transition group-hover:scale-110 group-hover:rotate-6`}>
-                    {category.icon}
+                  <div className={`mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br ${category.tone} text-blue-700 transition group-hover:scale-110 group-hover:rotate-6 dark:text-blue-300`}>
+                    <category.icon className="h-7 w-7" />
                   </div>
                   <p className="text-sm font-semibold">{category.name}</p>
                 </div>
