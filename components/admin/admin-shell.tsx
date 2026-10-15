@@ -74,7 +74,7 @@ export function AdminShell({ children, username }: { children: React.ReactNode; 
 
   useEffect(() => {
     const stored = localStorage.getItem("mecart_theme");
-    const enabled = stored === "dark";
+    const enabled = stored ? stored === "dark" : true;
     const timer = window.setTimeout(() => {
       setDark(enabled);
       document.documentElement.classList.toggle("dark", enabled);
