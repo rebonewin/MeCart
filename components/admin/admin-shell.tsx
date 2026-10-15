@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import {
   BarChart3,
   Bell,
+  Brain,
   Box,
   ChevronLeft,
   ChevronRight,
@@ -32,6 +33,7 @@ const navGroups = [
     title: "Overview",
     items: [
       { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/admin/ai-insights", label: "AI Insights", icon: Brain },
       { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
       { href: "/admin/reports", label: "Reports", icon: ClipboardList },
     ],
