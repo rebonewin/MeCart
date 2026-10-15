@@ -1,7 +1,4 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "node:fs/promises";
-import path from "node:path";
-import { randomUUID } from "node:crypto";
 
 export async function POST(request: Request) {
   const formData = await request.formData();
@@ -10,16 +7,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "No files provided" }, { status: 400 });
   }
 
-  const uploadsDir = path.join(process.cwd(), "public", "uploads");
-  await mkdir(uploadsDir, { recursive: true });
-
   const urls: string[] = [];
   for (const file of files) {
-    const ext = path.extname(file.name) || ".bin";
-    const name = `${randomUUID()}${ext}`;
     const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(path.join(uploadsDir, name), buffer);
-    urls.push(`/uploads/${name}`);
+    const mime = file.type || "application/octet-stream";
+    urls.push(`data:${mime};base64,${buffer.toString("base64")}`);
   }
 
   return NextResponse.json({ urls });
