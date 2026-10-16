@@ -3,24 +3,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  BarChart3,
-  Brain,
-  Calendar,
-  Command,
-  CreditCard,
-  Home,
-  LayoutDashboard,
-  LogOut,
-  Package,
-  Plus,
-  Settings,
-  Shield,
-  ShoppingBag,
-  Tag,
-  Tags,
-  Users,
-} from "lucide-react";
+import { Command, Home } from "lucide-react";
+import { useAuth } from "@/components/providers/auth-provider";
 
 type CommandItem = {
   id: string;
@@ -61,6 +45,7 @@ function matches(command: CommandItem, query: string) {
 
 export function CommandPalette() {
   const router = useRouter();
+  const { signOut } = useAuth();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
@@ -71,14 +56,18 @@ export function CommandPalette() {
     setQuery("");
   }, []);
 
-  const execute = useCallback((command: CommandItem) => {
-    close();
-    if (command.id === "logout") {
-      window.location.href = "/api/auth/signout";
-      return;
-    }
-    router.push(command.href);
-  }, [close, router]);
+  const execute = useCallback(
+    async (command: CommandItem) => {
+      close();
+      if (command.id === "logout") {
+        await signOut();
+        router.push("/login");
+        return;
+      }
+      router.push(command.href);
+    },
+    [close, router, signOut],
+  );
 
   const filtered = useMemo(() => commands.filter((command) => matches(command, query)), [query]);
 

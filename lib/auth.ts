@@ -1,104 +1,69 @@
-import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
+import { createClient } from "@/lib/supabase/server";
+import type { AppRole } from "@/types/database";
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
-  secret: process.env.AUTH_SECRET ?? "mecart-default-secret-change-me",
-  trustHost: true,
-  session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60,
-  },
-  pages: {
-    signIn: "/login",
-  },
-  providers: [
-    Credentials({
-      name: "credentials",
-      credentials: {
-        username: { label: "Username", type: "text" },
-        password: { label: "Password", type: "password" },
-      },
-  async authorize(credentials) {
-    const username = String(credentials?.username ?? "");
-    const password = String(credentials?.password ?? "");
-    if (!username || !password) return null;
+export type SessionUser = {
+  id: string;
+  email: string | null;
+  name: string | null;
+  role: AppRole;
+  username: string | null;
+  avatarUrl: string | null;
+};
 
-    let authenticatedUser: {
-      id: string;
-      name: string | null;
-      email: string | null;
-      role: string;
-      username: string | null;
-    } | null = null;
+export type AppSession = { user: SessionUser };
 
-    try {
-      const user = await prisma.user.findFirst({
-        where: { OR: [{ username }, { email: username }] },
-      });
+/**
+ * Supabase-backed session accessor.
+ * Drop-in replacement for the previous NextAuth `auth()` helper.
+ */
+export async function auth(): Promise<AppSession | null> {
+  const user = await getCurrentUser();
+  if (!user) return null;
+  return { user };
+}
 
-      if (user && user.password && !user.deletedAt) {
-        const isValid = await bcrypt.compare(password, user.password);
-        if (isValid) {
-          authenticatedUser = {
-            id: user.id,
-            name: user.name ?? user.username ?? null,
-            email: user.email ?? null,
-            role: user.role,
-            username: user.username ?? null,
-          };
-        }
-      }
-    } catch {
-      // Fall through to demo credentials if the database is unavailable.
-    }
+export async function getCurrentUser(): Promise<SessionUser | null> {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (authenticatedUser) return authenticatedUser;
+    if (!user) return null;
 
-    const adminUsername = process.env.ADMIN_USERNAME ?? "A153TA";
-    const adminPassword = process.env.ADMIN_PASSWORD ?? "Welcome@Port153";
-    const customerUsername = process.env.CUSTOMER_USERNAME ?? "customer01";
-    const customerPassword = process.env.CUSTOMER_PASSWORD ?? "Welcome@Customer153";
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .maybeSingle();
 
-    if (username === adminUsername && password === adminPassword) {
-      return { id: "admin-demo", name: "Administrator", email: `${adminUsername.toLowerCase()}@mecart.local`, role: "ADMIN", username: adminUsername };
-    }
-    if (username === customerUsername && password === customerPassword) {
-      return { id: "customer-demo", name: "Demo Customer", email: "customer@mecart.demo", role: "USER", username: customerUsername };
-    }
-
+    return {
+      id: user.id,
+      email: user.email ?? profile?.email ?? null,
+      name: profile?.full_name ?? (user.user_metadata?.name as string | undefined) ?? null,
+      role: profile?.role ?? "customer",
+      username: profile?.username ?? null,
+      avatarUrl: profile?.avatar_url ?? null,
+    };
+  } catch {
     return null;
-  },
-    }),
-  ],
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.role = (user as { role?: string }).role ?? "USER";
-        token.username = (user as { username?: string | null }).username ?? null;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string;
-        session.user.username = (token.username as string | null) ?? null;
-      }
-      return session;
-    },
-  },
-  cookies: {
-    sessionToken: {
-      name: "mecart.session-token",
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-      },
-    },
-  },
-});
+  }
+}
+
+export async function requireUser(): Promise<SessionUser> {
+  const user = await getCurrentUser();
+  if (!user) throw new Error("Unauthorized");
+  return user;
+}
+
+export async function requireStaff(): Promise<SessionUser> {
+  const user = await requireUser();
+  if (user.role !== "admin" && user.role !== "manager") throw new Error("Unauthorized");
+  return user;
+}
+
+export async function requireAdmin(): Promise<SessionUser> {
+  const user = await requireUser();
+  if (user.role !== "admin") throw new Error("Unauthorized");
+  return user;
+}

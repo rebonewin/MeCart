@@ -46,3 +46,27 @@ export type Product = {
   images: string[];
   createdAt: string;
 };
+
+/** Structural shape shared by storefront views (subset of the admin ProductView flags). */
+export type StorefrontProduct = Product & {
+  featured?: boolean;
+  bestSeller?: boolean;
+  newArrival?: boolean;
+};
+
+export type StorefrontReview = {
+  id: string;
+  author: string;
+  rating: number;
+  title: string | null;
+  body: string | null;
+  productName: string;
+  createdAt: string;
+};
+
+export type StorefrontStats = {
+  products: number;
+  categories: number;
+  brands: number;
+  rating: number;
+};

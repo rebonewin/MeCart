@@ -1,14 +1,19 @@
-import { prisma } from "@/lib/prisma";
 import { updateOrderStatusAction, updatePaymentStatusAction } from "@/lib/actions/orders";
+import { listAllOrders } from "@/lib/repositories/orders";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminOrdersPage() {
-  const orders = await prisma.order.findMany({
-    where: { deletedAt: null },
-    orderBy: { createdAt: "desc" },
-    include: { items: true, payments: true, user: true },
-  });
+  const orders = await listAllOrders();
+
+  const rows = orders.map(({ order, customerName, customerEmail }) => ({
+    id: order.id,
+    orderNumber: order.order_number,
+    customerName: customerName ?? customerEmail ?? "Guest",
+    grandTotal: Number(order.grand_total),
+    status: order.status,
+    paymentStatus: order.payment_status,
+  }));
 
   return (
     <div className="space-y-4">
@@ -26,7 +31,7 @@ export default async function AdminOrdersPage() {
             </tr>
           </thead>
           <tbody>
-            {orders.map((o) => (
+            {rows.map((o) => (
               <tr key={o.id} className="border-b border-gray-100 dark:border-gray-800">
                 <td className="p-3 font-medium">{o.orderNumber}</td>
                 <td className="p-3">{o.customerName}</td>
@@ -65,7 +70,7 @@ export default async function AdminOrdersPage() {
                 </td>
               </tr>
             ))}
-            {orders.length === 0 && <tr><td colSpan={6} className="p-6 text-center text-gray-500">No orders</td></tr>}
+            {rows.length === 0 && <tr><td colSpan={6} className="p-6 text-center text-gray-500">No orders</td></tr>}
           </tbody>
         </table>
       </div>

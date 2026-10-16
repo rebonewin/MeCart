@@ -17,8 +17,12 @@ export default function RegisterPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await registerCustomer({ name, username, email, password });
-      toast.success("Account created. Please sign in.");
+      const res = await registerCustomer({ name, username, email, password });
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      toast.success(res.message);
       router.push("/login");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Registration failed");

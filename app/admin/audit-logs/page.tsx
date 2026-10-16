@@ -1,12 +1,9 @@
-import { prisma } from "@/lib/prisma";
+import { listActivityLogs, listAuditLogs } from "@/lib/repositories/logs";
 
 export const dynamic = "force-dynamic";
 
 export default async function AuditLogsPage() {
-  const [audit, activity] = await Promise.all([
-    prisma.auditLog.findMany({ orderBy: { createdAt: "desc" }, take: 100, include: { admin: true } }),
-    prisma.activityLog.findMany({ orderBy: { createdAt: "desc" }, take: 100, include: { user: true } }),
-  ]);
+  const [audit, activity] = await Promise.all([listAuditLogs(100), listActivityLogs(100)]);
 
   return (
     <div className="space-y-6">
@@ -28,8 +25,8 @@ export default async function AuditLogsPage() {
             <tbody>
               {audit.map((a) => (
                 <tr key={a.id} className="border-b border-gray-100 dark:border-gray-800">
-                  <td className="p-2">{new Date(a.createdAt).toLocaleString()}</td>
-                  <td className="p-2">{a.admin?.username ?? "-"}</td>
+                  <td className="p-2">{new Date(a.created_at).toLocaleString()}</td>
+                  <td className="p-2">{a.adminName ?? "-"}</td>
                   <td className="p-2">{a.action}</td>
                   <td className="p-2">{a.resource}</td>
                   <td className="p-2">{a.status}</td>
@@ -55,8 +52,8 @@ export default async function AuditLogsPage() {
             <tbody>
               {activity.map((a) => (
                 <tr key={a.id} className="border-b border-gray-100 dark:border-gray-800">
-                  <td className="p-2">{new Date(a.createdAt).toLocaleString()}</td>
-                  <td className="p-2">{a.user?.username ?? "guest"}</td>
+                  <td className="p-2">{new Date(a.created_at).toLocaleString()}</td>
+                  <td className="p-2">{a.userName ?? a.userEmail ?? "guest"}</td>
                   <td className="p-2">{a.action}</td>
                   <td className="p-2">{a.resource ?? "-"}</td>
                 </tr>

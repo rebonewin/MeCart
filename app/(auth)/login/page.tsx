@@ -3,12 +3,10 @@
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { login } from "@/lib/actions/auth";
 import { Eye, EyeOff, Lock, User } from "lucide-react";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -19,18 +17,22 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
-    const res = await signIn("credentials", { username, password, redirect: false });
+
+    const callbackUrl =
+      typeof window !== "undefined"
+        ? new URLSearchParams(window.location.search).get("callbackUrl")
+        : null;
+
+    const res = await login({ username, password, callbackUrl });
     setLoading(false);
-    if (res?.error) {
-      setError("Invalid username or password");
+
+    if (!res.ok) {
+      setError(res.error);
       return;
     }
-    if (username.trim().toLowerCase() === "a153ta") {
-      router.push("/admin");
-    } else {
-      router.push("/");
-    }
-    router.refresh();
+    // Hard navigation so every provider (auth/cart/wishlist) initialises with
+    // the new session right away.
+    window.location.assign(res.redirectTo);
   };
 
   return (

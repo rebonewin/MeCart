@@ -1,2 +1,9 @@
 import { ThemeEditor } from "@/components/theme/ThemeEditor";
-export default function ThemeFontsPage() { return <ThemeEditor initialTab="typography" />; }
+import { loadThemeEditorData } from "@/lib/repositories/theme";
+
+export const dynamic = "force-dynamic";
+
+export default async function ThemeFontsPage() {
+  const { initial, initialVersions } = await loadThemeEditorData();
+  return <ThemeEditor initial={initial} initialVersions={initialVersions} initialTab="typography" />;
+}

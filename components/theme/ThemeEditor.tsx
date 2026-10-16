@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Download, Eye, History, Monitor, Palette, Redo2, Save, Smartphone, Square, Tablet, Undo2, Upload, WandSparkles } from "lucide-react";
-import { defaultTheme, presetThemes, varsForTheme, type ThemeTokens } from "@/lib/theme";
+import { useCallback, useMemo, useRef, useState, useTransition } from "react";
+import { toast } from "sonner";
+import { Download, Eye, History, Monitor, Palette, Redo2, RotateCcw, Save, Smartphone, Square, Tablet, Undo2, Upload, WandSparkles } from "lucide-react";
+import { defaultTheme, isThemeTokens, presetThemes, varsForTheme, type ThemeTokens, type ThemeVersion } from "@/lib/theme";
+import { publishThemeAction, resetThemeAction, saveThemeAction } from "@/lib/actions/theme";
 
 const colorKeys = [
   "primary",
@@ -24,25 +25,16 @@ const fontOptions = ["Inter, system-ui, sans-serif", "Outfit, sans-serif", "Spac
 const radiusOptions = ["0.75rem", "1rem", "1.25rem", "1.5rem", "2rem"];
 const shadowOptions = ["0 10px 30px rgba(0,0,0,0.15)", "0 20px 60px rgba(2,8,23,0.35)", "0 30px 80px rgba(2,8,23,0.45)"];
 
-export function ThemeEditor({ initialTab = "colors" }: { initialTab?: string }) {
-  const [theme, setTheme] = useState(defaultTheme);
+export function ThemeEditor({ initial, initialVersions = [], initialTab = "colors" }: { initial: ThemeTokens; initialVersions?: ThemeVersion[]; initialTab?: string }) {
+  const [theme, setTheme] = useState(initial);
   const [history, setHistory] = useState<ThemeTokens[]>([]);
   const [future, setFuture] = useState<ThemeTokens[]>([]);
   const [active, setActive] = useState(initialTab);
   const [viewport, setViewport] = useState<"desktop" | "tablet" | "mobile">("desktop");
-  const [savedVersions, setSavedVersions] = useState<Array<{ id: string; name: string; createdAt: string; theme: ThemeTokens }>>([]);
+  const [savedVersions, setSavedVersions] = useState<ThemeVersion[]>(initialVersions);
   const [selectedPreset, setSelectedPreset] = useState("Luxury Dark");
+  const [pending, startTransition] = useTransition();
   const importRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      const rawTheme = localStorage.getItem("mecart_theme_editor");
-      const rawVersions = localStorage.getItem("mecart_theme_versions");
-      if (rawTheme) setTheme(JSON.parse(rawTheme));
-      if (rawVersions) setSavedVersions(JSON.parse(rawVersions));
-    }, 0);
-    return () => window.clearTimeout(timer);
-  }, []);
 
   const pushHistory = useCallback((next: ThemeTokens) => {
     setHistory((previous) => [...previous.slice(-19), JSON.parse(JSON.stringify(theme))]);
@@ -71,17 +63,41 @@ export function ThemeEditor({ initialTab = "colors" }: { initialTab?: string }) 
 
   const previewWidth = viewport === "mobile" ? "390px" : viewport === "tablet" ? "768px" : "100%";
 
+  const saveNow = () => {
+    startTransition(async () => {
+      try {
+        await saveThemeAction(theme);
+        toast.success("Theme saved");
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Failed to save theme");
+      }
+    });
+  };
+
   const publish = () => {
-    const version = {
-      id: `version-${Date.now()}`,
-      name: `Published ${new Date().toLocaleString()}`,
-      createdAt: new Date().toISOString(),
-      theme: JSON.parse(JSON.stringify(theme)),
-    };
-    const nextVersions = [version, ...savedVersions].slice(0, 12);
-    setSavedVersions(nextVersions);
-    localStorage.setItem("mecart_theme_editor", JSON.stringify(theme));
-    localStorage.setItem("mecart_theme_versions", JSON.stringify(nextVersions));
+    startTransition(async () => {
+      try {
+        const version = await publishThemeAction(theme);
+        setSavedVersions((versions) => [version, ...versions].slice(0, 12));
+        toast.success("Theme published");
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Failed to publish theme");
+      }
+    });
+  };
+
+  const reset = () => {
+    startTransition(async () => {
+      try {
+        await resetThemeAction();
+        setHistory([]);
+        setFuture([]);
+        setTheme(defaultTheme);
+        toast.success("Theme reset to defaults");
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Failed to reset theme");
+      }
+    });
   };
 
   const exportTheme = () => {
@@ -95,26 +111,14 @@ export function ThemeEditor({ initialTab = "colors" }: { initialTab?: string }) 
   };
 
   const importTheme = async (file: File) => {
-    const text = await file.text();
-    const parsed = JSON.parse(text) as ThemeTokens;
-    pushHistory(parsed);
-  };
-
-  const updateToken = useCallback((path: string, value: string) => {
-    setTheme((current) => {
-      const next = JSON.parse(JSON.stringify(current)) as ThemeTokens;
-      const parts = path.split(".");
-      let target: Record<string, unknown> = next as unknown as Record<string, unknown>;
-      parts.slice(0, -1).forEach((part) => {
-        target = target[part] as Record<string, unknown>;
-      });
-      target[parts[parts.length - 1]] = value;
-      return next;
-    });
-  }, []);
-
-  const saveNow = () => {
-    localStorage.setItem("mecart_theme_editor", JSON.stringify(theme));
+    try {
+      const parsed: unknown = JSON.parse(await file.text());
+      if (!isThemeTokens(parsed)) throw new Error("The selected file is not a valid theme");
+      pushHistory(parsed);
+      toast.success("Theme imported");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to import theme");
+    }
   };
 
   const tabs = [
@@ -141,10 +145,13 @@ export function ThemeEditor({ initialTab = "colors" }: { initialTab?: string }) 
             <button onClick={redo} disabled={!future.length} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold transition hover:bg-white/10 disabled:opacity-50">
               <Redo2 className="mr-2 inline h-4 w-4" /> Redo
             </button>
-            <button onClick={saveNow} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold transition hover:bg-white/10">
+            <button onClick={reset} disabled={pending} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold transition hover:bg-white/10 disabled:opacity-50">
+              <RotateCcw className="mr-2 inline h-4 w-4" /> Reset
+            </button>
+            <button onClick={saveNow} disabled={pending} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold transition hover:bg-white/10 disabled:opacity-50">
               <Save className="mr-2 inline h-4 w-4" /> Save Draft
             </button>
-            <button onClick={publish} className="rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-2.5 text-sm font-bold text-white shadow-xl shadow-blue-600/20">
+            <button onClick={publish} disabled={pending} className="rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-2.5 text-sm font-bold text-white shadow-xl shadow-blue-600/20 disabled:opacity-50">
               Publish
             </button>
           </div>
@@ -286,7 +293,7 @@ export function ThemeEditor({ initialTab = "colors" }: { initialTab?: string }) 
                 {savedVersions.map((version) => (
                   <button
                     key={version.id}
-                    onClick={() => pushHistory(version.theme)}
+                    onClick={() => pushHistory(version.tokens)}
                     className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-left transition hover:bg-white/[0.08]"
                   >
                     <p className="font-semibold text-white">{version.name}</p>

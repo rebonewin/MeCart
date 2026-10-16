@@ -1,26 +1,29 @@
 "use server";
 
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { requireStaff } from "@/lib/auth";
 import { productSchema } from "@/lib/validators/product";
 import { revalidatePath } from "next/cache";
 import { logAudit } from "@/lib/security/audit";
+import {
+  adjustStock as repoAdjustStock,
+  bulkDeleteProducts as repoBulkDelete,
+  bulkUpdateProducts as repoBulkUpdate,
+  createProduct as repoCreateProduct,
+  deleteProduct as repoDeleteProduct,
+  restoreProduct as repoRestoreProduct,
+  updateProduct as repoUpdateProduct,
+  type ProductInput,
+} from "@/lib/repositories/products";
+import type { ProductStatus } from "@/types/database";
 
-async function requireAdmin() {
-  const session = await auth();
-  if (!session?.user || session.user.role !== "ADMIN") {
-    throw new Error("Unauthorized");
-  }
-}
-
-function toProductData(values: ReturnType<typeof productSchema.parse>) {
+function toProductInput(values: ReturnType<typeof productSchema.parse>): ProductInput {
   const sizes = values.sizes.split(",").map((s) => s.trim()).filter(Boolean);
   const colors = values.colors.split(",").map((s) => s.trim()).filter(Boolean);
   const discount = values.discountPercent ?? 0;
-  const finalPrice = Math.round((values.originalPrice * (100 - discount)) / 100 * 100) / 100;
+  const finalPrice = Math.round(((values.originalPrice * (100 - discount)) / 100) * 100) / 100;
+
   return {
     name: values.name,
-    slug: `${values.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}-${Date.now()}`,
     sku: values.sku,
     description: values.description,
     material: values.material || null,
@@ -29,110 +32,85 @@ function toProductData(values: ReturnType<typeof productSchema.parse>) {
     stock: values.stock,
     sizes,
     colors,
-    rating: values.rating ?? 0,
-    reviewCount: values.reviewCount ?? 0,
     originalPrice: values.originalPrice,
     discountPercent: discount,
     finalPrice,
-    status: values.status,
+    status: values.status as ProductStatus,
     featured: values.featured ?? false,
     bestSeller: values.bestSeller ?? false,
     newArrival: values.newArrival ?? false,
-    category: { connect: { id: values.categoryId } },
-    subCategory: values.subCategoryId ? { connect: { id: values.subCategoryId } } : undefined,
-    brand: values.brandId ? { connect: { id: values.brandId } } : undefined,
+    categoryId: values.categoryId,
+    subCategoryId: values.subCategoryId || null,
+    brandId: values.brandId || null,
+    images: values.images,
   };
 }
 
 export async function createProduct(input: unknown) {
-  await requireAdmin();
+  await requireStaff();
   const values = productSchema.parse(input);
-  const data = toProductData(values);
+  const id = await repoCreateProduct(toProductInput(values));
 
-  const product = await prisma.product.create({
-    data: {
-      ...data,
-      images: {
-        create: values.images.map((url, index) => ({ url, position: index })),
-      },
-    },
-  });
-
-  await logAudit({ action: "CREATE", resource: `Product:${product.id}`, newValue: product.name });
+  await logAudit({ action: "CREATE", resource: `Product:${id}`, newValue: values.name });
   revalidatePath("/admin/products");
   revalidatePath("/products");
-  return product.id;
+  return id;
 }
 
 export async function updateProduct(id: string, input: unknown) {
-  await requireAdmin();
+  await requireStaff();
   const values = productSchema.parse(input);
-  const data = toProductData(values);
+  await repoUpdateProduct(id, toProductInput(values));
 
-  await prisma.product.update({
-    where: { id },
-    data: {
-      ...data,
-      images: {
-        deleteMany: {},
-        create: values.images.map((url, index) => ({ url, position: index })),
-      },
-    },
-  });
-
+  await logAudit({ action: "UPDATE", resource: `Product:${id}`, newValue: values.name });
   revalidatePath("/admin/products");
   revalidatePath("/products");
-  revalidatePath(`/products/${data.slug}`);
 }
 
 export async function deleteProduct(id: string) {
-  await requireAdmin();
-  const old = await prisma.product.findUnique({ where: { id }, select: { name: true } });
-  await prisma.product.update({
-    where: { id },
-    data: { deletedAt: new Date() },
-  });
-  await logAudit({ action: "DELETE", resource: `Product:${id}`, oldValue: old?.name ?? null });
+  await requireStaff();
+  await repoDeleteProduct(id);
+  await logAudit({ action: "DELETE", resource: `Product:${id}` });
   revalidatePath("/admin/products");
   revalidatePath("/products");
 }
 
 export async function restoreProduct(id: string) {
-  await requireAdmin();
-  await prisma.product.update({
-    where: { id },
-    data: { deletedAt: null },
-  });
+  await requireStaff();
+  await repoRestoreProduct(id);
   revalidatePath("/admin/products");
 }
 
 export async function bulkDeleteProducts(ids: string[]) {
-  await requireAdmin();
-  await prisma.product.updateMany({
-    where: { id: { in: ids } },
-    data: { deletedAt: new Date() },
-  });
+  await requireStaff();
+  await repoBulkDelete(ids);
   await logAudit({ action: "BULK_DELETE", resource: "Product", newValue: ids.join(",") });
   revalidatePath("/admin/products");
   revalidatePath("/products");
 }
 
-export async function bulkUpdateProducts(ids: string[], patch: { status?: "ACTIVE" | "DRAFT" | "HIDDEN"; featured?: boolean; bestSeller?: boolean; newArrival?: boolean; stock?: number }) {
-  await requireAdmin();
-  await prisma.product.updateMany({
-    where: { id: { in: ids } },
-    data: patch,
-  });
+export async function bulkUpdateProducts(
+  ids: string[],
+  patch: { status?: ProductStatus; featured?: boolean; best_seller?: boolean; new_arrival?: boolean; stock?: number },
+) {
+  await requireStaff();
+  const { stock, ...rest } = patch;
+  if (Object.keys(rest).length) await repoBulkUpdate(ids, rest);
+  if (stock !== undefined) {
+    for (const id of ids) {
+      const { getProductById } = await import("@/lib/repositories/products");
+      const product = await getProductById(id);
+      if (product) await repoAdjustStock(id, stock - product.stock, "bulk_update");
+    }
+  }
   revalidatePath("/admin/products");
   revalidatePath("/products");
 }
 
 export async function adjustStock(id: string, delta: number) {
-  await requireAdmin();
-  await prisma.product.update({
-    where: { id },
-    data: { stock: { increment: delta } },
-  });
+  await requireStaff();
+  await repoAdjustStock(id, delta, "manual", `admin:${id}`);
   revalidatePath("/admin/products");
+  revalidatePath("/admin/inventory");
   revalidatePath("/products");
 }

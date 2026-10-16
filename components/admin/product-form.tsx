@@ -2,8 +2,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { productSchema, type ProductFormValues } from "@/lib/validators/product";
@@ -57,7 +58,7 @@ export function ProductForm({
     },
   });
 
-  const watchedCategory = form.watch("categoryId");
+  const watchedCategory = useWatch({ control: form.control, name: "categoryId" });
   const filteredSubs = subCategories.filter((s) => (s.categoryId ?? s.category?.id) === watchedCategory);
 
   useEffect(() => {
@@ -210,9 +211,8 @@ export function ProductForm({
         {uploading && <p className="text-xs text-gray-500">Uploading...</p>}
         <div className="mt-3 grid grid-cols-4 gap-3">
           {images.map((url, i) => (
-            <div key={url + i} className="relative">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={url} alt="" className="aspect-square w-full rounded object-cover" />
+            <div key={url + i} className="relative aspect-square">
+              <Image src={url} alt="" fill sizes="120px" className="rounded object-cover" />
               <button type="button" onClick={() => setImages((prev) => prev.filter((_, idx) => idx !== i))} className="absolute right-1 top-1 rounded bg-black/60 px-1.5 text-xs text-white">✕</button>
             </div>
           ))}

@@ -1,5 +1,7 @@
-import { products } from "@/lib/mock-data";
 import { ProductDetailClient } from "@/components/shop/product-detail-client";
+import { getProductBySlug, getRelatedProducts } from "@/lib/repositories/products";
+
+export const dynamic = "force-dynamic";
 
 export default async function ProductDetailPage({
   params,
@@ -7,9 +9,13 @@ export default async function ProductDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = products.find((p) => p.slug === slug);
+  const product = await getProductBySlug(slug);
+
   if (!product) {
     return <div className="mx-auto max-w-7xl px-4 py-16 text-center">Product not found.</div>;
   }
-  return <ProductDetailClient product={product} />;
+
+  const related = await getRelatedProducts(product, 8);
+
+  return <ProductDetailClient product={product} related={related} />;
 }

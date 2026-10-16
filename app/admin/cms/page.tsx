@@ -1,358 +1,49 @@
-"use client";
+import { CmsBuilder } from "@/components/admin/cms-builder";
+import type { CmsPageData, CmsSection, SectionType } from "@/components/admin/cms-builder";
+import { listCmsPages } from "@/lib/repositories/cms";
+import type { CmsStatus, Json } from "@/types/database";
 
-import { useEffect, useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowDown, ArrowUp, Copy, LayoutTemplate, Plus, Save, Sparkles, Trash2, Undo2, Eye, FileText } from "lucide-react";
+export const dynamic = "force-dynamic";
 
-type SectionType = "hero" | "feature-grid" | "newsletter" | "faq" | "product-grid" | "cta";
+const sectionTypes: readonly SectionType[] = ["hero", "feature-grid", "newsletter", "faq", "product-grid", "cta"];
 
-type CmsSection = {
-  id: string;
-  type: SectionType;
-  title: string;
-  subtitle: string;
-  align: "left" | "center";
-  theme: "light" | "dark" | "gradient";
-  visible: boolean;
+const statusLabels: Record<CmsStatus, CmsPageData["status"]> = {
+  DRAFT: "Draft",
+  PUBLISHED: "Published",
+  ARCHIVED: "Archived",
 };
 
-type CmsPage = {
-  id: string;
-  title: string;
-  slug: string;
-  status: "Draft" | "Published" | "Scheduled";
-  sections: CmsSection[];
-};
-
-const sectionPresets: Record<SectionType, Omit<CmsSection, "id">> = {
-  hero: { type: "hero", title: "Future Shopping Experience", subtitle: "Premium products, modern design, and AI-powered discovery.", align: "center", theme: "gradient", visible: true },
-  "feature-grid": { type: "feature-grid", title: "Why MeCart", subtitle: "Fast delivery, secure payments, easy returns, and 24/7 support.", align: "center", theme: "dark", visible: true },
-  newsletter: { type: "newsletter", title: "Stay in the Loop", subtitle: "Get launch updates and private offers.", align: "center", theme: "dark", visible: true },
-  faq: { type: "faq", title: "Frequently Asked Questions", subtitle: "Everything shoppers need to know.", align: "left", theme: "dark", visible: true },
-  "product-grid": { type: "product-grid", title: "Featured Products", subtitle: "Curated premium collections.", align: "center", theme: "dark", visible: true },
-  cta: { type: "cta", title: "Start Shopping", subtitle: "Discover the MeCart difference today.", align: "center", theme: "gradient", visible: true },
-};
-
-const templateSets: Record<string, CmsSection[]> = {
-  Fashion: [
-    { id: "f1", ...sectionPresets.hero, title: "Fashion Forward Collection", theme: "gradient" },
-    { id: "f2", ...sectionPresets["product-grid"], title: "New Arrivals", theme: "dark" },
-    { id: "f3", ...sectionPresets.cta, title: "Shop the Look", theme: "gradient" },
-  ],
-  Electronics: [
-    { id: "e1", ...sectionPresets.hero, title: "Technology That Inspires", theme: "gradient" },
-    { id: "e2", ...sectionPresets["feature-grid"], title: "Why Choose Our Tech", theme: "dark" },
-    { id: "e3", ...sectionPresets.newsletter, title: "Tech Updates", theme: "dark" },
-  ],
-  Luxury: [
-    { id: "l1", ...sectionPresets.hero, title: "Luxury Redefined", theme: "gradient" },
-    { id: "l2", ...sectionPresets.cta, title: "Explore Collections", theme: "gradient" },
-  ],
-};
-
-const initialPages: CmsPage[] = [
-  { id: "home", title: "Home", slug: "/", status: "Published", sections: templateSets.Fashion },
-  { id: "about", title: "About", slug: "/about", status: "Draft", sections: [ { id: "a1", ...sectionPresets.hero } ] },
-  { id: "contact", title: "Contact", slug: "/contact", status: "Draft", sections: [ { id: "c1", ...sectionPresets.cta } ] },
-];
-
-function SectionPreview({ section }: { section: CmsSection }) {
-  const theme = section.theme === "gradient" ? "bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 text-white" : section.theme === "light" ? "bg-white text-slate-900" : "bg-slate-900/60 text-white";
-  if (section.type === "hero") {
-    return <div className={`rounded-2xl p-8 ${theme}`}><h3 className={`text-2xl font-black ${section.align === "center" ? "text-center" : "text-left"}`}>{section.title}</h3><p className={`mt-2 ${section.align === "center" ? "text-center" : "text-left"} text-sm opacity-85`}>{section.subtitle}</p></div>;
-  }
-  if (section.type === "feature-grid") {
-    return <div className={`rounded-2xl p-8 ${theme}`}><h3 className={`text-xl font-bold ${section.align === "center" ? "text-center" : "text-left"}`}>{section.title}</h3><p className={`mt-2 text-sm opacity-85 ${section.align === "center" ? "text-center" : "text-left"}`}>{section.subtitle}</p></div>;
-  }
-  if (section.type === "newsletter") {
-    return <div className={`rounded-2xl p-8 ${theme}`}><h3 className={`text-xl font-bold ${section.align === "center" ? "text-center" : "text-left"}`}>{section.title}</h3><p className={`mt-2 text-sm opacity-85 ${section.align === "center" ? "text-center" : "text-left"}`}>{section.subtitle}</p></div>;
-  }
-  if (section.type === "faq") {
-    return <div className={`rounded-2xl p-8 ${theme}`}><h3 className="text-xl font-bold">{section.title}</h3><p className={`mt-2 text-sm opacity-85`}>{section.subtitle}</p></div>;
-  }
-  if (section.type === "product-grid") {
-    return <div className={`rounded-2xl p-8 ${theme}`}><h3 className={`text-xl font-bold ${section.align === "center" ? "text-center" : "text-left"}`}>{section.title}</h3><p className={`mt-2 text-sm opacity-85 ${section.align === "center" ? "text-center" : "text-left"}`}>{section.subtitle}</p></div>;
-  }
-  return <div className={`rounded-2xl p-8 ${theme}`}><h3 className="text-xl font-bold">{section.title}</h3><p className="mt-2 text-sm opacity-85">{section.subtitle}</p></div>;
-}
-
-export default function CmsBuilderPage() {
-  const [pages, setPages] = useState<CmsPage[]>(initialPages);
-  const [selectedPageId, setSelectedPageId] = useState(initialPages[0].id);
-  const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
-  const [preview, setPreview] = useState(false);
-  const [template, setTemplate] = useState("Fashion");
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      const raw = localStorage.getItem("mecart_cms_pages");
-      if (raw) {
-        try {
-          setPages(JSON.parse(raw));
-        } catch {
-          setPages(initialPages);
-        }
-      }
-    }, 0);
-    return () => window.clearTimeout(timer);
-  }, []);
-
-  const selectedPage = useMemo(() => pages.find((page) => page.id === selectedPageId) ?? pages[0], [pages, selectedPageId]);
-  const selectedSection = useMemo(() => selectedPage.sections.find((section) => section.id === selectedSectionId) ?? null, [selectedPage.sections, selectedSectionId]);
-
-  const savePages = (next: CmsPage[]) => {
-    setPages(next);
-    localStorage.setItem("mecart_cms_pages", JSON.stringify(next));
-  };
-
-  const addSection = (type: SectionType) => {
-    const next = pages.map((page) => page.id === selectedPage.id ? { ...page, sections: [...page.sections, { id: `${type}-${Date.now()}`, ...sectionPresets[type] }] } : page);
-    savePages(next);
-  };
-
-  const updateSection = (id: string, updates: Partial<CmsSection>) => {
-    const next = pages.map((page) => page.id === selectedPage.id ? { ...page, sections: page.sections.map((section) => section.id === id ? { ...section, ...updates } : section) } : page);
-    savePages(next);
-  };
-
-  const removeSection = (id: string) => {
-    const next = pages.map((page) => page.id === selectedPage.id ? { ...page, sections: page.sections.filter((section) => section.id !== id) } : page);
-    savePages(next);
-    setSelectedSectionId(null);
-  };
-
-  const duplicateSection = (section: CmsSection) => {
-    const next = pages.map((page) => page.id === selectedPage.id ? { ...page, sections: [...page.sections, { ...section, id: `${section.id}-copy-${Date.now()}` }] } : page);
-    savePages(next);
-  };
-
-  const moveSection = (index: number, delta: number) => {
-    const sections = [...selectedPage.sections];
-    const target = index + delta;
-    if (target < 0 || target >= sections.length) return;
-    [sections[index], sections[target]] = [sections[target], sections[index]];
-    const next = pages.map((page) => page.id === selectedPage.id ? { ...page, sections } : page);
-    savePages(next);
-  };
-
-  const publish = () => {
-    const next = pages.map((page) => page.id === selectedPage.id ? { ...page, status: "Published" as const } : page);
-    savePages(next);
-  };
-
-  const applyTemplate = (name: string) => {
-    const template = templateSets[name as keyof typeof templateSets];
-    if (!template) return;
-    const next = pages.map((page) => page.id === selectedPage.id ? { ...page, sections: template.map((section) => ({ ...section, id: `${section.id}-${Date.now()}` })) } : page);
-    savePages(next);
-    setTemplate(name);
-  };
-
-  const addPage = () => {
-    const id = `page-${Date.now()}`;
-    const next = [...pages, { id, title: `Untitled Page ${pages.length + 1}`, slug: `/page-${pages.length + 1}`, status: "Draft" as const, sections: [] }];
-    savePages(next);
-    setSelectedPageId(id);
-  };
-
+function isCmsSection(value: unknown): value is CmsSection {
+  if (!value || typeof value !== "object") return false;
+  const section = value as Record<string, unknown>;
   return (
-    <div className="relative min-h-screen space-y-6">
-      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute -left-20 top-0 h-80 w-80 rounded-full bg-blue-500/20 blur-3xl" />
-        <div className="absolute right-0 top-24 h-96 w-96 rounded-full bg-violet-500/20 blur-3xl" />
-      </div>
-
-      <motion.section
-        className="overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-950 p-8 shadow-2xl"
-        initial={{ opacity: 0, y: 18 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-blue-300">MeCart CMS Builder</p>
-            <h1 className="mt-3 text-4xl font-black text-white">Page Builder</h1>
-            <p className="mt-2 text-sm text-slate-300">Build pages visually with reusable sections while preserving routing and content.</p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <button className="rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-3 text-sm font-bold text-white shadow-xl shadow-blue-600/20" onClick={publish}>
-              Publish Page
-            </button>
-            <button className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold transition hover:bg-white/10" onClick={() => setPreview((value) => !value)}>
-              {preview ? "Edit Mode" : "Preview Mode"}
-            </button>
-            <button className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold transition hover:bg-white/10" onClick={() => { localStorage.removeItem("mecart_cms_pages"); setPages(initialPages); setSelectedPageId(initialPages[0].id); }}>
-              Reset
-            </button>
-          </div>
-        </div>
-      </motion.section>
-
-      <section className="grid gap-6 xl:grid-cols-[260px_1fr_320px]">
-        <Panel title="Pages">
-          <div className="space-y-2">
-            {pages.map((page) => (
-              <button
-                key={page.id}
-                onClick={() => { setSelectedPageId(page.id); setSelectedSectionId(null); }}
-                className={`w-full rounded-2xl border px-4 py-3 text-left transition ${selectedPage.id === page.id ? "border-blue-400/40 bg-blue-500/10" : "border-white/10 bg-white/[0.04] hover:bg-white/[0.07]"}`}
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <span className="font-semibold">{page.title}</span>
-                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${page.status === "Published" ? "bg-emerald-400/10 text-emerald-300" : "bg-amber-400/10 text-amber-300"}`}>{page.status}</span>
-                </div>
-                <p className="mt-1 text-xs text-slate-400">{page.slug}</p>
-              </button>
-            ))}
-            <button onClick={addPage} className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-white/20 bg-white/[0.03] px-4 py-3 text-sm font-semibold transition hover:bg-white/[0.07]">
-              <Plus className="h-4 w-4" /> Add Page
-            </button>
-          </div>
-
-          <div className="mt-6">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Template Library</p>
-            <div className="flex flex-wrap gap-2">
-              {Object.keys(templateSets).map((templateName) => (
-                <button
-                  key={templateName}
-                  onClick={() => applyTemplate(templateName)}
-                  className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${template === templateName ? "bg-blue-500 text-white" : "bg-white/5 text-slate-300 hover:bg-white/10"}`}
-                >
-                  <LayoutTemplate className="mr-1 inline h-3.5 w-3.5" />
-                  {templateName}
-                </button>
-              ))}
-            </div>
-          </div>
-        </Panel>
-
-        <Panel title={`Canvas — ${selectedPage.title}`}>
-          {preview ? (
-            <div className="space-y-4">
-              {selectedPage.sections.map((section) => (
-                <div key={section.id} className={section.visible ? "" : "opacity-40"}>
-                  <SectionPreview section={section} />
-                </div>
-              ))}
-              {selectedPage.sections.length === 0 && <EmptyState />}
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {selectedPage.sections.map((section, index) => (
-                <motion.div
-                  key={section.id}
-                  layout
-                  className={`rounded-2xl border p-4 transition ${selectedSectionId === section.id ? "border-blue-400/50 bg-blue-500/10" : "border-white/10 bg-white/[0.04]"}`}
-                >
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <button className="text-left" onClick={() => setSelectedSectionId(section.id)}>
-                      <p className="font-semibold text-white">{section.title}</p>
-                      <p className="text-xs text-slate-400">{section.type} · {section.visible ? "Visible" : "Hidden"}</p>
-                    </button>
-                    <div className="flex flex-wrap gap-2">
-                      <button onClick={() => moveSection(index, -1)} className="rounded-xl border border-white/10 bg-white/5 p-2 transition hover:bg-white/10"><ArrowUp className="h-4 w-4" /></button>
-                      <button onClick={() => moveSection(index, 1)} className="rounded-xl border border-white/10 bg-white/5 p-2 transition hover:bg-white/10"><ArrowDown className="h-4 w-4" /></button>
-                      <button onClick={() => duplicateSection(section)} className="rounded-xl border border-white/10 bg-white/5 p-2 transition hover:bg-white/10"><Copy className="h-4 w-4" /></button>
-                      <button onClick={() => removeSection(section.id)} className="rounded-xl border border-red-400/20 bg-red-500/10 p-2 text-red-200 transition hover:bg-red-500/20"><Trash2 className="h-4 w-4" /></button>
-                    </div>
-                  </div>
-                  <div className="mt-3">
-                    <SectionPreview section={section} />
-                  </div>
-                </motion.div>
-              ))}
-              {selectedPage.sections.length === 0 && <EmptyState />}
-            </div>
-          )}
-        </Panel>
-
-        <Panel title="Section Library & Editor">
-          <div className="mb-5">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Add Sections</p>
-            <div className="grid grid-cols-2 gap-2">
-              {(Object.keys(sectionPresets) as SectionType[]).map((type) => (
-                <button
-                  key={type}
-                  onClick={() => addSection(type)}
-                  className="rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-3 text-xs font-semibold transition hover:-translate-y-0.5 hover:bg-white/[0.08]"
-                >
-                  <Plus className="mr-1 inline h-3.5 w-3.5" />
-                  {type.replace("-", " ")}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {selectedSection ? (
-            <div className="space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Edit Section</p>
-              <label className="block">
-                <span className="mb-1 block text-xs text-slate-400">Title</span>
-                <input value={selectedSection.title} onChange={(event) => updateSection(selectedSection.id, { title: event.target.value })} className="h-10 w-full rounded-2xl border border-white/10 bg-slate-900/70 px-3 text-sm text-white outline-none focus:border-blue-400" />
-              </label>
-              <label className="block">
-                <span className="mb-1 block text-xs text-slate-400">Subtitle</span>
-                <textarea value={selectedSection.subtitle} onChange={(event) => updateSection(selectedSection.id, { subtitle: event.target.value })} rows={3} className="w-full rounded-2xl border border-white/10 bg-slate-900/70 px-3 py-2 text-sm text-white outline-none focus:border-blue-400" />
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                <label className="block">
-                  <span className="mb-1 block text-xs text-slate-400">Align</span>
-                  <select value={selectedSection.align} onChange={(event) => updateSection(selectedSection.id, { align: event.target.value as "left" | "center" })} className="h-10 w-full rounded-2xl border border-white/10 bg-slate-900/70 px-3 text-sm text-white">
-                    <option value="left">Left</option>
-                    <option value="center">Center</option>
-                  </select>
-                </label>
-                <label className="block">
-                  <span className="mb-1 block text-xs text-slate-400">Theme</span>
-                  <select value={selectedSection.theme} onChange={(event) => updateSection(selectedSection.id, { theme: event.target.value as "light" | "dark" | "gradient" })} className="h-10 w-full rounded-2xl border border-white/10 bg-slate-900/70 px-3 text-sm text-white">
-                    <option value="gradient">Gradient</option>
-                    <option value="dark">Dark</option>
-                    <option value="light">Light</option>
-                  </select>
-                </label>
-              </div>
-              <label className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm">
-                <span>Visible on page</span>
-                <button
-                  onClick={() => updateSection(selectedSection.id, { visible: !selectedSection.visible })}
-                  className={`rounded-full px-3 py-1 text-xs font-bold ${selectedSection.visible ? "bg-emerald-400/15 text-emerald-300" : "bg-white/10 text-slate-400"}`}
-                >
-                  {selectedSection.visible ? "Visible" : "Hidden"}
-                </button>
-              </label>
-              <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-xs text-slate-400">
-                <span>Type</span>
-                <span className="font-semibold text-white">{selectedSection.type}</span>
-              </div>
-            </div>
-          ) : (
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-sm text-slate-400">
-              Select a section on the canvas to edit it. Added sections are saved automatically in this browser.
-            </div>
-          )}
-        </Panel>
-      </section>
-    </div>
+    typeof section.id === "string" &&
+    typeof section.title === "string" &&
+    typeof section.subtitle === "string" &&
+    typeof section.visible === "boolean" &&
+    (section.align === "left" || section.align === "center") &&
+    (section.theme === "light" || section.theme === "dark" || section.theme === "gradient") &&
+    (typeof section.type === "string" && (sectionTypes as readonly string[]).includes(section.type))
   );
 }
 
-function Panel({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="rounded-3xl border border-white/10 bg-slate-900/60 p-5 shadow-2xl backdrop-blur-xl">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-bold text-white">{title}</h2>
-        <Save className="h-4 w-4 text-blue-300" />
-      </div>
-      {children}
-    </div>
-  );
+function sectionsFromContent(content: Json): CmsSection[] {
+  if (!content || typeof content !== "object" || Array.isArray(content)) return [];
+  const sections = (content as Record<string, unknown>).sections;
+  if (!Array.isArray(sections)) return [];
+  return sections.filter(isCmsSection);
 }
 
-function EmptyState() {
-  return (
-    <div className="rounded-3xl border border-dashed border-white/20 bg-white/[0.03] p-10 text-center">
-      <Sparkles className="mx-auto h-8 w-8 text-blue-300" />
-      <h3 className="mt-4 text-lg font-bold text-white">No sections yet</h3>
-      <p className="mt-2 text-sm text-slate-400">Add hero, product, FAQ, CTA, feature, and newsletter sections from the library.</p>
-    </div>
-  );
+export default async function AdminCmsPage() {
+  const rows = await listCmsPages();
+
+  const pages: CmsPageData[] = rows.map((row) => ({
+    id: row.id,
+    title: row.title,
+    slug: row.slug,
+    status: statusLabels[row.status],
+    sections: sectionsFromContent(row.content),
+  }));
+
+  return <CmsBuilder initialPages={pages} />;
 }

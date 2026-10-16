@@ -1,197 +1,218 @@
 "use server";
 
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { checkoutSchema } from "@/lib/validators/checkout";
+import { auth, requireStaff } from "@/lib/auth";
+import { toNumber, unwrapList } from "@/lib/repositories/utils";
 import { revalidatePath } from "next/cache";
 import { logAudit, logActivity } from "@/lib/security/audit";
-import { validateCoupon } from "@/lib/actions/coupons";
+import { checkout, type CheckoutInput } from "@/lib/services/checkout";
+import {
+  getOrderDetails,
+  listOrdersForUser,
+  updateOrderStatus as repoUpdateOrderStatus,
+  updatePaymentStatus as repoUpdatePaymentStatus,
+  type OrderWithDetails,
+} from "@/lib/repositories/orders";
+import { createClient } from "@/lib/supabase/server";
+import type { OrderStatus, PaymentStatus } from "@/types/database";
 
-export async function createOrder(input: unknown) {
-  const values = checkoutSchema.parse(input);
-
-  if (values.paymentMethod === "CARD") {
-    if (!/^\d{16}$/.test(values.cardNumber ?? "")) throw new Error("Invalid card number");
-    if (!values.cardHolder || values.cardHolder.length < 2) throw new Error("Invalid card holder");
-    if (!/^\d{3}$/.test(values.cvv ?? "")) throw new Error("Invalid CVV");
-    if (!/^\d{2}$/.test(values.expiryMonth ?? "") || !/^\d{2,4}$/.test(values.expiryYear ?? "")) throw new Error("Invalid expiry");
-  }
-  if (values.paymentMethod === "UPI") {
-    if (!/^[a-zA-Z0-9._-]+@[a-zA-Z]{3,}$/.test(values.upiId ?? "")) throw new Error("Invalid UPI ID");
-  }
-  if (values.paymentMethod === "NETBANKING") {
-    if (!values.bank) throw new Error("Select a bank");
-  }
-
+/**
+ * Checkout — prices and stock are validated inside the `place_order`
+ * database function; the client cart is only a list of product IDs.
+ */
+export async function createOrder(input: CheckoutInput) {
   const session = await auth();
-  const userId = session?.user?.id ?? null;
+  if (!session?.user?.id) throw new Error("Please sign in to place an order");
 
-  const dbProducts = await prisma.product.findMany({
-    where: { id: { in: values.items.map((i) => i.productId) }, deletedAt: null },
-  });
-  if (dbProducts.length !== values.items.length) {
-    throw new Error("Invalid product");
+  if (input.paymentMethod === "CARD") {
+    if (!/^\d{16}$/.test(input.cardNumber ?? "")) throw new Error("Invalid card number");
+    if (!input.cardHolder || input.cardHolder.length < 2) throw new Error("Invalid card holder");
+    if (!/^\d{3}$/.test(input.cvv ?? "")) throw new Error("Invalid CVV");
+    if (!/^\d{2}$/.test(input.expiryMonth ?? "") || !/^\d{2,4}$/.test(input.expiryYear ?? ""))
+      throw new Error("Invalid expiry");
+  }
+  if (input.paymentMethod === "UPI") {
+    if (!/^[a-zA-Z0-9._-]+@[a-zA-Z]{3,}$/.test(input.upiId ?? "")) throw new Error("Invalid UPI ID");
+  }
+  if (input.paymentMethod === "NETBANKING") {
+    if (!input.bank) throw new Error("Select a bank");
   }
 
-  for (const item of values.items) {
-    const db = dbProducts.find((p) => p.id === item.productId);
-    if (!db || db.status !== "ACTIVE") throw new Error("Product unavailable");
-    if (db.stock < item.quantity) throw new Error("Insufficient stock");
-    if (Math.abs(db.finalPrice - item.price) > 0.01) throw new Error("Price mismatch detected");
-  }
+  const result = await checkout(input);
 
-  const subtotal = values.items.reduce((sum, i) => {
-    const db = dbProducts.find((p) => p.id === i.productId)!;
-    return sum + db.finalPrice * i.quantity;
-  }, 0);
-  const tax = Math.round(subtotal * 0.08 * 100) / 100;
-  const shipping = subtotal > 0 ? 49 : 0;
-
-  let discount = 0;
-  let couponId: string | null = null;
-  if (values.couponCode) {
-    const c = await validateCoupon(values.couponCode, subtotal);
-    discount = c.discount;
-    couponId = c.couponId;
-  }
-
-  const grandTotal = Math.round((subtotal + tax + shipping - discount) * 100) / 100;
-
-  const success = process.env.DEMO_PAYMENT_ALWAYS_SUCCESS === "true" ? true : Math.random() > 0.3;
-  const paymentStatus = success ? "PAID" : "FAILED";
-  const orderStatus = values.paymentMethod === "COD" ? "PENDING" : (success ? "CONFIRMED" : "PENDING");
-
-  const transactionId = `TXN-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-  const paymentId = `PAY-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-  const orderNumber = `ORD-${Date.now()}`;
-  const invoiceNumber = `INV-${Date.now()}`;
-
-  const order = await prisma.$transaction(async (tx) => {
-    const created = await tx.order.create({
-      data: {
-        orderNumber,
-        invoiceNumber,
-        userId,
-        customerName: values.customerName,
-        customerEmail: values.customerEmail,
-        customerPhone: values.customerPhone,
-        shippingAddress: values.shippingAddress,
-        billingAddress: values.billingAddress || null,
-        city: values.city,
-        zip: values.zip,
-        subtotal,
-        shippingCost: shipping,
-        tax,
-        discount,
-        grandTotal,
-        status: orderStatus,
-        paymentStatus,
-        items: {
-          create: values.items.map((i) => ({
-            productId: i.productId,
-            name: i.name,
-            sku: `SKU-${i.productId}`,
-            quantity: i.quantity,
-            size: i.size || null,
-            color: i.color || null,
-            price: i.price,
-            total: i.price * i.quantity,
-          })),
-        },
-        payments: {
-          create: {
-            method: values.paymentMethod,
-            amount: grandTotal,
-            status: paymentStatus,
-            transactionId,
-            paymentId,
-          },
-        },
-      },
-      include: { payments: true, items: true },
-    });
-
-    if (success) {
-      for (const i of values.items) {
-        await tx.product.updateMany({
-          where: { id: i.productId, stock: { gte: i.quantity } },
-          data: { stock: { decrement: i.quantity } },
-        });
-      }
-    }
-
-    if (couponId) {
-      await tx.coupon.update({
-        where: { id: couponId },
-        data: { usedCount: { increment: 1 } },
-      });
-    }
-
-    return created;
+  await logActivity({
+    action: "ORDER_CREATED",
+    resource: result.order_id,
+    metadata: {
+      orderNumber: result.order_number,
+      paymentStatus: result.payment_status,
+      orderStatus: result.order_status,
+      grandTotal: result.grand_total,
+    },
   });
 
-  await logActivity({ action: "ORDER_CREATED", resource: order.id, metadata: { paymentStatus, orderStatus, total: grandTotal } });
   revalidatePath("/orders");
   revalidatePath("/admin/orders");
   revalidatePath("/admin/payments");
 
   return {
-    orderId: order.id,
-    orderNumber: order.orderNumber,
-    invoiceNumber: order.invoiceNumber,
-    paymentId,
-    transactionId,
-    paymentStatus,
-    orderStatus,
-    grandTotal,
-    estimatedDelivery: "3-5 business days",
+    orderId: result.order_id,
+    orderNumber: result.order_number,
+    invoiceNumber: result.invoice_number,
+    paymentId: result.payment_id,
+    transactionId: result.transaction_id,
+    paymentStatus: result.payment_status,
+    orderStatus: result.order_status,
+    grandTotal: toNumber(result.grand_total),
+    estimatedDelivery: result.estimatedDelivery,
   };
 }
 
-export async function updateOrderStatus(id: string, status: "PENDING"|"CONFIRMED"|"PROCESSING"|"PACKED"|"SHIPPED"|"DELIVERED"|"CANCELLED"|"RETURNED") {
-  await (await import("@/lib/auth")).auth().then((s) => {
-    if (!s?.user || s.user.role !== "ADMIN") throw new Error("Unauthorized");
-  });
-  await prisma.order.update({ where: { id }, data: { status } });
+export async function updateOrderStatus(id: string, status: OrderStatus) {
+  await requireStaff();
+  await repoUpdateOrderStatus(id, status);
   await logAudit({ action: "UPDATE_ORDER_STATUS", resource: `Order:${id}`, newValue: status });
   revalidatePath("/admin/orders");
   revalidatePath("/orders");
 }
-export async function updatePaymentStatus(id: string, status: "PENDING"|"PAID"|"FAILED"|"REFUNDED") {
-  const { auth } = await import("@/lib/auth");
-  const session = await auth();
-  if (!session?.user || session.user.role !== "ADMIN") throw new Error("Unauthorized");
-  await prisma.order.update({ where: { id }, data: { paymentStatus: status } });
-  // update payment records too
-  await prisma.payment.updateMany({ where: { orderId: id }, data: { status } });
+
+export async function updatePaymentStatus(id: string, status: PaymentStatus) {
+  await requireStaff();
+  await repoUpdatePaymentStatus(id, status);
   await logAudit({ action: "UPDATE_PAYMENT_STATUS", resource: `Order:${id}`, newValue: status });
   revalidatePath("/admin/payments");
   revalidatePath("/admin/orders");
 }
+
 export async function updateOrderStatusAction(formData: FormData) {
   const id = String(formData.get("id"));
-  const status = String(formData.get("status")) as Parameters<typeof updateOrderStatus>[1];
+  const status = String(formData.get("status")) as OrderStatus;
   await updateOrderStatus(id, status);
 }
 
 export async function updatePaymentStatusAction(formData: FormData) {
   const id = String(formData.get("id"));
-  const status = String(formData.get("status")) as Parameters<typeof updatePaymentStatus>[1];
+  const status = String(formData.get("status")) as PaymentStatus;
   await updatePaymentStatus(id, status);
 }
 
-export async function getOrderById(id: string) {
-  return prisma.order.findUnique({
-    where: { id },
-    include: { items: { include: { product: { include: { images: { take: 1 } } } } }, payments: true, user: true },
-  });
+export async function getOrderById(id: string): Promise<LegacyOrder | null> {
+  const details = await getOrderDetails(id);
+  return details ? toLegacyOrder(details) : null;
 }
 
-export async function listUserOrders(userId?: string | null) {
+export async function listUserOrders(userId?: string | null): Promise<LegacyOrder[]> {
   if (!userId) return [];
-  return prisma.order.findMany({
-    where: { userId, deletedAt: null },
-    orderBy: { createdAt: "desc" },
-    include: { items: true, payments: true },
-  });
+  const orders = await listOrdersForUser(userId);
+  return orders.map(toLegacyOrder);
+}
+
+export type LegacyOrder = {
+  id: string;
+  orderNumber: string;
+  invoiceNumber: string;
+  createdAt: string;
+  updatedAt: string;
+  status: OrderStatus;
+  paymentStatus: PaymentStatus;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  shippingAddress: string;
+  billingAddress: string | null;
+  city: string;
+  zip: string;
+  subtotal: number;
+  shippingCost: number;
+  tax: number;
+  discount: number;
+  grandTotal: number;
+  userId: string | null;
+  items: {
+    id: string;
+    productId: string | null;
+    name: string;
+    sku: string;
+    quantity: number;
+    size: string | null;
+    color: string | null;
+    price: number;
+    total: number;
+  }[];
+  payments: {
+    id: string;
+    method: string;
+    status: PaymentStatus;
+    transactionId: string | null;
+    paymentId: string | null;
+    amount: number;
+  }[];
+  user: { name: string | null; email: string | null } | null;
+};
+
+function toLegacyOrder(details: OrderWithDetails): LegacyOrder {
+  const { order } = details;
+  return {
+    id: order.id,
+    orderNumber: order.order_number,
+    invoiceNumber: order.invoice_number,
+    createdAt: order.created_at,
+    updatedAt: order.updated_at,
+    status: order.status,
+    paymentStatus: order.payment_status,
+    customerName: order.customer_name,
+    customerEmail: order.customer_email,
+    customerPhone: order.customer_phone,
+    shippingAddress: order.shipping_address,
+    billingAddress: order.billing_address,
+    city: order.city,
+    zip: order.zip,
+    subtotal: toNumber(order.subtotal),
+    shippingCost: toNumber(order.shipping_cost),
+    tax: toNumber(order.tax),
+    discount: toNumber(order.discount),
+    grandTotal: toNumber(order.grand_total),
+    userId: order.user_id,
+    items: details.items.map((item) => ({
+      id: item.id,
+      productId: item.product_id,
+      name: item.name,
+      sku: item.sku,
+      quantity: item.quantity,
+      size: item.size,
+      color: item.color,
+      price: toNumber(item.price),
+      total: toNumber(item.total),
+    })),
+    payments: details.payments.map((payment) => ({
+      id: payment.id,
+      method: payment.method,
+      status: payment.status,
+      transactionId: payment.transaction_id,
+      paymentId: payment.payment_id,
+      amount: toNumber(payment.amount),
+    })),
+    user: details.customerName
+      ? { name: details.customerName, email: details.customerEmail }
+      : null,
+  };
+}
+
+/** Distinct product IDs that the signed-in user has already ordered (for review gating). */
+export async function listUserPurchasedProductIds(): Promise<string[]> {
+  const session = await auth();
+  if (!session?.user?.id) return [];
+  const supabase = await createClient();
+  const orders = unwrapList(
+    await supabase.from("orders").select("id").eq("user_id", session.user.id).is("deleted_at", null),
+  );
+  if (!orders.length) return [];
+
+  const items = unwrapList(
+    await supabase
+      .from("order_items")
+      .select("product_id")
+      .in("order_id", orders.map((o) => o.id)),
+  );
+
+  return [...new Set(items.map((i) => i.product_id).filter((x): x is string => Boolean(x)))];
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { deleteProduct, bulkDeleteProducts, bulkUpdateProducts, adjustStock } from "@/lib/actions/products";
@@ -176,8 +177,7 @@ export function ProductsManager({
                 <td className="p-3"><input type="checkbox" checked={selected.includes(p.id)} onChange={() => toggleSelect(p.id)} /></td>
                 <td className="p-3">
                   {p.images[0]?.url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.images[0].url} alt={p.name} className="h-10 w-10 rounded object-cover" />
+                    <Image src={p.images[0].url} alt={p.name} width={40} height={40} className="h-10 w-10 rounded object-cover" />
                   ) : (
                     <div className="h-10 w-10 rounded bg-gray-100" />
                   )}

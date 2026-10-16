@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useCart } from "@/lib/cart-context";
 
 export default function CartPage() {
@@ -27,8 +28,9 @@ export default function CartPage() {
         <div className="lg:col-span-2 space-y-4">
           {cart.items.map((item) => (
             <div key={`${item.productId}-${item.size}-${item.color}`} className="flex gap-4 rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={item.image} alt={item.name} className="h-24 w-24 rounded-lg object-cover" />
+              <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg">
+                <Image src={item.image} alt={item.name} fill sizes="96px" className="object-cover" />
+              </div>
               <div className="flex-1">
                 <Link href={`/products/${item.slug}`} className="font-medium hover:text-indigo-600">{item.name}</Link>
                 <p className="text-xs text-gray-500">{item.size} / {item.color}</p>

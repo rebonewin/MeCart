@@ -6,7 +6,7 @@ import { AdminShell } from "@/components/admin/admin-shell";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!session?.user || (session.user.role !== "admin" && session.user.role !== "manager")) {
     redirect("/login");
   }
 

@@ -3,8 +3,8 @@
 import Link from "next/link";
 
 import { CommandPalette } from "@/components/admin/command-palette";
-import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/components/providers/auth-provider";
 import { useEffect, useState } from "react";
 import {
   BarChart3,
@@ -16,6 +16,7 @@ import {
   ClipboardList,
   CreditCard,
   Home,
+  Image as ImageIcon,
   LayoutDashboard,
   LayoutTemplate,
   LogOut,
@@ -28,7 +29,6 @@ import {
   Star,
   Store,
   Tags,
-  Truck,
   Users,
 } from "lucide-react";
 
@@ -39,6 +39,7 @@ const navGroups = [
       { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
       { href: "/admin/ai-insights", label: "AI Insights", icon: Brain },
       { href: "/admin/cms", label: "CMS Builder", icon: LayoutTemplate },
+      { href: "/admin/media", label: "Media Library", icon: ImageIcon },
       { href: "/admin/theme", label: "Theme Customizer", icon: Palette },
       { href: "/admin/notifications", label: "Notifications", icon: Bell },
       { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
@@ -78,11 +79,14 @@ const navGroups = [
 
 export function AdminShell({ children, username }: { children: React.ReactNode; username?: string | null }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { signOut } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
   const [dark, setDark] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem("mecart_theme");
+    const match = document.cookie.match(/(?:^|; )mecart-theme=([^;]*)/);
+    const stored = match ? decodeURIComponent(match[1]) : null;
     const enabled = stored ? stored === "dark" : true;
     const timer = window.setTimeout(() => {
       setDark(enabled);
@@ -95,7 +99,12 @@ export function AdminShell({ children, username }: { children: React.ReactNode; 
     const next = !dark;
     setDark(next);
     document.documentElement.classList.toggle("dark", next);
-    localStorage.setItem("mecart_theme", next ? "dark" : "light");
+    document.cookie = `mecart-theme=${next ? "dark" : "light"}; path=/; max-age=31536000; samesite=lax`;
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push("/login");
   };
 
   const active = (href: string) => pathname === href || (href !== "/admin" && pathname.startsWith(`${href}/`));
@@ -178,7 +187,7 @@ export function AdminShell({ children, username }: { children: React.ReactNode; 
                 {username || "Admin"}
               </div>
               <button
-                onClick={() => signOut({ callbackUrl: "/" })}
+                onClick={() => void handleSignOut()}
                 className="rounded-2xl border border-white/10 p-2 text-slate-300 transition hover:bg-white/10 hover:text-white"
                 aria-label="Logout"
               >

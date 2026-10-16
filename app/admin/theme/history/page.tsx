@@ -1,2 +1,9 @@
 import { ThemeEditor } from "@/components/theme/ThemeEditor";
-export default function ThemeHistoryPage() { return <ThemeEditor initialTab="history" />; }
+import { loadThemeEditorData } from "@/lib/repositories/theme";
+
+export const dynamic = "force-dynamic";
+
+export default async function ThemeHistoryPage() {
+  const { initial, initialVersions } = await loadThemeEditorData();
+  return <ThemeEditor initial={initial} initialVersions={initialVersions} initialTab="history" />;
+}

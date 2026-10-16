@@ -1,6 +1,5 @@
 import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { createClient } from "@/lib/supabase/server";
 
 function parseClient(userAgent: string | null) {
   const ua = userAgent ?? "";
@@ -29,24 +28,26 @@ export async function logAudit(input: {
   adminId?: string | null;
 }) {
   try {
-    const session = await auth();
+    const supabase = await createClient();
     const h = await headers();
     const { browser, os } = parseClient(h.get("user-agent"));
     const ipAddress = h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || null;
 
-    await prisma.auditLog.create({
-      data: {
-        adminId: input.adminId ?? session?.user?.id ?? null,
-        action: input.action,
-        resource: input.resource,
-        oldValue: input.oldValue ?? null,
-        newValue: input.newValue ?? null,
-        status: input.status ?? "SUCCESS",
-        ipAddress,
-        userAgent: h.get("user-agent"),
-        browser,
-        os,
-      },
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    await supabase.from("audit_logs").insert({
+      admin_id: input.adminId ?? user?.id ?? null,
+      action: input.action,
+      resource: input.resource,
+      old_value: input.oldValue ?? null,
+      new_value: input.newValue ?? null,
+      status: input.status ?? "SUCCESS",
+      ip_address: ipAddress,
+      user_agent: h.get("user-agent"),
+      browser,
+      os,
     });
   } catch {
     // Never throw from audit logging
@@ -60,19 +61,21 @@ export async function logActivity(input: {
   userId?: string | null;
 }) {
   try {
-    const session = await auth();
+    const supabase = await createClient();
     const h = await headers();
     const ipAddress = h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || null;
 
-    await prisma.activityLog.create({
-      data: {
-        userId: input.userId ?? session?.user?.id ?? null,
-        action: input.action,
-        resource: input.resource ?? null,
-        ipAddress,
-        userAgent: h.get("user-agent"),
-        metadata: input.metadata ? JSON.stringify(input.metadata) : null,
-      },
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    await supabase.from("activity_logs").insert({
+      user_id: input.userId ?? user?.id ?? null,
+      action: input.action,
+      resource: input.resource ?? null,
+      ip_address: ipAddress,
+      user_agent: h.get("user-agent"),
+      metadata: (input.metadata ?? null) as never,
     });
   } catch {
     // Never throw

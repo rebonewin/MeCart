@@ -1,14 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart-context";
 import { useWishlist } from "@/lib/wishlist-context";
 import { ProductCard } from "@/components/shop/product-card";
-import { products } from "@/lib/mock-data";
 import type { Product } from "@/types/product";
 
-export function ProductDetailClient({ product }: { product: Product }) {
+export function ProductDetailClient({
+  product,
+  related = [],
+}: {
+  product: Product;
+  related?: Product[];
+}) {
   const cart = useCart();
   const wishlist = useWishlist();
   const router = useRouter();
@@ -21,23 +27,25 @@ export function ProductDetailClient({ product }: { product: Product }) {
   const size = selectedSize || (product.sizes[0] ?? "");
   const color = selectedColor || (product.colors[0] ?? "");
 
-  const related = (products as Product[])
-    .filter((p) => p.subCategoryId === product.subCategoryId && p.id !== product.id)
-    .slice(0, 8);
-
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
         <div>
-          <div className="aspect-square overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-800">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={product.images[activeImage]} alt={product.name} className="h-full w-full object-cover" />
+          <div className="relative aspect-square overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-800">
+            <Image
+              src={product.images[activeImage]}
+              alt={product.name}
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover"
+              loading="eager"
+              fetchPriority="high"
+            />
           </div>
           <div className="mt-3 grid grid-cols-5 gap-2">
             {product.images.map((img, i) => (
               <button key={i} onClick={() => setActiveImage(i)} className={`overflow-hidden rounded-lg border ${i === activeImage ? "border-indigo-500" : "border-transparent"}`}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={img} alt="" className="aspect-square w-full object-cover" loading="lazy" />
+                <Image src={img} alt="" width={160} height={160} className="aspect-square w-full object-cover" />
               </button>
             ))}
           </div>

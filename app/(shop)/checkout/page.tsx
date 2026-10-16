@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useCart } from "@/lib/cart-context";
@@ -47,7 +47,7 @@ export default function CheckoutPage() {
     },
   });
 
-  const pm = form.watch("paymentMethod");
+  const pm = useWatch({ control: form.control, name: "paymentMethod" });
 
   const onSubmit = async (values: CheckoutInput) => {
     if (cart.items.length === 0) {

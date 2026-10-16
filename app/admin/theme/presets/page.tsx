@@ -1,2 +1,9 @@
 import { ThemeEditor } from "@/components/theme/ThemeEditor";
-export default function ThemePresetsPage() { return <ThemeEditor initialTab="presets" />; }
+import { loadThemeEditorData } from "@/lib/repositories/theme";
+
+export const dynamic = "force-dynamic";
+
+export default async function ThemePresetsPage() {
+  const { initial, initialVersions } = await loadThemeEditorData();
+  return <ThemeEditor initial={initial} initialVersions={initialVersions} initialTab="presets" />;
+}
