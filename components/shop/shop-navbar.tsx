@@ -62,13 +62,6 @@ export function ShopNavbar() {
   const { items: wishlistItems } = useWishlist();
   const [dark, setDark] = useState(false);
 
-  useEffect(() => {
-    const match = document.cookie.match(/(?:^|; )mecart-theme=([^;]*)/);
-    const stored = match ? decodeURIComponent(match[1]) : localStorage.getItem("mecart-theme");
-    const enabled = stored ? stored === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
-    setDark(enabled);
-    document.documentElement.classList.toggle("dark", enabled);
-  }, []);
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);

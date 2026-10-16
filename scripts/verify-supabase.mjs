@@ -429,12 +429,14 @@ async function main() {
   const autoconfirm = authSettings?.mailer_autoconfirm === true;
   console.log(`  note: mailer_autoconfirm=${authSettings ? autoconfirm : "unknown"}`);
 
+  // Unique test IP per run so repeated runs never trip the 15/hour IP throttle.
+  const otpTestIp = `203.0.113.${(ts % 250) + 1}`;
   const otpArgs = (email, purpose = "email_verification") => ({
     p_email: email,
     p_purpose: purpose,
     p_expires_in_seconds: 600,
     p_max_resend: 5,
-    p_client_ip: "10.0.0.1",
+    p_client_ip: otpTestIp,
   });
 
   // PostgREST may encode a missing composite row as null, [] or {} — normalize.
