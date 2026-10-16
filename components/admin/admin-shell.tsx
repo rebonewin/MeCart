@@ -89,8 +89,8 @@ export function AdminShell({ children, username }: { children: React.ReactNode; 
 
   useEffect(() => {
     const match = document.cookie.match(/(?:^|; )mecart-theme=([^;]*)/);
-    const stored = match ? decodeURIComponent(match[1]) : null;
-    const enabled = stored ? stored === "dark" : true;
+    const stored = match ? decodeURIComponent(match[1]) : localStorage.getItem("mecart-theme");
+    const enabled = stored ? stored === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
     const timer = window.setTimeout(() => {
       setDark(enabled);
       document.documentElement.classList.toggle("dark", enabled);
@@ -102,6 +102,7 @@ export function AdminShell({ children, username }: { children: React.ReactNode; 
     const next = !dark;
     setDark(next);
     document.documentElement.classList.toggle("dark", next);
+    localStorage.setItem("mecart-theme", next ? "dark" : "light");
     document.cookie = `mecart-theme=${next ? "dark" : "light"}; path=/; max-age=31536000; samesite=lax`;
   };
 
