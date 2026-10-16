@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient, hasAdminCredentials } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { logActivity } from "@/lib/security/audit";
+import { logActivity, logSecurityEvent } from "@/lib/security/audit";
 
 const registerSchema = z.object({
   name: z.string().min(2),
@@ -20,7 +20,7 @@ const loginSchema = z.object({
 
 export type LoginResult =
   | { ok: true; redirectTo: string; role: string }
-  | { ok: false; error: string };
+  | { ok: false; error: string; needsVerification?: boolean; email?: string | null };
 
 /** Resolve a username (or email) to the account email. Server-side only. */
 async function resolveLoginEmail(identifier: string): Promise<string | null> {
@@ -93,9 +93,45 @@ export async function login(input: {
   if (error || !data.user) {
     await logActivity({ action: "LOGIN_FAILED", resource: `user:${identifier}` });
     if (error?.message.toLowerCase().includes("email not confirmed")) {
-      return { ok: false, error: "Please verify your email address first — check your inbox." };
+      return { ok: false, error: "Please verify your email before signing in.", needsVerification: true, email };
     }
     return { ok: false, error: "Invalid username or password" };
+  }
+
+  const isVerified = Boolean(data.user.email_confirmed_at);
+  const { data: loginProfile } = await supabase
+    .from("profiles")
+    .select("account_status, email_verified_at")
+    .eq("id", data.user.id)
+    .maybeSingle();
+  const accountStatus = (loginProfile as { account_status?: string | null } | null)?.account_status ?? null;
+  if (accountStatus === "suspended") {
+    await supabase.auth.signOut();
+    await logSecurityEvent({
+      action: "LOGIN_BLOCKED_SUSPENDED",
+      email,
+      userId: data.user.id,
+      status: "FAILED",
+      metadata: { reason: "account_suspended" },
+    });
+    return { ok: false, error: "This account has been suspended. Please contact support." };
+  }
+
+  if (!isVerified || accountStatus === "pending_verification" || accountStatus === "email_verified") {
+    await supabase.auth.signOut();
+    await logSecurityEvent({
+      action: "LOGIN_BLOCKED_UNVERIFIED",
+      email,
+      userId: data.user.id,
+      status: "FAILED",
+      metadata: { reason: "email_not_verified" },
+    });
+    return {
+      ok: false,
+      error: "Please verify your email before signing in.",
+      needsVerification: true,
+      email: data.user.email ?? email,
+    };
   }
 
   if (guestId && guestId !== data.user.id) {

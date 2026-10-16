@@ -422,6 +422,242 @@ async function main() {
     expect(!couponCheckError && !!couponCheck, "rpc accepts valid coupon", JSON.stringify(couponCheck).slice(0, 100));
   }
 
+  // --- email OTP --------------------------------------------------------------
+  console.log("\nEmail OTP");
+  const settingsResponse = await fetch(`${URL}/auth/v1/settings`, { headers: { apikey: ANON } });
+  const authSettings = settingsResponse.ok ? await settingsResponse.json() : null;
+  const autoconfirm = authSettings?.mailer_autoconfirm === true;
+  console.log(`  note: mailer_autoconfirm=${authSettings ? autoconfirm : "unknown"}`);
+
+  const otpArgs = (email, purpose = "email_verification") => ({
+    p_email: email,
+    p_purpose: purpose,
+    p_expires_in_seconds: 600,
+    p_max_resend: 5,
+    p_client_ip: "10.0.0.1",
+  });
+
+  // PostgREST may encode a missing composite row as null, [] or {} — normalize.
+  const pendingRow = (data) => {
+    if (!data) return null;
+    if (Array.isArray(data)) return data[0] ?? null;
+    if (typeof data === "object" && !Object.keys(data).length) return null;
+    return data?.id ? data : null;
+  };
+
+  // ledger writes stay server-side (service role only)
+  const { error: anonOtpError } = await anon.rpc("create_email_otp_request", otpArgs(`zzotp-anon+${ts}@example.com`));
+  expect(!!anonOtpError, "otp ledger blocked for anon", anonOtpError ? "denied" : "NOT blocked!");
+
+  const otpEmail = `zzotp+${ts}@example.com`;
+
+  // issue → 60s resend cooldown → pending visibility
+  const { data: otpCreate, error: otpCreateError } = await service.rpc("create_email_otp_request", otpArgs(otpEmail));
+  expect(!otpCreateError && !!otpCreate?.request_id, "otp request created", otpCreateError?.message ?? `resend_count=${otpCreate?.resend_count}`);
+  const otpRequestId = otpCreate?.request_id ?? null;
+
+  const { error: otpCooldownError } = await service.rpc("create_email_otp_request", otpArgs(otpEmail));
+  expect(!!otpCooldownError, "otp resend cooldown (60s)", otpCooldownError?.message ?? "NOT enforced!");
+
+  const { data: pendingOtp } = await service.rpc("pending_otp_request", { p_email: otpEmail, p_purpose: "email_verification" });
+  expect(pendingRow(pendingOtp)?.id === otpRequestId, "pending otp request visible");
+
+  // five wrong codes lock the request and force a freshly issued one
+  let otpLock = null;
+  let otpLockError = null;
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const { data, error } = await service.rpc("verify_email_otp_request", {
+      p_email: otpEmail,
+      p_purpose: "email_verification",
+      p_success: false,
+      p_error: "Invalid token",
+      p_max_attempts: 5,
+    });
+    otpLock = data;
+    otpLockError = error;
+  }
+  expect(!otpLockError && otpLock?.attempts === 5 && otpLock?.locked === true, "otp locks after 5 failed attempts", otpLockError?.message ?? `attempts=${otpLock?.attempts} locked=${otpLock?.locked}`);
+
+  const { data: lockedPending } = await service.rpc("pending_otp_request", { p_email: otpEmail, p_purpose: "email_verification" });
+  expect(!pendingRow(lockedPending), "locked request not pending");
+
+  const { error: lockedVerifyError } = await service.rpc("verify_email_otp_request", {
+    p_email: otpEmail,
+    p_purpose: "email_verification",
+    p_success: true,
+    p_max_attempts: 5,
+  });
+  expect(!!lockedVerifyError, "locked request rejects attempts", lockedVerifyError?.message ?? "NOT rejected!");
+
+  // fresh code after the lock → success consumes it → replay is impossible
+  const { data: otpReissue, error: otpReissueError } = await service.rpc("create_email_otp_request", otpArgs(otpEmail));
+  expect(!otpReissueError && !!otpReissue?.request_id, "otp reissued after lockout", otpReissueError?.message ?? `resend_count=${otpReissue?.resend_count}`);
+
+  if (otpReissue?.request_id) {
+    const { data: otpVerified, error: otpVerifiedError } = await service.rpc("verify_email_otp_request", {
+      p_email: otpEmail,
+      p_purpose: "email_verification",
+      p_success: true,
+      p_max_attempts: 5,
+    });
+    expect(!otpVerifiedError && otpVerified?.verified === true, "otp success consumes request", otpVerifiedError?.message ?? `attempts=${otpVerified?.attempts}`);
+
+    const { data: consumedPending } = await service.rpc("pending_otp_request", { p_email: otpEmail, p_purpose: "email_verification" });
+    expect(!pendingRow(consumedPending), "verified request not pending");
+
+    const { error: otpReplayError } = await service.rpc("verify_email_otp_request", {
+      p_email: otpEmail,
+      p_purpose: "email_verification",
+      p_success: true,
+      p_max_attempts: 5,
+    });
+    expect(!!otpReplayError, "verified otp cannot be replayed", otpReplayError?.message ?? "NOT blocked!");
+  }
+
+  // rolling mailbox throttle (max 3 issue events per 30 minutes)
+  const { data: otpThird, error: otpThirdError } = await service.rpc("create_email_otp_request", otpArgs(otpEmail));
+  expect(!otpThirdError && !!otpThird?.request_id, "third otp request accepted", otpThirdError?.message ?? `resend_count=${otpThird?.resend_count}`);
+  const { error: otpThrottleError } = await service.rpc("create_email_otp_request", otpArgs(otpEmail));
+  expect(!!otpThrottleError, "otp mailbox throttle (3/30min)", otpThrottleError?.message ?? "NOT enforced!");
+
+  // expiry window on a second mailbox
+  const otpEmailB = `zzotp-expiry+${ts}@example.com`;
+  const { data: otpB1 } = await service.rpc("create_email_otp_request", otpArgs(otpEmailB));
+  if (otpB1?.request_id) {
+    await service
+      .from("email_otp_requests")
+      .update({ expires_at: new Date(Date.now() - 60_000).toISOString() })
+      .eq("id", otpB1.request_id);
+    const { data: expiredPending } = await service.rpc("pending_otp_request", { p_email: otpEmailB, p_purpose: "email_verification" });
+    expect(!pendingRow(expiredPending), "expired otp not pending");
+
+    const { error: expiredVerifyError } = await service.rpc("verify_email_otp_request", {
+      p_email: otpEmailB,
+      p_purpose: "email_verification",
+      p_success: true,
+      p_max_attempts: 5,
+    });
+    expect(!!expiredVerifyError, "expired otp cannot be verified", expiredVerifyError?.message ?? "NOT accepted!");
+  } else {
+    bad("otp expiry setup", "second-mailbox request not created");
+  }
+
+  const { data: otpB2 } = await service.rpc("create_email_otp_request", otpArgs(otpEmailB));
+  if (otpB2?.request_id) {
+    const { error: consumedError } = await service.rpc("consumed_email_otp_request", { p_email: otpEmailB, p_purpose: "email_verification" });
+    expect(!consumedError, "consumed rpc runs", consumedError?.message ?? "marked");
+    const { data: consumedPendingB } = await service.rpc("pending_otp_request", { p_email: otpEmailB, p_purpose: "email_verification" });
+    expect(!pendingRow(consumedPendingB), "consumed request not pending");
+  } else {
+    bad("otp consumed setup", "second-mailbox request not created");
+  }
+
+  // OTP-first lifecycle: pending_verification → email_verified → password set
+  const otpFirstEmail = `zzotp-first+${ts}@example.com`;
+  const { data: otpFirstUser, error: otpFirstError } = await service.auth.admin.createUser({
+    email: otpFirstEmail,
+    email_confirm: false,
+    user_metadata: { full_name: "ZZ OTP First" },
+  });
+  expect(!otpFirstError && !!otpFirstUser?.user?.id, "otp-first user created", otpFirstError?.message);
+  if (otpFirstUser?.user?.id) {
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    const { data: pendingProfile } = await service
+      .from("profiles")
+      .select("account_status, email_verified_at")
+      .eq("id", otpFirstUser.user.id)
+      .maybeSingle();
+    expect(pendingProfile?.account_status === "pending_verification" && !pendingProfile?.email_verified_at, "otp-first profile pending", `status=${pendingProfile?.account_status}`);
+
+    await service.rpc("create_email_otp_request", otpArgs(otpFirstEmail, "registration"));
+    const { data: lifecycleVerify, error: lifecycleVerifyError } = await service.rpc("verify_email_otp_request", {
+      p_email: otpFirstEmail,
+      p_purpose: "registration",
+      p_success: true,
+      p_max_attempts: 5,
+    });
+    expect(!lifecycleVerifyError && lifecycleVerify?.verified === true, "otp-first ledger verify", lifecycleVerifyError?.message ?? `attempts=${lifecycleVerify?.attempts}`);
+
+    const { data: verifiedProfile } = await service
+      .from("profiles")
+      .select("account_status, email_verified_at")
+      .eq("id", otpFirstUser.user.id)
+      .maybeSingle();
+    expect(verifiedProfile?.account_status === "email_verified" && !!verifiedProfile?.email_verified_at, "profile promoted to email_verified", `status=${verifiedProfile?.account_status}`);
+
+    console.log("  note: account_status drives password routing — hosted GoTrue stores a bcrypt placeholder for passwordless users");
+
+    const { error: setPasswordError } = await service.auth.admin.updateUserById(otpFirstUser.user.id, { password: `ZzOtp-${ts}-pw!` });
+    expect(!setPasswordError, "password set after verification", setPasswordError?.message ?? "updated");
+
+    await service.auth.admin.deleteUser(otpFirstUser.user.id);
+  }
+
+  // password account without a confirmed e-mail stays gated for the app layer
+  const unverifiedEmail = `zzotp-unverified+${ts}@example.com`;
+  const { data: unverifiedUser, error: unverifiedCreateError } = await service.auth.admin.createUser({
+    email: unverifiedEmail,
+    password: `ZzUnverified-${ts}-pw!`,
+    email_confirm: false,
+  });
+  expect(!unverifiedCreateError && !!unverifiedUser?.user?.id, "unverified user created", unverifiedCreateError?.message);
+  if (unverifiedUser?.user?.id) {
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    const { data: unverifiedProfile } = await service
+      .from("profiles")
+      .select("account_status, email_verified_at")
+      .eq("id", unverifiedUser.user.id)
+      .maybeSingle();
+    expect(unverifiedProfile?.account_status === "pending_verification" && !unverifiedProfile?.email_verified_at, "unverified profile flagged pending", `status=${unverifiedProfile?.account_status}`);
+
+    const unverifiedClient = createClient(URL, ANON, { auth: { persistSession: false } });
+    const { error: unverifiedSignInError } = await unverifiedClient.auth.signInWithPassword({
+      email: unverifiedEmail,
+      password: `ZzUnverified-${ts}-pw!`,
+    });
+    if (autoconfirm) {
+      console.log("  note: confirmations disabled on the project — the app-level login gate is the enforcement point");
+    } else {
+      expect(!!unverifiedSignInError, "unverified login blocked by supabase", unverifiedSignInError?.message ?? "NOT blocked!");
+    }
+    await service.auth.admin.deleteUser(unverifiedUser.user.id);
+  }
+
+  // duplicate registration pre-check (drives the friendly register error)
+  const { data: takenCheck } = await anon.rpc("check_signup_available", { p_username: `zzcheck${ts}`, p_email: tempEmail });
+  expect(takenCheck?.email_taken === true, "duplicate email detected", JSON.stringify(takenCheck));
+  const { data: freeCheck } = await anon.rpc("check_signup_available", { p_username: `zzcheck${ts}`, p_email: `zzotp-free+${ts}@example.com` });
+  expect(freeCheck?.email_taken === false && freeCheck?.username_taken === false, "fresh email available", JSON.stringify(freeCheck));
+
+  // real Supabase OTP handling (GoTrue magic-link + recovery codes)
+  if (tempUserId) {
+    const { data: magicLink, error: magicLinkError } = await service.auth.admin.generateLink({ type: "magiclink", email: tempEmail });
+    const emailOtp = magicLink?.properties?.email_otp;
+    expect(!magicLinkError && !!emailOtp, "supabase magiclink otp generated", magicLinkError?.message ?? "6-digit code issued");
+
+    if (emailOtp) {
+      const otpClient = createClient(URL, ANON, { auth: { persistSession: false } });
+      const { error: wrongOtpError } = await otpClient.auth.verifyOtp({ email: tempEmail, token: "000000", type: "email" });
+      expect(!!wrongOtpError, "supabase rejects wrong otp", wrongOtpError?.message ?? "NOT rejected!");
+
+      const { data: verifiedSession, error: verifyError } = await otpClient.auth.verifyOtp({ email: tempEmail, token: emailOtp, type: "email" });
+      expect(!verifyError && !!verifiedSession?.session, "supabase verifies real otp", verifyError?.message ?? `user=${verifiedSession?.user?.email}`);
+
+      const replayClient = createClient(URL, ANON, { auth: { persistSession: false } });
+      const { error: supabaseReplayError } = await replayClient.auth.verifyOtp({ email: tempEmail, token: emailOtp, type: "email" });
+      expect(!!supabaseReplayError, "supabase otp single-use", supabaseReplayError?.message ?? "NOT blocked!");
+    }
+
+    const { data: recoveryOtpLink, error: recoveryOtpLinkError } = await service.auth.admin.generateLink({ type: "recovery", email: tempEmail });
+    const recoveryOtp = recoveryOtpLink?.properties?.email_otp;
+    expect(!recoveryOtpLinkError && !!recoveryOtp, "supabase recovery otp generated", recoveryOtpLinkError?.message ?? "6-digit code issued");
+    if (recoveryOtp) {
+      const resetClient = createClient(URL, ANON, { auth: { persistSession: false } });
+      const { data: resetSession, error: resetError } = await resetClient.auth.verifyOtp({ email: tempEmail, token: recoveryOtp, type: "recovery" });
+      expect(!resetError && !!resetSession?.session, "supabase recovery otp verifies", resetError?.message ?? "session established");
+    }
+  }
+
   // --- storage --------------------------------------------------------------
   console.log("\nStorage");
   const { data: buckets, error: bucketsError } = await service.storage.listBuckets();
@@ -514,6 +750,8 @@ async function cleanup() {
     const { error } = await service.from(table).delete().like("key", "zz_test_%");
     if (error) console.log(`  note: sweep ${table} — ${error.message}`);
   }
+  const { error: otpSweepError } = await service.from("email_otp_requests").delete().like("email", "zzotp%");
+  if (otpSweepError) console.log(`  note: sweep email_otp_requests — ${otpSweepError.message}`);
   console.log(`  removed ${created.length} test rows`);
 }
 

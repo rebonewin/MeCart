@@ -1,5 +1,7 @@
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import type { Json } from "@/types/database";
 
 function parseClient(userAgent: string | null) {
   const ua = userAgent ?? "";
@@ -79,5 +81,105 @@ export async function logActivity(input: {
     });
   } catch {
     // Never throw
+  }
+}
+
+// --- security / auth event trail ---------------------------------------------
+
+export type SecurityEventAction =
+  | "OTP_SENT"
+  | "OTP_RESENT"
+  | "OTP_SENT_FAILED"
+  | "OTP_BLOCKED"
+  | "OTP_VERIFIED"
+  | "OTP_FAILED"
+  | "OTP_EXPIRED"
+  | "PASSWORD_CREATED"
+  | "ACCOUNT_CREATED"
+  | "PASSWORD_RESET"
+  | "ACCOUNT_DEACTIVATED"
+  | "ACCOUNT_REACTIVATED"
+  | "ADMIN_RESEND_VERIFICATION";
+
+export type SecurityEventInput = {
+  action: SecurityEventAction | (string & {});
+  email?: string | null;
+  userId?: string | null;
+  adminId?: string | null;
+  status?: "SUCCESS" | "FAILED";
+  metadata?: Record<string, unknown> | null;
+};
+
+/**
+ * Writes an auth/OTP event to both `activity_logs` and `audit_logs`.
+ *
+ * Uses the service-role client when available so events are recorded even
+ * before a session exists (OTP issued to a brand-new account). Falls back to
+ * the caller's session client so no event is ever silently dropped when the
+ * service key is absent. Never throws — auditing must not break auth flows.
+ */
+export async function logSecurityEvent(input: SecurityEventInput) {
+  try {
+    const h = await headers();
+    const userAgent = h.get("user-agent");
+    const ipAddress = h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || null;
+    const { browser, os } = parseClient(userAgent);
+
+    const resource = input.email
+      ? `auth:${input.email}`
+      : input.userId
+        ? `user:${input.userId}`
+        : "auth";
+
+    const status = input.status ?? "SUCCESS";
+    const metadata = (input.metadata ?? null) as Json;
+
+    let written = false;
+
+    try {
+      const admin = createAdminClient();
+
+      const [{ error: activityError }, { error: auditError }] = await Promise.all([
+        admin.from("activity_logs").insert({
+          user_id: input.userId ?? null,
+          action: input.action,
+          resource,
+          ip_address: ipAddress,
+          user_agent: userAgent,
+          metadata,
+        }),
+        admin.from("audit_logs").insert({
+          admin_id: input.adminId ?? input.userId ?? null,
+          action: input.action,
+          resource,
+          status,
+          ip_address: ipAddress,
+          user_agent: userAgent,
+          os,
+          browser,
+        }),
+      ]);
+
+      written = !activityError || !auditError;
+    } catch {
+      // Service client unavailable — fall back to the session client below.
+    }
+
+    if (!written) {
+      const supabase = await createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      await supabase.from("activity_logs").insert({
+        user_id: input.userId ?? user?.id ?? null,
+        action: input.action,
+        resource,
+        ip_address: ipAddress,
+        user_agent: userAgent,
+        metadata,
+      });
+    }
+  } catch {
+    // Never throw from audit logging.
   }
 }

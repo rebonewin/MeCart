@@ -20,7 +20,8 @@ import {
   LayoutDashboard,
   LayoutTemplate,
   LogOut,
-  Package,
+  MailCheck,
+  Smartphone,  Package,
   Palette,
   Receipt,
   Settings,
@@ -69,6 +70,8 @@ const navGroups = [
     title: "System",
     items: [
       { href: "/admin/users", label: "Users", icon: Users },
+      { href: "/admin/users/email-verification", label: "Email Verification", icon: MailCheck },
+      { href: "/admin/users/phone-verification", label: "Phone Verification", icon: Smartphone },
       { href: "/admin/security", label: "Security", icon: Shield },
       { href: "/admin/audit-logs", label: "Audit Logs", icon: ClipboardList },
       { href: "/admin/settings", label: "Settings", icon: Settings },

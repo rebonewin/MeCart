@@ -651,6 +651,54 @@ export type Database = {
           },
         ]
       }
+      email_otp_requests: {
+        Row: {
+          client_ip: string | null
+          consumed_at: string | null
+          email: string
+          expires_at: string
+          id: string
+          is_verified: boolean
+          last_error: string | null
+          purpose: string
+          requested_at: string
+          resend_count: number
+          user_id: string | null
+          verification_attempts: number
+          verified_at: string | null
+        }
+        Insert: {
+          client_ip?: string | null
+          consumed_at?: string | null
+          email: string
+          expires_at: string
+          id?: string
+          is_verified?: boolean
+          last_error?: string | null
+          purpose: string
+          requested_at?: string
+          resend_count?: number
+          user_id?: string | null
+          verification_attempts?: number
+          verified_at?: string | null
+        }
+        Update: {
+          client_ip?: string | null
+          consumed_at?: string | null
+          email?: string
+          expires_at?: string
+          id?: string
+          is_verified?: boolean
+          last_error?: string | null
+          purpose?: string
+          requested_at?: string
+          resend_count?: number
+          user_id?: string | null
+          verification_attempts?: number
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       inventory: {
         Row: {
           created_at: string
@@ -1301,46 +1349,61 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_status: string
           avatar_url: string | null
           created_at: string
           deleted_at: string | null
           email: string | null
+          email_verified_at: string | null
+          failed_otp_attempts: number
           full_name: string | null
           id: string
           is_active: boolean
           last_login_at: string | null
+          last_otp_sent_at: string | null
           phone: string | null
           role: Database["public"]["Enums"]["app_role"]
           updated_at: string
           username: string | null
+          verification_attempts: number
         }
         Insert: {
+          account_status?: string
           avatar_url?: string | null
           created_at?: string
           deleted_at?: string | null
           email?: string | null
+          email_verified_at?: string | null
+          failed_otp_attempts?: number
           full_name?: string | null
           id: string
           is_active?: boolean
           last_login_at?: string | null
+          last_otp_sent_at?: string | null
           phone?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
           username?: string | null
+          verification_attempts?: number
         }
         Update: {
+          account_status?: string
           avatar_url?: string | null
           created_at?: string
           deleted_at?: string | null
           email?: string | null
+          email_verified_at?: string | null
+          failed_otp_attempts?: number
           full_name?: string | null
           id?: string
           is_active?: boolean
           last_login_at?: string | null
+          last_otp_sent_at?: string | null
           phone?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
           username?: string | null
+          verification_attempts?: number
         }
         Relationships: []
       }
@@ -1839,6 +1902,20 @@ export type Database = {
         Args: { p_email: string; p_username: string }
         Returns: Json
       }
+      consumed_email_otp_request: {
+        Args: { p_email: string; p_purpose: string }
+        Returns: undefined
+      }
+      create_email_otp_request: {
+        Args: {
+          p_client_ip?: string
+          p_email: string
+          p_expires_in_seconds?: number
+          p_max_resend?: number
+          p_purpose: string
+        }
+        Returns: Json
+      }
       current_app_role: {
         Args: never
         Returns: Database["public"]["Enums"]["app_role"]
@@ -1847,11 +1924,46 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
       merge_guest_cart: { Args: { p_from_user: string }; Returns: undefined }
+      pending_otp_request: {
+        Args: { p_email: string; p_purpose: string }
+        Returns: {
+          client_ip: string | null
+          consumed_at: string | null
+          email: string
+          expires_at: string
+          id: string
+          is_verified: boolean
+          last_error: string | null
+          purpose: string
+          requested_at: string
+          resend_count: number
+          user_id: string | null
+          verification_attempts: number
+          verified_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "email_otp_requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       place_order: { Args: { payload: Json }; Returns: Json }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
+      user_has_password: { Args: { p_user_id: string }; Returns: boolean }
       validate_coupon_code: {
         Args: { p_code: string; p_subtotal: number }
+        Returns: Json
+      }
+      verify_email_otp_request: {
+        Args: {
+          p_email: string
+          p_error?: string
+          p_max_attempts?: number
+          p_purpose: string
+          p_success: boolean
+        }
         Returns: Json
       }
     }

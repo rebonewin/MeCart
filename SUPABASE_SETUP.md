@@ -24,6 +24,9 @@ Run SQL files in `supabase/migrations/` in filename order:
 7. `20261016000100_harden_storage_upload_policies.sql`
 8. `20261016000200_fix_merge_guest_cart_anonymous.sql`
 9. `20261016000300_signup_availability_rpc.sql`
+10. `20261017000200_email_otp_verification.sql`
+11. `20261017000300_email_otp_hardening.sql`
+12. `20261017000400_email_otp_security.sql`
 
 The first migration installs `pgcrypto` and `pg_trgm`.
 
@@ -33,7 +36,44 @@ The first migration installs `pgcrypto` and `pg_trgm`.
 - Enable anonymous sign-ins (required for guest carts).
 - Enable password recovery and set redirect handling to `/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password` when using custom SMTP.
 - Default templates use the confirmation URL flow handled by `/reset-password`.
-- Optional: customize SMTP provider.
+
+### 3.1 Email OTP verification (registration / login / password reset)
+
+The registration, login-verification and password-reset funnels use real
+Supabase email OTPs (`signInWithOtp` + `verifyOtp`). Apply these settings to
+the hosted project — local-equivalent defaults live in `supabase/config.toml`.
+
+**Authentication → Settings**
+
+- Enable **Confirm email**. The app also enforces verification server-side
+  (login gate + account status), so behaviour is identical either way — but
+  keeping Supabase's own gate on is recommended.
+- **Email OTP length:** 6 · **Email OTP expiry:** 600 seconds (10 minutes).
+- **Minimum password length:** 8 · **Password requirements:** lower + upper +
+  digits + symbols. The server validates the same policy regardless.
+- Rate limits: keep the defaults. The app additionally throttles per mailbox
+  (3 requests / 30 min, 60s between resends, 5 resends max), per IP
+  (15 requests / hour) and locks a code after 5 failed attempts.
+
+**Authentication → Email Templates → Magic Link**
+
+- Subject: `Verify your MeCart Account`
+- Content: paste `supabase/email-templates/magic-link.html` — it renders the
+  6-digit `{{ .Token }}` prominently and is shared by registration, resends,
+  the login verification panel and password-reset codes.
+- Set **Site URL** to the deployed origin (`NEXT_PUBLIC_SITE_URL`).
+
+**Email delivery**
+
+- Hosted projects on the default SMTP are limited to a few emails per hour —
+  configure a custom SMTP provider under **Project Settings → Auth → SMTP**
+  before production traffic.
+
+Flow notes: accounts are only usable after `verifyOtp` succeeds. The profile
+row tracks `email_verified_at`, `verification_attempts`, `last_otp_sent_at`,
+`failed_otp_attempts` and `account_status`
+(`pending_verification → email_verified → active`; `suspended` blocks login
+and is toggled from Admin → Users → Email Verification).
 
 ## 4. Admin seed
 
@@ -78,6 +118,10 @@ Checks include:
 - Coupon RPC acceptance/rejection
 - Storage upload and removal across public/private buckets
 - Seeded reference row counts
+- Email OTP ledger: issuing, 10-minute expiry, resend throttle + cap, brute-force
+  lockout, single-use replay protection
+- Real Supabase OTP verification, unverified-login blocking, password reset via
+  recovery OTP, duplicate registration blocking, admin verification queries
 
 Address any failing check name before releasing.
 

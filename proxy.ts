@@ -15,5 +15,6 @@ export const config = {
     "/login/:path*",
     "/register/:path*",
     "/forgot-password/:path*",
+    "/verify-email/:path*",
   ],
 };
