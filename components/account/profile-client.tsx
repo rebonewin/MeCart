@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { ShieldCheck } from "lucide-react";
 import { updateProfile, changePassword } from "@/lib/actions/auth";
 import { createAddress, updateAddress, deleteAddress } from "@/lib/actions/addresses";
 import { PhoneSettings, type PhoneInfo } from "@/components/account/phone-settings";
@@ -82,7 +84,15 @@ export function ProfileClient({
 
   return (
     <div className="mx-auto max-w-4xl space-y-8 px-4 py-8">
-      <h1 className="text-2xl font-bold">Profile</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold">Profile</h1>
+        <Link
+          href="/profile/security"
+          className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-700 transition hover:bg-gray-50 dark:border-gray-800 dark:text-gray-200 dark:hover:bg-gray-800"
+        >
+          <ShieldCheck className="h-4 w-4" /> Security &amp; 2FA
+        </Link>
+      </div>
 
       <section className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
         <h2 className="text-lg font-semibold">Personal Information</h2>

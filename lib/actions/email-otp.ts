@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAdmin, requireStaff } from "@/lib/auth";
 import { logSecurityEvent } from "@/lib/security/audit";
+import { beginTwoFactorGate } from "@/lib/services/two-factor-service";
 import type { Database } from "@/types/database";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -493,6 +494,92 @@ export async function verifyOtpCode(
     redirectTo = needsPassword
       ? `/register?resume=password&email=${encodeURIComponent(email)}`
       : "/";
+
+    // Email OTP login already proved email possession — that is the first
+    // factor. Accounts with 2FA must still present a second factor, and email
+    // is excluded from the challenge to avoid counting the same factor twice.
+    if (!needsPassword) {
+      try {
+        const gate = await beginTwoFactorGate({
+          userId: user.id,
+          firstFactor: "email_otp",
+          redirectTo,
+          signOutExistingSession: true,
+        });
+        if (gate.required) {
+          await logSecurityEvent({
+            action: "LOGIN_2FA_REQUIRED",
+            email,
+            userId: user.id,
+            metadata: { first_factor: "email_otp" },
+          });
+          redirectTo = "/two-factor";
+        }
+      } catch {
+        try {
+          await supabase.auth.signOut({ scope: "local" });
+        } catch {
+          // Fail closed below.
+        }
+        await logSecurityEvent({
+          action: "LOGIN_2FA_GATE_FAILED",
+          email,
+          userId: user.id,
+          status: "FAILED",
+        });
+        return {
+          ok: false,
+          error: "We couldn't start secure verification. Please try again.",
+        };
+      }
+    }
+  } else if (purpose === "password_reset") {
+    // A password reset proves email control — never a second factor. If the
+    // account has 2FA, the recovery session is revoked immediately so email
+    // alone can never bypass it; users recover with a recovery code or an
+    // admin-assisted reset instead.
+    let factorEnabled = true;
+    try {
+      const { data: factor } = await admin
+        .from("user_two_factor")
+        .select("enabled")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      factorEnabled = Boolean(factor?.enabled);
+    } catch {
+      factorEnabled = true;
+    }
+
+    if (factorEnabled) {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (session?.access_token) {
+          try {
+            await admin.auth.admin.signOut(session.access_token, "local");
+          } catch {
+            // Cookie removal below still applies.
+          }
+        }
+        await supabase.auth.signOut({ scope: "local" });
+      } catch {
+        // Best effort — the caller is still blocked below.
+      }
+
+      await logSecurityEvent({
+        action: "PASSWORD_RESET_BLOCKED_2FA",
+        email,
+        userId: user.id,
+        status: "FAILED",
+      });
+
+      return {
+        ok: false,
+        error:
+          "Two-factor authentication is enabled for this account, so email alone cannot reset the password. Sign in with your password and a recovery code, or contact an administrator.",
+      };
+    }
   }
 
   await logSecurityEvent({
@@ -650,6 +737,51 @@ export async function completePasswordReset(input: {
       .eq("id", user.id);
   } catch {
     // Profile refresh is best-effort; the password change already succeeded.
+  }
+
+  // A password reset proves email control, not a second factor. If 2FA is
+  // enabled (or cannot be checked), drop the recovery session so the user must
+  // sign in with the new password plus their second factor.
+  let revokeRequired = true;
+  try {
+    const admin = createAdminClient();
+    const { data: factor } = await admin
+      .from("user_two_factor")
+      .select("enabled")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    revokeRequired = Boolean(factor?.enabled);
+  } catch {
+    revokeRequired = true;
+  }
+
+  if (revokeRequired) {
+    try {
+      const admin = createAdminClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        try {
+          await admin.auth.admin.signOut(session.access_token, "local");
+        } catch {
+          // Cookie removal below still applies.
+        }
+      }
+      await supabase.auth.signOut({ scope: "local" });
+      await logSecurityEvent({
+        action: "PASSWORD_RESET_SESSION_REVOKED_2FA",
+        email,
+        userId: user.id,
+      });
+    } catch {
+      await logSecurityEvent({
+        action: "PASSWORD_RESET_2FA_SIGNOUT_FAILED",
+        email,
+        userId: user.id,
+        status: "FAILED",
+      });
+    }
   }
 
   await logSecurityEvent({

@@ -31,6 +31,7 @@ import {
   Store,
   Tags,
   Users,
+  ShieldCheck,
 } from "lucide-react";
 
 const navGroups = [
@@ -73,6 +74,7 @@ const navGroups = [
       { href: "/admin/users/email-verification", label: "Email Verification", icon: MailCheck },
       { href: "/admin/users/phone-verification", label: "Phone Verification", icon: Smartphone },
       { href: "/admin/security", label: "Security", icon: Shield },
+      { href: "/admin/security/two-factor", label: "2FA Dashboard", icon: ShieldCheck },
       { href: "/admin/audit-logs", label: "Audit Logs", icon: ClipboardList },
       { href: "/admin/settings", label: "Settings", icon: Settings },
       { href: "/admin/profile", label: "Profile", icon: Home },

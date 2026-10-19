@@ -47,6 +47,9 @@ export function LoginForm({ presetEmail }: { presetEmail: string }) {
       }
       return;
     }
+    if ("requiresTwoFactor" in res && res.requiresTwoFactor) {
+      toast.info("Password verified. Confirm your second factor to finish signing in.");
+    }
     // Hard navigation so every provider (auth/cart/wishlist) initialises with
     // the new session right away.
     window.location.assign(res.redirectTo);
@@ -229,7 +232,7 @@ export function LoginForm({ presetEmail }: { presetEmail: string }) {
               onClick={async () => {
                 const { createClient } = await import("@/lib/supabase/client");
                 const supabase = createClient();
-                await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${window.location.origin}/` } });
+                await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${window.location.origin}/auth/callback?next=/` } });
               }}
               className="rounded-xl border border-white/10 px-3 py-2 text-xs text-slate-300 transition hover:bg-white/10"
             >
@@ -240,7 +243,7 @@ export function LoginForm({ presetEmail }: { presetEmail: string }) {
               onClick={async () => {
                 const { createClient } = await import("@/lib/supabase/client");
                 const supabase = createClient();
-                await supabase.auth.signInWithOAuth({ provider: "github", options: { redirectTo: `${window.location.origin}/` } });
+                await supabase.auth.signInWithOAuth({ provider: "github", options: { redirectTo: `${window.location.origin}/auth/callback?next=/` } });
               }}
               className="rounded-xl border border-white/10 px-3 py-2 text-xs text-slate-300 transition hover:bg-white/10"
             >

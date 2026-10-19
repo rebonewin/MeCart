@@ -5,6 +5,7 @@ import { createAdminClient, hasAdminCredentials } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { logActivity, logSecurityEvent } from "@/lib/security/audit";
+import { beginTwoFactorGate } from "@/lib/services/two-factor-service";
 
 const registerSchema = z.object({
   name: z.string().min(2),
@@ -20,6 +21,7 @@ const loginSchema = z.object({
 
 export type LoginResult =
   | { ok: true; redirectTo: string; role: string }
+  | { ok: true; requiresTwoFactor: true; redirectTo: string }
   | { ok: false; error: string; needsVerification?: boolean; email?: string | null };
 
 /** Resolve a username (or email) to the account email. Server-side only. */
@@ -134,6 +136,54 @@ export async function login(input: {
     };
   }
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role, username")
+    .eq("id", data.user.id)
+    .maybeSingle();
+
+  const role = profile?.role ?? "customer";
+  const fallback = role === "admin" || role === "manager" ? "/admin/dashboard" : "/";
+  const callbackUrl = input.callbackUrl;
+  const redirectTo =
+    callbackUrl && callbackUrl.startsWith("/") && !callbackUrl.startsWith("//") ? callbackUrl : fallback;
+
+  try {
+    const gate = await beginTwoFactorGate({
+      userId: data.user.id,
+      firstFactor: "password",
+      redirectTo,
+      guestId,
+      signOutExistingSession: true,
+    });
+
+    if (gate.required) {
+      await logSecurityEvent({
+        action: "LOGIN_2FA_REQUIRED",
+        email,
+        userId: data.user.id,
+        metadata: { role },
+      });
+      return { ok: true, requiresTwoFactor: true, redirectTo: "/two-factor" };
+    }
+  } catch {
+    try {
+      await supabase.auth.signOut({ scope: "local" });
+    } catch {
+      // Fail closed below regardless.
+    }
+    await logSecurityEvent({
+      action: "LOGIN_2FA_GATE_FAILED",
+      email,
+      userId: data.user.id,
+      status: "FAILED",
+    });
+    return {
+      ok: false,
+      error: "We couldn't start secure verification. Please try again.",
+    };
+  }
+
   if (guestId && guestId !== data.user.id) {
     try {
       await supabase.rpc("merge_guest_cart", { p_from_user: guestId });
@@ -141,12 +191,6 @@ export async function login(input: {
       // Best-effort merge; signing in must never fail because of it.
     }
   }
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role, username")
-    .eq("id", data.user.id)
-    .maybeSingle();
 
   await supabase
     .from("profiles")
@@ -160,12 +204,6 @@ export async function login(input: {
   });
 
   revalidatePath("/", "layout");
-
-  const role = profile?.role ?? "customer";
-  const fallback = role === "admin" || role === "manager" ? "/admin/dashboard" : "/";
-  const callbackUrl = input.callbackUrl;
-  const redirectTo =
-    callbackUrl && callbackUrl.startsWith("/") && !callbackUrl.startsWith("//") ? callbackUrl : fallback;
 
   return { ok: true, redirectTo, role };
 }
@@ -294,8 +332,49 @@ export async function requestPasswordReset(input: { email: string }) {
 export async function updatePassword(input: { newPassword: string }) {
   if (input.newPassword.length < 8) throw new Error("Password must be at least 8 characters");
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const { error } = await supabase.auth.updateUser({ password: input.newPassword });
   if (error) throw new Error(error.message);
+
+  // A password reset must never leave a durable session behind for accounts
+  // with 2FA — the user signs in again with password + second factor.
+  if (user) {
+    let revoke = true;
+    try {
+      const admin = createAdminClient();
+      const { data: factor } = await admin
+        .from("user_two_factor")
+        .select("enabled")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      revoke = Boolean(factor?.enabled);
+
+      if (revoke) {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (session?.access_token) {
+          try {
+            await admin.auth.admin.signOut(session.access_token, "local");
+          } catch {
+            // Cookie removal below still applies.
+          }
+        }
+      }
+    } catch {
+      revoke = true;
+    }
+
+    if (revoke) {
+      await supabase.auth.signOut({ scope: "local" });
+      await logSecurityEvent({
+        action: "PASSWORD_RESET_SESSION_REVOKED_2FA",
+        userId: user.id,
+      });
+    }
+  }
 }
 
 export async function logout() {

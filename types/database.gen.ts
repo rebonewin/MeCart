@@ -699,6 +699,36 @@ export type Database = {
         }
         Relationships: []
       }
+      failed_2fa_attempts: {
+        Row: {
+          created_at: string
+          id: string
+          ip: string | null
+          method: string | null
+          reason: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip?: string | null
+          method?: string | null
+          reason?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip?: string | null
+          method?: string | null
+          reason?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       inventory: {
         Row: {
           created_at: string
@@ -1955,6 +1985,192 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      trusted_devices: {
+        Row: {
+          browser: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          ip: string | null
+          label: string | null
+          last_used_at: string | null
+          location: string | null
+          os: string | null
+          revoked_at: string | null
+          token_hash: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          browser?: string | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          ip?: string | null
+          label?: string | null
+          last_used_at?: string | null
+          location?: string | null
+          os?: string | null
+          revoked_at?: string | null
+          token_hash: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          browser?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          ip?: string | null
+          label?: string | null
+          last_used_at?: string | null
+          location?: string | null
+          os?: string | null
+          revoked_at?: string | null
+          token_hash?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      two_factor_challenges: {
+        Row: {
+          attempts: number
+          created_at: string
+          email_send_count: number
+          email_sent_at: string | null
+          expires_at: string
+          id: string
+          metadata: Json
+          method: string | null
+          sms_send_count: number
+          sms_sent_at: string | null
+          token_hash: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          email_send_count?: number
+          email_sent_at?: string | null
+          expires_at: string
+          id?: string
+          metadata?: Json
+          method?: string | null
+          sms_send_count?: number
+          sms_sent_at?: string | null
+          token_hash: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          email_send_count?: number
+          email_sent_at?: string | null
+          expires_at?: string
+          id?: string
+          metadata?: Json
+          method?: string | null
+          sms_send_count?: number
+          sms_sent_at?: string | null
+          token_hash?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      two_factor_recovery_codes: {
+        Row: {
+          batch_id: string
+          code_hash: string
+          created_at: string
+          id: string
+          used_at: string | null
+          used_ip: string | null
+          used_user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          batch_id: string
+          code_hash: string
+          created_at?: string
+          id?: string
+          used_at?: string | null
+          used_ip?: string | null
+          used_user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          batch_id?: string
+          code_hash?: string
+          created_at?: string
+          id?: string
+          used_at?: string | null
+          used_ip?: string | null
+          used_user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_two_factor: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          enabled_at: string | null
+          encrypted_secret: string | null
+          failed_attempts: number
+          last_totp_step: number | null
+          last_used_at: string | null
+          locked_until: string | null
+          method: string
+          pending_attempts: number
+          pending_contact_sent_at: string | null
+          pending_encrypted_secret: string | null
+          pending_method: string | null
+          secret_verified_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          enabled_at?: string | null
+          encrypted_secret?: string | null
+          failed_attempts?: number
+          last_totp_step?: number | null
+          last_used_at?: string | null
+          locked_until?: string | null
+          method?: string
+          pending_attempts?: number
+          pending_contact_sent_at?: string | null
+          pending_encrypted_secret?: string | null
+          pending_method?: string | null
+          secret_verified_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          enabled_at?: string | null
+          encrypted_secret?: string | null
+          failed_attempts?: number
+          last_totp_step?: number | null
+          last_used_at?: string | null
+          locked_until?: string | null
+          method?: string
+          pending_attempts?: number
+          pending_contact_sent_at?: string | null
+          pending_encrypted_secret?: string | null
+          pending_method?: string | null
+          secret_verified_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       wishlists: {
         Row: {

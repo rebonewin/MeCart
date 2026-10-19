@@ -6,6 +6,11 @@ import { getSmsProvider, getSmsSetupStatus, type SmsProviderName } from "@/lib/s
 import { isValidE164, maskPhone, normalizePhone } from "@/lib/sms/phone";
 import { createOtpChallenge, verifyOtpChallenge, type OtpChallenge } from "@/lib/sms/signing";
 import { logSecurityEvent } from "@/lib/security/audit";
+import { SHADOW_EMAIL_DOMAIN, isShadowEmail } from "@/lib/auth/shadow-email";
+import { establishSupabaseSession } from "@/lib/services/session-bridge";
+import { beginTwoFactorGate } from "@/lib/services/two-factor-service";
+
+export { SHADOW_EMAIL_DOMAIN };
 
 /**
  * Phone OTP business logic — shared by server actions and the /api/sms routes.
@@ -32,7 +37,6 @@ export const MAX_RESENDS = 3;
 export const RESEND_COOLDOWN_SECONDS = 60;
 export const MAX_VERIFY_ATTEMPTS = 5;
 export const BLOCK_MINUTES = 15;
-export const SHADOW_EMAIL_DOMAIN = "phone.mecart.app";
 
 export type SendPhoneOtpResult =
   | {
@@ -55,6 +59,9 @@ export type VerifyPhoneOtpResult =
       needsProfile: boolean;
       isNewUser: boolean;
       purpose: PhoneOtpPurpose;
+      /** Existing accounts with 2FA must complete a second factor first. */
+      requiresTwoFactor?: boolean;
+      redirectTo?: string;
     }
   | { ok: false; error: string; remainingAttempts?: number; blockedUntil?: string | null };
 
@@ -81,9 +88,7 @@ export type AdminPhoneVerificationRow = {
   pending: boolean;
 };
 
-export function isShadowEmail(email: string | null | undefined): boolean {
-  return Boolean(email && email.toLowerCase().endsWith(`@${SHADOW_EMAIL_DOMAIN}`));
-}
+export { isShadowEmail };
 
 async function getClientIp(): Promise<string | null> {
   const h = await headers();
@@ -201,40 +206,6 @@ async function createPhoneShadowUser(admin: any, phone: string): Promise<{ id: s
     lastError = error?.message ?? lastError;
   }
   throw new Error(lastError);
-}
-
-async function establishSupabaseSession(admin: any, userId: string): Promise<void> {
-  const { data: userRes, error: getUserError } = await admin.auth.admin.getUserById(userId);
-  if (getUserError || !userRes?.user) {
-    throw new Error(getUserError?.message ?? "Unable to resolve account for sign-in.");
-  }
-
-  let email: string | null = userRes.user.email ?? null;
-  if (!email) {
-    email = `phone.${userId.replace(/-/g, "").slice(0, 20)}@${SHADOW_EMAIL_DOMAIN}`;
-    const { error: emailError } = await admin.auth.admin.updateUserById(userId, {
-      email,
-      email_confirm: true,
-    });
-    if (emailError) throw new Error(emailError.message);
-  }
-
-  const { data: link, error: linkError } = await admin.auth.admin.generateLink({
-    type: "magiclink",
-    email,
-  });
-
-  const tokenHash = link?.properties?.hashed_token;
-  if (linkError || !tokenHash) {
-    throw new Error(linkError?.message ?? "Unable to create a secure session.");
-  }
-
-  const supabase = await createClient();
-  const { error: verifyError } = await supabase.auth.verifyOtp({
-    type: "magiclink",
-    token_hash: tokenHash,
-  });
-  if (verifyError) throw new Error(verifyError.message);
 }
 
 /**
@@ -415,6 +386,39 @@ async function finalizeLogin(
     }
   } else {
     await markPhoneVerified(admin, profile.id, phone, providerName, { countryCode });
+  }
+
+  // Existing accounts with 2FA must complete a second factor before a session
+  // is minted. Phone possession is only the first factor here, and using SMS
+  // again as the second factor is explicitly disallowed for this sign-in.
+  try {
+    const gate = await beginTwoFactorGate({
+      userId: profile.id,
+      firstFactor: "phone_otp",
+      redirectTo: "/",
+    });
+    if (gate.required) {
+      await audit("PHONE_LOGIN_2FA_REQUIRED", {
+        phone,
+        userId: profile.id,
+        metadata: { provider: providerName },
+      });
+      return {
+        ok: true,
+        message: "Phone verified. Confirm your second factor to continue.",
+        remainingAttempts: 0,
+        needsProfile: false,
+        isNewUser: false,
+        purpose: "login",
+        requiresTwoFactor: true,
+        redirectTo: "/two-factor",
+      };
+    }
+  } catch {
+    return {
+      ok: false,
+      error: "Phone verified, but we could not start secure verification. Please try again.",
+    };
   }
 
   try {

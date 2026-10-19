@@ -12,6 +12,7 @@
     "seed:admin": "node scripts/seed-admin.mjs",
     "verify:supabase": "node scripts/verify-supabase.mjs",
     "verify:sms": "node scripts/verify-sms.mjs",
+    "verify:2fa": "tsx scripts/verify-2fa.ts",
     "twilio:setup": "node scripts/setup-twilio-verify.mjs"
   },
   "dependencies": {
@@ -28,6 +29,7 @@
     "lenis": "^1.3.26",
     "lucide-react": "latest",
     "next": "^16.4.2",
+    "qrcode.react": "^4.2.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "react-hook-form": "latest",
@@ -48,6 +50,7 @@
     "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "4.0.0",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }

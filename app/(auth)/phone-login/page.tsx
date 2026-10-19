@@ -166,6 +166,12 @@ export default function PhoneLoginPage() {
         return;
       }
 
+      if (result.requiresTwoFactor && result.redirectTo) {
+        toast.success(result.message);
+        window.location.assign(result.redirectTo);
+        return;
+      }
+
       if (result.needsProfile) {
         toast.success(result.message);
         setStep("profile");

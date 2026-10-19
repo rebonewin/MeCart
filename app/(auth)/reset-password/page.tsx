@@ -5,12 +5,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { updatePassword } from "@/lib/actions/auth";
+import { guardRecoverySession } from "@/lib/actions/two-factor";
 
-type LinkState = "checking" | "ready" | "invalid";
+type LinkState = "checking" | "ready" | "blocked" | "invalid";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
   const [linkState, setLinkState] = useState<LinkState>("checking");
+  const [blockedMessage, setBlockedMessage] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
@@ -42,7 +44,22 @@ export default function ResetPasswordPage() {
         }
 
         const { data } = await supabase.auth.getSession();
-        if (!cancelled) setLinkState(data.session ? "ready" : "invalid");
+        if (!data.session) {
+          if (!cancelled) setLinkState("invalid");
+          return;
+        }
+
+        // 2FA accounts must not gain a session from an email link: the guard
+        // revokes it server-side and reports back a blocked state.
+        const guard = await guardRecoverySession();
+        if (cancelled) return;
+        if (!guard.ok) {
+          setBlockedMessage(guard.error);
+          setLinkState("blocked");
+          return;
+        }
+
+        setLinkState("ready");
       } catch {
         if (!cancelled) setLinkState("invalid");
       }
@@ -116,6 +133,21 @@ export default function ResetPasswordPage() {
                   {loading ? "Updating..." : "Update password"}
                 </button>
               </form>
+            </>
+          )}
+
+          {linkState === "blocked" && (
+            <>
+              <h1 className="text-2xl font-bold">Two-factor protection applied</h1>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{blockedMessage}</p>
+              <p className="mt-4 text-sm">
+                <Link
+                  href="/login"
+                  className="text-indigo-600 hover:underline dark:text-indigo-400"
+                >
+                  Go to sign in
+                </Link>
+              </p>
             </>
           )}
 

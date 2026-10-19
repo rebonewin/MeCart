@@ -1,6 +1,9 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
+
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { logSecurityEvent } from "@/lib/security/audit";
 
 /**
  * Email link confirmation endpoint.
@@ -10,6 +13,10 @@ import { createClient } from "@/lib/supabase/server";
  * /auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password
  * (free-tier default templates use the ConfirmationURL flow handled by
  * /reset-password directly).
+ *
+ * Because this link works in any browser, it is also the strongest email-only
+ * path into an account: for accounts with 2FA enabled the session is revoked
+ * immediately so a link can never bypass the second factor.
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -20,8 +27,53 @@ export async function GET(request: NextRequest) {
 
   if (tokenHash && type) {
     const supabase = await createClient();
-    const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
-    if (!error) {
+    const { data, error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
+
+    if (!error && data.user) {
+      let blocked = true;
+
+      try {
+        const admin = createAdminClient();
+        const { data: factor } = await admin
+          .from("user_two_factor")
+          .select("enabled")
+          .eq("user_id", data.user.id)
+          .maybeSingle();
+        blocked = Boolean(factor?.enabled);
+
+        if (blocked) {
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
+          if (session?.access_token) {
+            try {
+              await admin.auth.admin.signOut(session.access_token, "local");
+            } catch {
+              // Cookie removal below still applies.
+            }
+          }
+          await supabase.auth.signOut({ scope: "local" });
+        }
+      } catch {
+        // Fail closed: if 2FA state cannot be checked, do not keep the session.
+        blocked = true;
+        try {
+          await supabase.auth.signOut({ scope: "local" });
+        } catch {
+          // Best effort.
+        }
+      }
+
+      if (blocked) {
+        await logSecurityEvent({
+          action: "EMAIL_LINK_BLOCKED_2FA",
+          userId: data.user.id,
+          status: "FAILED",
+          metadata: { type },
+        });
+        return NextResponse.redirect(new URL("/forgot-password?error=two_factor", request.url));
+      }
+
       return NextResponse.redirect(new URL(next, request.url));
     }
   }
