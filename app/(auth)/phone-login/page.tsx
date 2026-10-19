@@ -2,190 +2,503 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { completePhoneProfile, requestPhoneOtp, verifyPhoneOtp } from "@/lib/actions/phone-otp";
-
-const COUNTRIES = [
-  { code: "US", name: "United States", dial: "+1" },
-  { code: "IN", name: "India", dial: "+91" },
-  { code: "GB", name: "United Kingdom", dial: "+44" },
-  { code: "CA", name: "Canada", dial: "+1" },
-  { code: "AU", name: "Australia", dial: "+61" },
-  { code: "AE", name: "United Arab Emirates", dial: "+971" },
-];
+import { SMS_COUNTRIES, type SmsCountry } from "@/lib/sms/countries";
+import { isValidE164, toE164 } from "@/lib/sms/phone";
+import {
+  completePhoneProfile,
+  createPhoneOtpChallenge,
+  getPhoneOtpSetupStatus,
+  requestPhoneOtp,
+  verifyPhoneOtp,
+} from "@/lib/actions/phone-otp";
+import type { OtpChallenge } from "@/lib/sms/signing";
 
 type Step = "phone" | "verify" | "profile" | "success";
 
+const EMPTY_DIGITS = () => Array.from({ length: 6 }, () => "");
+
+function getDeviceId(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    let id = window.localStorage.getItem("mecart-device-id");
+    if (!id) {
+      id = window.crypto?.randomUUID?.() ?? `dev-${Math.random().toString(36).slice(2)}-${Date.now()}`;
+      window.localStorage.setItem("mecart-device-id", id);
+    }
+    return id;
+  } catch {
+    return null;
+  }
+}
+
+function formatCountdown(seconds: number): string {
+  const safe = Math.max(0, seconds);
+  return `${String(Math.floor(safe / 60)).padStart(2, "0")}:${String(safe % 60).padStart(2, "0")}`;
+}
+
 export default function PhoneLoginPage() {
   const router = useRouter();
+
   const [step, setStep] = useState<Step>("phone");
-  const [country, setCountry] = useState(COUNTRIES[1]);
-  const [search, setSearch] = useState("");
+  const [country, setCountry] = useState<SmsCountry>(SMS_COUNTRIES[0]);
+  const [countrySearch, setCountrySearch] = useState("");
+  const [countryOpen, setCountryOpen] = useState(false);
   const [number, setNumber] = useState("");
+
   const [phone, setPhone] = useState("");
-  const [otpDigits, setOtpDigits] = useState<string[]>(Array.from({ length: 6 }, () => ""));
+  const [challenge, setChallenge] = useState<OtpChallenge | null>(null);
+  const [otpDigits, setOtpDigits] = useState<string[]>(EMPTY_DIGITS);
   const [otpError, setOtpError] = useState("");
   const [expiresAt, setExpiresAt] = useState<number | null>(null);
+  const [resendAvailableAt, setResendAvailableAt] = useState<number | null>(null);
+  const [resendCount, setResendCount] = useState(0);
+  const [maxResends, setMaxResends] = useState(3);
   const [now, setNow] = useState(() => Date.now());
   const [loading, setLoading] = useState(false);
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+
+  const [setup, setSetup] = useState<{ provider: string; configured: boolean; missing: string[] } | null>(null);
 
   const refs = useRef<Array<HTMLInputElement | null>>([]);
-  const secondsRemaining = expiresAt ? Math.max(0, Math.floor((expiresAt - now) / 1000)) : 0;
+  const autoSubmitRef = useRef(false);
+
   const otpValue = otpDigits.join("");
+  const secondsRemaining = expiresAt ? Math.max(0, Math.floor((expiresAt - now) / 1000)) : 0;
+  const resendIn = resendAvailableAt ? Math.max(0, Math.ceil((resendAvailableAt - now) / 1000)) : 0;
 
   const filteredCountries = useMemo(() => {
-    const term = search.toLowerCase();
-    return COUNTRIES.filter((item) => !term || item.name.toLowerCase().includes(term) || item.dial.includes(term));
-  }, [search]);
+    const term = countrySearch.trim().toLowerCase();
+    if (!term) return SMS_COUNTRIES;
+    return SMS_COUNTRIES.filter(
+      (item) =>
+        item.name.toLowerCase().includes(term) ||
+        item.dial.includes(term) ||
+        item.code.toLowerCase() === term,
+    );
+  }, [countrySearch]);
 
   useEffect(() => {
-    const timer = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(timer);
+    const timer = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(timer);
   }, []);
 
-  const setDigit = (index: number, next: string) => {
-    const chars = next.replace(/\D/g, "").slice(0, 1);
-    const nextDigits = [...otpDigits];
-    nextDigits[index] = chars;
-    setOtpDigits(nextDigits);
-    if (chars && index < 5) refs.current[index + 1]?.focus();
-  };
+  useEffect(() => {
+    getPhoneOtpSetupStatus()
+      .then((status) => setSetup(status))
+      .catch(() => setSetup(null));
+  }, []);
 
-  const sendCode = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const fullPhone = `${country.dial}${number.replace(/\D/g, "")}`;
-    setPhone(fullPhone);
-    setLoading(true);
-    try {
-      const result = await requestPhoneOtp(fullPhone);
-      if (!result.ok) {
-        toast.error(result.error);
+  const sendOtp = useCallback(
+    async (mode: "send" | "resend") => {
+      const fullPhone = toE164(country.dial, number);
+      if (!isValidE164(fullPhone)) {
+        toast.error("Enter a valid mobile number in international format.");
         return;
       }
-      setExpiresAt(Date.now() + result.expiresInSeconds * 1000);
-      setOtpDigits(Array.from({ length: 6 }, () => ""));
-      setOtpError("");
-      toast.success(result.message);
-      setStep("verify");
-    } finally {
-      setLoading(false);
-    }
-  };
+      setLoading(true);
+      try {
+        const deviceId = getDeviceId();
+        const challengeResult = await createPhoneOtpChallenge({
+          phone: fullPhone,
+          purpose: "login",
+          deviceId,
+        });
+        if (!challengeResult.ok) {
+          toast.error(challengeResult.error);
+          return;
+        }
 
-  const verifyCode = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (otpValue.length !== 6) {
-      setOtpError("Enter all 6 code digits.");
+        const result = await requestPhoneOtp(fullPhone, {
+          purpose: "login",
+          deviceId,
+          countryCode: country.code,
+          challenge: challengeResult.challenge,
+        });
+
+        if (!result.ok) {
+          toast.error(result.error);
+          return;
+        }
+
+        setPhone(fullPhone);
+        setChallenge(challengeResult.challenge);
+        setExpiresAt(Date.now() + result.expiresInSeconds * 1000);
+        setResendAvailableAt(Date.now() + result.resendAvailableInSeconds * 1000);
+        setResendCount(result.resendCount);
+        setMaxResends(result.maxResends);
+        setOtpDigits(EMPTY_DIGITS());
+        setOtpError("");
+        setStep("verify");
+        toast.success(mode === "resend" ? "A new code is on its way." : result.message);
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Could not send the code.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [country, number],
+  );
+
+  const verify = useCallback(async () => {
+    const code = otpDigits.join("");
+    if (code.length !== 6) {
+      setOtpError("Enter all 6 digits.");
       return;
     }
     setLoading(true);
     setOtpError("");
     try {
-      const result = await verifyPhoneOtp(phone, otpValue);
+      const result = await verifyPhoneOtp(phone, code, {
+        purpose: "login",
+        deviceId: getDeviceId(),
+        countryCode: country.code,
+        challenge,
+      });
+
       if (!result.ok) {
         setOtpError(result.error);
         return;
       }
-      toast.success("Phone verified.");
-      setStep("profile");
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const finish = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const result = await completePhoneProfile({
-        phone,
-        fullName: fullName.trim(),
-        email: email.trim() || undefined,
-        password: password || undefined,
-      });
-      if (!result.ok) {
-        toast.error(result.error);
+      if (result.needsProfile) {
+        toast.success(result.message);
+        setStep("profile");
         return;
       }
-      toast.success("Welcome to MeCart!");
+
+      toast.success(result.message);
       setStep("success");
-      window.setTimeout(() => router.push("/"), 900);
+      window.setTimeout(() => {
+        router.push("/");
+        router.refresh();
+      }, 700);
     } finally {
       setLoading(false);
     }
+  }, [otpDigits, phone, country, challenge, router]);
+
+  // Auto-submit as soon as all six digits are present.
+  useEffect(() => {
+    if (step !== "verify" || loading) {
+      autoSubmitRef.current = false;
+      return;
+    }
+    if (otpDigits.every((digit) => digit !== "") && !autoSubmitRef.current) {
+      autoSubmitRef.current = true;
+      void verify();
+    }
+  }, [otpDigits, step, loading, verify]);
+
+  const setDigit = (index: number, next: string) => {
+    const char = next.replace(/\D/g, "").slice(-1);
+    const nextDigits = [...otpDigits];
+    nextDigits[index] = char;
+    autoSubmitRef.current = false;
+    setOtpDigits(nextDigits);
+    if (char && index < 5) refs.current[index + 1]?.focus();
+  };
+
+  const handleKeyDown = (index: number, event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Backspace" && !otpDigits[index] && index > 0) {
+      event.preventDefault();
+      const nextDigits = [...otpDigits];
+      nextDigits[index - 1] = "";
+      setOtpDigits(nextDigits);
+      refs.current[index - 1]?.focus();
+    }
+    if (event.key === "ArrowLeft" && index > 0) refs.current[index - 1]?.focus();
+    if (event.key === "ArrowRight" && index < 5) refs.current[index + 1]?.focus();
   };
 
   const handlePaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
     const pasted = event.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
-    if (!pasted.length) return;
+    if (!pasted) return;
     event.preventDefault();
-    const next = [...otpDigits];
-    for (let i = 0; i < 6; i += 1) next[i] = pasted[i] ?? "";
-    setOtpDigits(next);
-    refs.current[5]?.focus();
+    const nextDigits = EMPTY_DIGITS();
+    for (let index = 0; index < 6; index += 1) nextDigits[index] = pasted[index] ?? "";
+    autoSubmitRef.current = false;
+    setOtpDigits(nextDigits);
+    refs.current[Math.min(pasted.length, 5)]?.focus();
   };
 
+  const finishProfile = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setLoading(true);
+    try {
+      let avatarUrl: string | undefined;
+      if (avatarFile) {
+        try {
+          const formData = new FormData();
+          formData.append("files", avatarFile);
+          formData.append("bucket", "avatars");
+          formData.append("folder", "phone-signup");
+          const upload = await fetch("/api/upload", { method: "POST", body: formData });
+          const payload = (await upload.json().catch(() => null)) as { urls?: string[] } | null;
+          if (upload.ok && payload?.urls?.[0]) avatarUrl = payload.urls[0];
+        } catch {
+          // Avatar upload is optional — continue without blocking signup.
+        }
+      }
+
+      const result = await completePhoneProfile({
+        phone,
+        fullName: fullName.trim(),
+        email: email.trim() || undefined,
+        avatarUrl,
+      });
+
+      if (!result.ok) {
+        toast.error(result.error);
+        return;
+      }
+
+      toast.success("Welcome to MeCart!");
+      setStep("success");
+      window.setTimeout(() => {
+        router.push("/");
+        router.refresh();
+      }, 900);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resendDisabled = loading || resendIn > 0 || resendCount >= maxResends;
+
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-indigo-50 via-white to-emerald-50 px-4 py-16 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
-      <div className="relative mx-auto max-w-md rounded-3xl border border-white/60 bg-white/80 p-6 shadow-2xl backdrop-blur dark:border-gray-800 dark:bg-gray-900/80">
-        <h1 className="text-2xl font-bold">Mobile OTP login</h1>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          {step === "phone" && "Choose your country and enter your number."}
-          {step === "verify" && `Code sent to ${phone}.`}
-          {step === "profile" && "Complete your profile (optional)."}
-          {step === "success" && "Redirecting home..."}
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-950 px-4 py-16">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_0%,rgba(99,102,241,0.22),transparent),radial-gradient(40%_40%_at_85%_90%,rgba(16,185,129,0.14),transparent)]" />
+
+      <div className="relative w-full max-w-md rounded-3xl border border-white/10 bg-white/[0.04] p-8 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.9)] backdrop-blur-2xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-indigo-300/80">MeCart Access</p>
+        <h1 className="mt-2 text-2xl font-bold text-white">
+          {step === "phone" && "Continue with Mobile"}
+          {step === "verify" && "Enter verification code"}
+          {step === "profile" && "A few last details"}
+          {step === "success" && "You're in"}
+        </h1>
+        <p className="mt-1 text-sm text-slate-400">
+          {step === "phone" && "We'll text you a 6-digit code. Standard rates may apply."}
+          {step === "verify" && `Code sent to ${phone}. It expires in 5 minutes.`}
+          {step === "profile" && "Full name is required — email and avatar are optional."}
+          {step === "success" && "Taking you to the storefront…"}
         </p>
 
+        {setup && !setup.configured && (
+          <div className="mt-4 rounded-xl border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-xs text-amber-200">
+            SMS provider <span className="font-semibold">{setup.provider}</span> is not configured yet.
+            Missing: <span className="font-mono">{setup.missing.join(", ") || "unknown"}</span>.
+          </div>
+        )}
+
         {step === "phone" && (
-          <form onSubmit={sendCode} className="mt-6 space-y-4">
-            <div>
-              <label className="mb-1 block text-sm font-medium">Country</label>
-              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search country" className="mb-2 w-full rounded-xl border border-gray-200 bg-white/70 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-950/80" />
-              <select value={country.code} onChange={(e) => setCountry(COUNTRIES.find((item) => item.code === e.target.value) ?? COUNTRIES[0])} className="w-full rounded-xl border border-gray-200 bg-white/70 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-950/80">
-                {filteredCountries.map((item) => (
-                  <option key={item.code} value={item.code}>{item.name} ({item.dial})</option>
-                ))}
-              </select>
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              void sendOtp("send");
+            }}
+            className="mt-6 space-y-4"
+          >
+            <div className="relative">
+              <label className="mb-1 block text-sm font-medium text-slate-200">Country</label>
+              <button
+                type="button"
+                onClick={() => setCountryOpen((open) => !open)}
+                aria-expanded={countryOpen}
+                className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-slate-900/70 px-3 py-3 text-sm text-white transition hover:border-indigo-400/40"
+              >
+                <span className="flex items-center gap-2">
+                  <span aria-hidden>{country.flag}</span>
+                  <span>{country.name}</span>
+                </span>
+                <span className="text-slate-400">{country.dial}</span>
+              </button>
+
+              {countryOpen && (
+                <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-white/10 bg-slate-900/95 shadow-2xl backdrop-blur">
+                  <input
+                    autoFocus
+                    value={countrySearch}
+                    onChange={(event) => setCountrySearch(event.target.value)}
+                    placeholder="Search country or dial code"
+                    className="w-full border-b border-white/10 bg-transparent px-3 py-2.5 text-sm text-white outline-none placeholder:text-slate-500"
+                  />
+                  <ul className="max-h-56 overflow-y-auto">
+                    {filteredCountries.map((item) => (
+                      <li key={item.code}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCountry(item);
+                            setCountryOpen(false);
+                            setCountrySearch("");
+                          }}
+                          className="flex w-full items-center justify-between px-3 py-2 text-left text-sm text-slate-200 transition hover:bg-white/5"
+                        >
+                          <span className="flex items-center gap-2">
+                            <span aria-hidden>{item.flag}</span>
+                            {item.name}
+                          </span>
+                          <span className="text-slate-500">{item.dial}</span>
+                        </button>
+                      </li>
+                    ))}
+                    {filteredCountries.length === 0 && (
+                      <li className="px-3 py-3 text-sm text-slate-500">No matching country</li>
+                    )}
+                  </ul>
+                </div>
+              )}
             </div>
-            <input value={number} onChange={(e) => setNumber(e.target.value)} placeholder="Mobile number" className="w-full rounded-xl border border-gray-200 bg-white/70 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-950/80" required />
-            <button disabled={loading} type="submit" className="w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white">
-              {loading ? "Sending..." : "Send OTP"}
+
+            <div>
+              <label htmlFor="mobile-number" className="mb-1 block text-sm font-medium text-slate-200">
+                Mobile number
+              </label>
+              <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-slate-900/70 px-3 focus-within:border-indigo-400/60">
+                <span className="text-sm text-slate-400">{country.dial}</span>
+                <input
+                  id="mobile-number"
+                  value={number}
+                  onChange={(event) => setNumber(event.target.value.replace(/[^\d\s]/g, ""))}
+                  placeholder="98765 43210"
+                  autoComplete="tel-national"
+                  inputMode="tel"
+                  required
+                  className="w-full bg-transparent py-3 text-sm text-white outline-none placeholder:text-slate-500"
+                />
+              </div>
+              <p className="mt-1 text-xs text-slate-500">
+                Digits only — we format the +{country.code.replace("+", "")} prefix for you.
+              </p>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition hover:brightness-110 disabled:opacity-50"
+            >
+              {loading ? "Sending…" : "Send OTP"}
             </button>
           </form>
         )}
 
         {step === "verify" && (
-          <form onSubmit={verifyCode} className="mt-6 space-y-4">
-            <div className="grid grid-cols-6 gap-2">
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              void verify();
+            }}
+            className="mt-6 space-y-4"
+          >
+            <div className="grid grid-cols-6 gap-2" role="group" aria-label="One-time passcode">
               {otpDigits.map((digit, index) => (
-                <input key={index} ref={(node) => { refs.current[index] = node; }} value={digit} onChange={(e) => setDigit(index, e.target.value)} onPaste={handlePaste} maxLength={1} inputMode="numeric" className="h-12 rounded-xl border border-gray-200 bg-white/70 text-center text-lg font-bold dark:border-gray-700 dark:bg-gray-950/80" />
+                <input
+                  key={index}
+                  ref={(node) => {
+                    refs.current[index] = node;
+                  }}
+                  value={digit}
+                  onChange={(event) => setDigit(index, event.target.value)}
+                  onKeyDown={(event) => handleKeyDown(index, event)}
+                  onPaste={handlePaste}
+                  maxLength={1}
+                  inputMode="numeric"
+                  autoComplete={index === 0 ? "one-time-code" : "off"}
+                  aria-label={`Digit ${index + 1}`}
+                  className="h-13 w-full rounded-xl border border-white/10 bg-slate-900/70 py-3 text-center text-lg font-bold text-white outline-none transition focus:border-indigo-400/70 focus:ring-2 focus:ring-indigo-500/30"
+                />
               ))}
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Expires in {String(Math.floor(secondsRemaining / 60)).padStart(2, "0")}:{String(secondsRemaining % 60).padStart(2, "0")}</p>
-            {otpError && <p className="rounded-xl bg-rose-50 px-3 py-2 text-sm text-rose-600 dark:bg-rose-950/40 dark:text-rose-400">{otpError}</p>}
+
+            <div className="flex items-center justify-between text-xs text-slate-400">
+              <span>Expires in {formatCountdown(secondsRemaining)}</span>
+              <span>
+                {Math.min(resendCount, maxResends)}/{maxResends} resends used
+              </span>
+            </div>
+
+            {otpError && (
+              <p role="alert" className="rounded-xl bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
+                {otpError}
+              </p>
+            )}
+
             <div className="flex gap-3">
-              <button type="submit" disabled={loading || otpValue.length !== 6} className="flex-1 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white disabled:opacity-40">{loading ? "Verifying..." : "Verify"}</button>
-              <button type="button" onClick={() => requestPhoneOtp(phone).then((r) => !r.ok && toast.error(r.error))} className="rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-200">Resend</button>
+              <button
+                type="submit"
+                disabled={loading || otpValue.length !== 6}
+                className="flex-1 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 disabled:opacity-40"
+              >
+                {loading ? "Verifying…" : "Verify"}
+              </button>
+              <button
+                type="button"
+                onClick={() => void sendOtp("resend")}
+                disabled={resendDisabled}
+                title={resendCount >= maxResends ? "Resend limit reached — request a new code later" : undefined}
+                className="rounded-xl border border-white/10 px-4 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/5 disabled:opacity-40"
+              >
+                {resendIn > 0 ? `Resend ${resendIn}s` : "Resend"}
+              </button>
             </div>
           </form>
         )}
 
         {step === "profile" && (
-          <form onSubmit={finish} className="mt-6 space-y-3">
-            <input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Full name (optional)" className="w-full rounded-xl border border-gray-200 bg-white/70 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-950/80" />
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email (optional)" className="w-full rounded-xl border border-gray-200 bg-white/70 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-950/80" />
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password (optional)" className="w-full rounded-xl border border-gray-200 bg-white/70 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-950/80" />
-            <button disabled={loading} type="submit" className="w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white">{loading ? "Finishing..." : "Continue"}</button>
+          <form onSubmit={finishProfile} className="mt-6 space-y-3">
+            <input
+              value={fullName}
+              onChange={(event) => setFullName(event.target.value)}
+              placeholder="Full name"
+              required
+              minLength={2}
+              className="w-full rounded-xl border border-white/10 bg-slate-900/70 px-3 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-indigo-400/60"
+            />
+            <input
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="Email (optional)"
+              className="w-full rounded-xl border border-white/10 bg-slate-900/70 px-3 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-indigo-400/60"
+            />
+            <label className="flex cursor-pointer items-center justify-between rounded-xl border border-dashed border-white/15 bg-slate-900/40 px-3 py-3 text-sm text-slate-300 transition hover:border-indigo-400/40">
+              <span>{avatarFile ? avatarFile.name : "Upload avatar (optional)"}</span>
+              <span className="text-xs text-slate-500">PNG / JPG</span>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(event) => setAvatarFile(event.target.files?.[0] ?? null)}
+              />
+            </label>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 disabled:opacity-50"
+            >
+              {loading ? "Creating account…" : "Finish"}
+            </button>
           </form>
         )}
 
-        <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
-          <Link href="/login" className="text-indigo-600 hover:underline dark:text-indigo-400">Back to login</Link>
+        {step === "success" && (
+          <div className="mt-8 flex flex-col items-center gap-3 text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/15 text-2xl">✓</div>
+            <p className="text-sm text-slate-300">Verified and signed in. Redirecting…</p>
+          </div>
+        )}
+
+        <p className="mt-6 text-center text-sm text-slate-400">
+          <Link href="/login" className="text-indigo-300 transition hover:text-indigo-200">
+            ← Back to login
+          </Link>
         </p>
       </div>
     </div>

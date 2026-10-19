@@ -1150,6 +1150,69 @@ export type Database = {
         }
         Relationships: []
       }
+      phone_otp_requests: {
+        Row: {
+          blocked_until: string | null
+          client_ip: string | null
+          consumed_at: string | null
+          country_code: string | null
+          device_id: string | null
+          expires_at: string
+          id: string
+          is_verified: boolean
+          last_error: string | null
+          phone_number: string
+          provider: string
+          purpose: string
+          requested_at: string
+          resend_count: number
+          signature_nonce: string | null
+          user_id: string | null
+          verification_attempts: number
+          verified_at: string | null
+        }
+        Insert: {
+          blocked_until?: string | null
+          client_ip?: string | null
+          consumed_at?: string | null
+          country_code?: string | null
+          device_id?: string | null
+          expires_at: string
+          id?: string
+          is_verified?: boolean
+          last_error?: string | null
+          phone_number: string
+          provider?: string
+          purpose: string
+          requested_at?: string
+          resend_count?: number
+          signature_nonce?: string | null
+          user_id?: string | null
+          verification_attempts?: number
+          verified_at?: string | null
+        }
+        Update: {
+          blocked_until?: string | null
+          client_ip?: string | null
+          consumed_at?: string | null
+          country_code?: string | null
+          device_id?: string | null
+          expires_at?: string
+          id?: string
+          is_verified?: boolean
+          last_error?: string | null
+          phone_number?: string
+          provider?: string
+          purpose?: string
+          requested_at?: string
+          resend_count?: number
+          signature_nonce?: string | null
+          user_id?: string | null
+          verification_attempts?: number
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       product_images: {
         Row: {
           alt: string | null
@@ -1351,59 +1414,95 @@ export type Database = {
         Row: {
           account_status: string
           avatar_url: string | null
+          blocked_until: string | null
+          country_code: string | null
           created_at: string
           deleted_at: string | null
           email: string | null
           email_verified_at: string | null
+          failed_attempts: number
           failed_otp_attempts: number
           full_name: string | null
           id: string
           is_active: boolean
           last_login_at: string | null
           last_otp_sent_at: string | null
+          last_phone_login: string | null
+          otp_attempts: number
+          otp_last_sent: string | null
+          password_set_at: string | null
           phone: string | null
+          phone_last_login: string | null
+          phone_number: string | null
+          phone_verified: boolean
+          phone_verified_at: string | null
           role: Database["public"]["Enums"]["app_role"]
           updated_at: string
           username: string | null
           verification_attempts: number
+          verification_provider: string | null
         }
         Insert: {
           account_status?: string
           avatar_url?: string | null
+          blocked_until?: string | null
+          country_code?: string | null
           created_at?: string
           deleted_at?: string | null
           email?: string | null
           email_verified_at?: string | null
+          failed_attempts?: number
           failed_otp_attempts?: number
           full_name?: string | null
           id: string
           is_active?: boolean
           last_login_at?: string | null
           last_otp_sent_at?: string | null
+          last_phone_login?: string | null
+          otp_attempts?: number
+          otp_last_sent?: string | null
+          password_set_at?: string | null
           phone?: string | null
+          phone_last_login?: string | null
+          phone_number?: string | null
+          phone_verified?: boolean
+          phone_verified_at?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
           username?: string | null
           verification_attempts?: number
+          verification_provider?: string | null
         }
         Update: {
           account_status?: string
           avatar_url?: string | null
+          blocked_until?: string | null
+          country_code?: string | null
           created_at?: string
           deleted_at?: string | null
           email?: string | null
           email_verified_at?: string | null
+          failed_attempts?: number
           failed_otp_attempts?: number
           full_name?: string | null
           id?: string
           is_active?: boolean
           last_login_at?: string | null
           last_otp_sent_at?: string | null
+          last_phone_login?: string | null
+          otp_attempts?: number
+          otp_last_sent?: string | null
+          password_set_at?: string | null
           phone?: string | null
+          phone_last_login?: string | null
+          phone_number?: string | null
+          phone_verified?: boolean
+          phone_verified_at?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
           username?: string | null
           verification_attempts?: number
+          verification_provider?: string | null
         }
         Relationships: []
       }
@@ -1916,9 +2015,29 @@ export type Database = {
         }
         Returns: Json
       }
+      create_phone_otp_request: {
+        Args: {
+          p_client_ip?: string
+          p_country_code?: string
+          p_device_id?: string
+          p_expires_in_seconds?: number
+          p_max_resend?: number
+          p_phone_number: string
+          p_provider?: string
+          p_purpose?: string
+          p_signature_nonce?: string
+        }
+        Returns: Json
+      }
       current_app_role: {
         Args: never
         Returns: Database["public"]["Enums"]["app_role"]
+      }
+      debug_pw: { Args: { p_user_id: string }; Returns: Json }
+      debug2_pw: { Args: { p_user_id: string }; Returns: Json }
+      expire_stale_phone_otp_requests: {
+        Args: { p_limit?: number }
+        Returns: number
       }
       has_permission: { Args: { p_key: string }; Returns: boolean }
       is_admin: { Args: never; Returns: boolean }
@@ -1926,27 +2045,11 @@ export type Database = {
       merge_guest_cart: { Args: { p_from_user: string }; Returns: undefined }
       pending_otp_request: {
         Args: { p_email: string; p_purpose: string }
-        Returns: {
-          client_ip: string | null
-          consumed_at: string | null
-          email: string
-          expires_at: string
-          id: string
-          is_verified: boolean
-          last_error: string | null
-          purpose: string
-          requested_at: string
-          resend_count: number
-          user_id: string | null
-          verification_attempts: number
-          verified_at: string | null
-        }
-        SetofOptions: {
-          from: "*"
-          to: "email_otp_requests"
-          isOneToOne: true
-          isSetofReturn: false
-        }
+        Returns: Json
+      }
+      pending_phone_otp_request: {
+        Args: { p_phone_number: string; p_purpose?: string }
+        Returns: Json
       }
       place_order: { Args: { payload: Json }; Returns: Json }
       show_limit: { Args: never; Returns: number }
@@ -1961,6 +2064,17 @@ export type Database = {
           p_email: string
           p_error?: string
           p_max_attempts?: number
+          p_purpose: string
+          p_success: boolean
+        }
+        Returns: Json
+      }
+      verify_phone_otp_request: {
+        Args: {
+          p_block_minutes?: number
+          p_error?: string
+          p_max_attempts?: number
+          p_phone_number: string
           p_purpose: string
           p_success: boolean
         }

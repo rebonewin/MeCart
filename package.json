@@ -10,7 +10,9 @@
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
     "seed:admin": "node scripts/seed-admin.mjs",
-    "verify:supabase": "node scripts/verify-supabase.mjs"
+    "verify:supabase": "node scripts/verify-supabase.mjs",
+    "verify:sms": "node scripts/verify-sms.mjs",
+    "twilio:setup": "node scripts/setup-twilio-verify.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "latest",

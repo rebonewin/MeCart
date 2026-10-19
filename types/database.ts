@@ -75,6 +75,7 @@ export type NotificationRow = Tables["notifications"]["Row"];
 export type ActivityLogRow = Tables["activity_logs"]["Row"];
 export type AuditLogRow = Tables["audit_logs"]["Row"];
 export type EmailOtpRequestRow = Tables["email_otp_requests"]["Row"];
+export type PhoneOtpRequestRow = Tables["phone_otp_requests"]["Row"];
 
 export type MediaLibraryRow = Tables["media_library"]["Row"];
 export type CmsPageRow = Tables["cms_pages"]["Row"];

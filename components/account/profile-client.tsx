@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { updateProfile, changePassword } from "@/lib/actions/auth";
 import { createAddress, updateAddress, deleteAddress } from "@/lib/actions/addresses";
+import { PhoneSettings, type PhoneInfo } from "@/components/account/phone-settings";
 
 type Address = {
   id: string;
@@ -23,9 +24,11 @@ type Address = {
 export function ProfileClient({
   initialUser,
   initialAddresses,
+  initialPhone,
 }: {
   initialUser: { name?: string | null; email?: string | null; username?: string | null; role?: string | null };
   initialAddresses: Address[];
+  initialPhone: PhoneInfo;
 }) {
   const router = useRouter();
   const [addresses, setAddresses] = useState(initialAddresses);
@@ -99,6 +102,8 @@ export function ProfileClient({
           <button type="submit" className="rounded-md bg-indigo-600 px-4 py-2 text-sm text-white">Change Password</button>
         </form>
       </section>
+
+      <PhoneSettings initialPhone={initialPhone} />
 
       <section className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
         <h2 className="text-lg font-semibold">Addresses</h2>
