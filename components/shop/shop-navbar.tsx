@@ -412,7 +412,7 @@ export function ShopNavbar() {
                 </Link>
                 <Link
                   href="/register"
-                  className="flex h-10 items-center whitespace-nowrap rounded-full bg-gradient-to-r from-[var(--lx-iris)] to-[var(--lx-cyan)] px-5 text-[11px] font-semibold uppercase tracking-[0.12em] text-white shadow-lg shadow-indigo-500/25 transition duration-300 hover:-translate-y-0.5 hover:brightness-110"
+                  className="flex h-10 items-center whitespace-nowrap rounded-full bg-gradient-to-r from-[#f5d08a] via-[#f0c46c] to-[#e0a84e] px-5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#241a05] shadow-[0_14px_40px_-18px_rgba(240,196,108,0.6)] transition duration-300 hover:-translate-y-0.5 hover:brightness-105"
                 >
                   Create account
                 </Link>
@@ -467,7 +467,7 @@ export function ShopNavbar() {
                 </button>
               </div>
 
-              <LiveSearch size="lg" autoFocus onNavigate={closeSearch} />
+              <LiveSearch size="lg" autoFocus inline onNavigate={closeSearch} />
 
               <div className="mt-8 grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {QUICK_LINKS.map((link) => (
@@ -555,7 +555,7 @@ export function ShopNavbar() {
                   <Link
                     href="/register"
                     onClick={() => setMenuOpen(false)}
-                    className="flex h-12 flex-1 items-center justify-center rounded-full bg-gradient-to-r from-[var(--lx-iris)] to-[var(--lx-cyan)] text-sm font-semibold text-white"
+                    className="flex h-12 flex-1 items-center justify-center rounded-full bg-gradient-to-r from-[#f5d08a] via-[#f0c46c] to-[#e0a84e] text-sm font-semibold text-[#241a05]"
                   >
                     Create account
                   </Link>

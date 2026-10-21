@@ -48,12 +48,14 @@ export function LiveSearch({
   placeholder = "Search the atelier — products, collections, drops…",
   onNavigate,
   autoFocus = false,
+  inline = false,
 }: {
   size?: "lg" | "sm";
   className?: string;
   placeholder?: string;
   onNavigate?: () => void;
   autoFocus?: boolean;
+  inline?: boolean;
 }) {
   const router = useRouter();
   const listId = useId();
@@ -276,7 +278,12 @@ export function LiveSearch({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.985 }}
             transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="lx-glass absolute left-0 right-0 top-[calc(100%+10px)] z-[70] max-h-[70vh] overflow-y-auto rounded-2xl bg-[#0a0c1a]/97 p-2 shadow-2xl shadow-black/60"
+            className={cn(
+              "lx-glass max-h-[70vh] overflow-y-auto rounded-2xl bg-[#0a0c1a]/97 p-2 shadow-2xl shadow-black/60",
+              inline
+                ? "relative z-0 mt-2.5"
+                : "absolute left-0 right-0 top-[calc(100%+10px)] z-[70]",
+            )}
           >
             {showMemory ? (
               <div className="p-2">

@@ -486,7 +486,8 @@ function ProductsContent({ products, brands }: { products: Product[]; brands: st
                   value={query}
                   onChange={(event) => update(setQuery, event.target.value)}
                   placeholder="Search this collection…"
-                  className="lx-field h-11 border-transparent bg-transparent pl-10 focus:bg-transparent"
+                  className="lx-field h-11 border-transparent bg-transparent focus:bg-transparent"
+                  style={{ paddingLeft: "2.5rem" }}
                 />
               </label>
 

@@ -248,7 +248,7 @@ export function ProductDetailClient({
                 {product.brandName || "MeCart atelier"}
               </Link>
               <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-[var(--lx-muted)]">
-                SKU {product.sku}
+                {product.sku}
               </span>
             </div>
 
@@ -490,7 +490,7 @@ export function ProductDetailClient({
                       <p>Material: {product.material || "Atelier selection"}</p>
                       <p>Country of origin: {product.country || "Imported"}</p>
                       <p>Weight: {product.weight || "—"} kg</p>
-                      <p>SKU: {product.sku}</p>
+                      <p>Reference: {product.sku}</p>
                     </div>
                   ),
                 },

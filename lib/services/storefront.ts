@@ -74,7 +74,7 @@ export async function getStorefrontHomeData(): Promise<StorefrontHomeData> {
   const rated = poolUnique.filter((product) => product.rating > 0);
   const stats: StorefrontStats = {
     products: counts.active,
-    categories: categories.length,
+    categories: categories.filter((category) => category.productCount > 0).length,
     brands: brands.length,
     rating: rated.length
       ? rated.reduce((sum, product) => sum + product.rating, 0) / rated.length

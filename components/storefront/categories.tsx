@@ -104,7 +104,7 @@ function CategoryTileCard({ category, index, featured }: { category: CategoryTil
 }
 
 export function CategoryShowcase({ categories }: { categories: CategoryTile[] }) {
-  const tiles = categories.slice(0, 6);
+  const tiles = categories.filter((category) => category.productCount > 0).slice(0, 6);
   if (!tiles.length) return null;
 
   return (

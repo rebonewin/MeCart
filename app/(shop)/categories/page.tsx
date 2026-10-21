@@ -21,6 +21,7 @@ export default async function CategoriesPage() {
     listCategoriesWithCounts(),
     listSubCategories(),
   ]);
+  const liveCategories = categories.filter((category) => category.productCount > 0);
 
   return (
     <div className="lx-page">
@@ -34,7 +35,7 @@ export default async function CategoriesPage() {
               The <span className="lx-serif text-[var(--lx-gold)]">collections</span>
             </>
           }
-          description="Six living capsules, restocked from real inventory. Each collection is edited by the atelier and delivered with the same care."
+          description={`${liveCategories.length} living ${liveCategories.length === 1 ? "capsule" : "capsules"}, restocked from real inventory. Each collection is edited by the atelier and delivered with the same care.`}
           aside={
             <div className="lx-glass flex items-center gap-4 rounded-2xl px-5 py-4">
               <Boxes className="h-5 w-5 text-[var(--lx-gold)]" aria-hidden />
@@ -43,16 +44,16 @@ export default async function CategoriesPage() {
                   Live capsules
                 </p>
                 <p className="mt-1 text-2xl font-semibold tabular-nums text-[var(--lx-text)]">
-                  {categories.length}
+                  {liveCategories.length}
                 </p>
               </div>
             </div>
           }
         />
 
-        {categories.length ? (
+        {liveCategories.length ? (
           <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {categories.map((category, index) => {
+            {liveCategories.map((category, index) => {
               const children = subCategories.filter((item) => item.categorySlug === category.slug);
               const featured = index === 0;
               return (
@@ -81,7 +82,7 @@ export default async function CategoriesPage() {
 
                       <div className="relative z-10 flex items-start justify-between gap-4">
                         <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/45">
-                          {String(index + 1).padStart(2, "0")} / {String(categories.length).padStart(2, "0")}
+                          {String(index + 1).padStart(2, "0")} / {String(liveCategories.length).padStart(2, "0")}
                         </span>
                         <span className="lx-glass flex h-11 w-11 items-center justify-center rounded-full text-white transition duration-500 group-hover:rotate-6 group-hover:scale-110 group-hover:text-[var(--lx-gold)]">
                           <Sparkles className="h-4 w-4" aria-hidden />
