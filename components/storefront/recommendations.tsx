@@ -17,9 +17,9 @@ function SignalBar({ label, value, delay }: { label: string; value: number; dela
     <div>
       <div className="flex items-center justify-between text-[11px]">
         <span className="text-[var(--lx-muted)]">{label}</span>
-        <span className="font-mono text-white/70">{value}%</span>
+        <span className="font-mono text-[var(--lx-text)]/70">{value}%</span>
       </div>
-      <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-white/10">
+      <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-[var(--lx-border)]">
         <motion.div
           className="h-full rounded-full bg-gradient-to-r from-[var(--lx-iris)] via-[var(--lx-cyan)] to-[var(--lx-gold)]"
           initial={{ width: "0%" }}
@@ -70,7 +70,7 @@ function RecommendationCard({ product, index }: { product: StorefrontProduct; in
             <span className="font-mono text-[9px] uppercase tracking-[0.24em] text-[var(--lx-muted)]">
               {product.brandName || product.categoryName}
             </span>
-            <span className="line-clamp-2 text-sm font-medium text-white transition group-hover:text-[var(--lx-gold)]">
+            <span className="line-clamp-2 text-sm font-medium text-[var(--lx-text)] transition group-hover:text-[var(--lx-gold)]">
               {product.name}
             </span>
             <div className="mt-auto flex items-center gap-2">
@@ -102,7 +102,7 @@ export function AIRecommendations({ products }: { products: StorefrontProduct[] 
           action={
             <Link
               href="/products"
-              className="inline-flex items-center gap-2 text-sm font-medium text-[var(--lx-cyan)] transition hover:text-white"
+              className="inline-flex items-center gap-2 text-sm font-medium text-[var(--lx-cyan)] transition hover:text-[var(--lx-text)]"
             >
               Tune recommendations
               <ArrowUpRight className="h-4 w-4" aria-hidden />
@@ -117,11 +117,11 @@ export function AIRecommendations({ products }: { products: StorefrontProduct[] 
             <div>
               <span className="relative flex h-14 w-14 items-center justify-center">
                 <span className="lx-conic-ring absolute inset-0 rounded-2xl opacity-80" />
-                <span className="relative z-10 flex h-[calc(100%-3px)] w-[calc(100%-3px)] items-center justify-center rounded-[13px] bg-[#0a0c1a]">
+                <span className="relative z-10 flex h-[calc(100%-3px)] w-[calc(100%-3px)] items-center justify-center rounded-[13px] bg-[var(--lx-surface)]">
                   <BrainCircuit className="h-6 w-6 text-[var(--lx-cyan)]" aria-hidden />
                 </span>
               </span>
-              <h3 className="mt-5 text-xl font-semibold text-white">Signals analysed this hour</h3>
+              <h3 className="mt-5 text-xl font-semibold text-[var(--lx-text)]">Signals analysed this hour</h3>
               <p className="mt-2 text-sm leading-6 text-[var(--lx-muted)]">
                 The model refreshes on every catalogue change — nothing is mocked, nothing is stale.
               </p>
@@ -132,7 +132,7 @@ export function AIRecommendations({ products }: { products: StorefrontProduct[] 
               <SignalBar label="Review sentiment" value={88} delay={0.34} />
               <SignalBar label="Price fit" value={76} delay={0.46} />
             </div>
-            <p className="mt-6 border-t border-white/10 pt-4 font-mono text-[9px] uppercase tracking-[0.24em] text-[var(--lx-muted)]">
+            <p className="mt-6 border-t border-[var(--lx-border)] pt-4 font-mono text-[9px] uppercase tracking-[0.24em] text-[var(--lx-muted)]">
               Recomputed live · v2.6
             </p>
           </div>

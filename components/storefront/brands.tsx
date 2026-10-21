@@ -23,7 +23,7 @@ function BrandCard({ brand }: { brand: BrandTile }) {
   return (
     <Link
       href={`/products?brand=${brand.slug}`}
-      className="lx-glass group mx-2.5 flex h-32 w-56 shrink-0 flex-col items-center justify-center gap-3 rounded-2xl transition-all duration-500 hover:-translate-y-1.5 hover:bg-white/10"
+      className="lx-glass group mx-2.5 flex h-32 w-56 shrink-0 flex-col items-center justify-center gap-3 rounded-2xl transition-all duration-500 hover:-translate-y-1.5 hover:border-[var(--lx-border-strong)] hover:bg-[var(--lx-surface-2)]"
       aria-label={`${brand.name} — ${brand.productCount} products`}
     >
       {brand.logoUrl ? (
@@ -37,12 +37,12 @@ function BrandCard({ brand }: { brand: BrandTile }) {
       ) : (
         <span className="relative flex h-12 w-12 items-center justify-center">
           <span className="lx-conic-ring absolute inset-0 rounded-2xl opacity-70 transition group-hover:opacity-100" />
-          <span className="relative z-10 flex h-[calc(100%-3px)] w-[calc(100%-3px)] items-center justify-center rounded-[13px] bg-[#0a0c1a] text-sm font-black tracking-tight text-white">
+          <span className="relative z-10 flex h-[calc(100%-3px)] w-[calc(100%-3px)] items-center justify-center rounded-[13px] bg-[var(--lx-surface)] text-sm font-black tracking-tight text-[var(--lx-text)]">
             {initials}
           </span>
         </span>
       )}
-      <span className="max-w-[12rem] truncate text-sm font-semibold text-white/85 transition group-hover:text-white">
+      <span className="max-w-[12rem] truncate text-sm font-semibold text-[var(--lx-text)]/85 transition group-hover:text-[var(--lx-text)]">
         {brand.name}
       </span>
       <span className="font-mono text-[9px] uppercase tracking-[0.24em] text-[var(--lx-muted)]">

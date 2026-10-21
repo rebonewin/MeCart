@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Lenis from "lenis";
 import { AnimatePresence, motion } from "framer-motion";
+import { completeIntro } from "@/lib/motion";
 
 /* ------------------------------------------------------------------ */
 /* LenisProvider — buttery smooth scroll                               */
@@ -76,19 +77,27 @@ export function LoadingScreen() {
   const [progress, setProgress] = useState(6);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (window.sessionStorage.getItem("mecart-intro-seen")) return;
-    window.sessionStorage.setItem("mecart-intro-seen", "1");
-    const frame = window.requestAnimationFrame(() => setVisible(true));
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      completeIntro();
+      return;
+    }
+    if (window.sessionStorage.getItem("mecart-intro-seen")) {
+      completeIntro();
+      return;
+    }
+    const frame = window.requestAnimationFrame(() => {
+      window.sessionStorage.setItem("mecart-intro-seen", "1");
+      setVisible(true);
+    });
     return () => window.cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {
     if (!visible) return;
     const timer = window.setInterval(() => {
-      setProgress((current) => Math.min(current + Math.ceil(Math.random() * 12), 100));
-    }, 130);
-    const hide = window.setTimeout(() => setVisible(false), 1700);
+      setProgress((current) => Math.min(current + Math.ceil(Math.random() * 16), 100));
+    }, 100);
+    const hide = window.setTimeout(() => setVisible(false), 1450);
     return () => {
       window.clearInterval(timer);
       window.clearTimeout(hide);
@@ -96,13 +105,13 @@ export function LoadingScreen() {
   }, [visible]);
 
   return (
-    <AnimatePresence>
+    <AnimatePresence onExitComplete={completeIntro}>
       {visible ? (
         <motion.div
           className="fixed inset-0 z-[200] flex items-center justify-center bg-[#04050d]"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0, filter: "blur(18px)" }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
           aria-hidden
         >
           <div className="text-center">

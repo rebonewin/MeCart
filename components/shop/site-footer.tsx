@@ -29,7 +29,7 @@ export function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative mt-24 overflow-hidden border-t border-white/[0.08] bg-[#05060e] text-[var(--lx-text)]">
+    <footer className="lx-dark-scene relative mt-24 overflow-hidden border-t border-white/[0.08] bg-[#05060e] text-[var(--lx-text)]">
       <div className="lx-hairline-x absolute inset-x-0 top-0 h-px" />
       <div className="lx-blob lx-drift-b left-[-10%] top-[-30%] h-[26rem] w-[26rem] bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.25),transparent_65%)]" />
       <div className="lx-blob lx-drift-c right-[-12%] bottom-[-40%] h-[28rem] w-[28rem] bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.18),transparent_65%)]" />
@@ -38,23 +38,28 @@ export function SiteFooter() {
         <div className="grid gap-12 lg:grid-cols-[1.3fr_1fr_1fr_1fr]">
           <div>
             <Link href="/" className="flex items-center gap-2.5" aria-label="MeCart home">
-              <span className="relative flex h-10 w-10 items-center justify-center">
-                <span className="lx-conic-ring absolute inset-0 rounded-xl opacity-90" />
-                <span className="relative z-10 flex h-[calc(100%-3px)] w-[calc(100%-3px)] items-center justify-center rounded-[10px] bg-[#05060e] text-base font-black text-white">
+              <span className="relative flex h-11 w-11 items-center justify-center">
+                <span className="lx-conic-ring absolute inset-0 rounded-[13px] opacity-90" />
+                <span className="relative z-10 flex h-[calc(100%-3px)] w-[calc(100%-3px)] items-center justify-center rounded-[11px] bg-[#05060e] text-base font-black text-white">
                   M
                 </span>
               </span>
               <span className="flex flex-col leading-none">
-                <span className="text-lg font-bold tracking-tight text-white">MeCart</span>
-                <span className="font-mono text-[8px] uppercase tracking-[0.32em] text-[var(--lx-muted)]">
-                  Atelier
+                <span className="text-[19px] font-semibold tracking-[0.2em] text-white">MECART</span>
+                <span className="mt-1 font-mono text-[8px] uppercase tracking-[0.4em] text-[var(--lx-muted)]">
+                  Maison · Atelier
                 </span>
               </span>
             </Link>
             <p className="mt-5 max-w-sm text-sm leading-6 text-[var(--lx-muted)]">
-              A premium commerce atelier — aurora-grade curation, live inventory and atelier care on every
+              A premium commerce atelier — considered objects, live inventory and atelier care on every
               order. Built on a real-time catalogue, not a brochure.
             </p>
+            <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 font-mono text-[9px] uppercase tracking-[0.22em] text-white/45">
+              <span>Curated in small batches</span>
+              <span>Worldwide delivery</span>
+              <span>7-day returns</span>
+            </div>
             <a
               href="mailto:care@mecart.store"
               className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-[var(--lx-cyan)] transition hover:text-white"

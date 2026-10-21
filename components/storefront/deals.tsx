@@ -34,13 +34,13 @@ function useMidnightCountdown(): Remaining | null {
 function TimeBox({ value, label }: { value: number | string; label: string }) {
   return (
     <div className="flex flex-col items-center">
-      <div className="relative h-14 w-14 overflow-hidden rounded-xl border border-white/10 bg-[#0a0c1a] shadow-inner sm:h-16 sm:w-16">
+      <div className="relative h-14 w-14 overflow-hidden rounded-xl border border-[var(--lx-border)] bg-[var(--lx-surface)] shadow-inner sm:h-16 sm:w-16">
         <motion.span
           key={String(value)}
           initial={{ y: "-70%", opacity: 0 }}
           animate={{ y: "0%", opacity: 1 }}
           transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className="absolute inset-0 flex items-center justify-center text-2xl font-black tabular-nums text-white sm:text-3xl"
+          className="absolute inset-0 flex items-center justify-center text-2xl font-black tabular-nums text-[var(--lx-text)] sm:text-3xl"
         >
           {typeof value === "number" ? String(value).padStart(2, "0") : value}
         </motion.span>

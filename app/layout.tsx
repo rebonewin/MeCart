@@ -21,8 +21,9 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "MeCart | Enterprise E-Commerce",
-  description: "MeCart modern enterprise eCommerce platform",
+  title: "MeCart | The Atelier of Modern Commerce",
+  description:
+    "MeCart is a curated atelier for fashion, audio, timepieces and technology — considered objects, live inventory and atelier care on every order.",
 };
 
 export default function RootLayout({
@@ -38,10 +39,15 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} min-h-screen bg-gray-50 text-gray-900 antialiased dark:bg-gray-950 dark:text-gray-100`}
+        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} min-h-screen bg-[var(--background)] text-[var(--foreground)] antialiased`}
       >
         <AppProviders>{children}</AppProviders>
-        <Toaster position="top-right" richColors />
+        <Toaster
+          position="top-right"
+          richColors
+          offset={18}
+          toastOptions={{ className: "font-sans" }}
+        />
       </body>
     </html>
   );

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -15,7 +15,7 @@ import {
   ShoppingBag,
   X,
 } from "lucide-react";
-import { useCart } from "@/lib/cart-context";
+import { useCartMotion } from "@/components/storefront/rider/use-cart-motion";
 import { useWishlist } from "@/lib/wishlist-context";
 import { snapshotOf, useCompare } from "@/lib/compare-context";
 import { RippleButton, Stars, useMounted } from "@/components/luxe/primitives";
@@ -31,10 +31,11 @@ export function QuickViewModal({
   open: boolean;
   onClose: () => void;
 }) {
-  const cart = useCart();
+  const { addToCart } = useCartMotion();
   const wishlist = useWishlist();
   const compare = useCompare();
   const mounted = useMounted();
+  const galleryRef = useRef<HTMLDivElement>(null);
   const [activeImage, setActiveImage] = useState(0);
   const [size, setSize] = useState(product.sizes[0] ?? "");
   const [color, setColor] = useState(product.colors[0] ?? "");
@@ -75,16 +76,19 @@ export function QuickViewModal({
 
   const addToBag = async () => {
     if (outOfStock) return;
-    await cart.addItem({
-      productId: product.id,
-      name: product.name,
-      slug: product.slug,
-      price: product.finalPrice,
-      image: product.coverImage,
-      quantity,
-      size: size || undefined,
-      color: color || undefined,
-    });
+    await addToCart(
+      {
+        productId: product.id,
+        name: product.name,
+        slug: product.slug,
+        price: product.finalPrice,
+        image: product.coverImage,
+        quantity,
+        size: size || undefined,
+        color: color || undefined,
+      },
+      { sourceEl: galleryRef.current },
+    );
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1600);
   };
@@ -126,7 +130,7 @@ export function QuickViewModal({
             <div className="grid gap-0 md:grid-cols-2">
               {/* gallery */}
               <div className="relative">
-                <div className="relative aspect-square overflow-hidden rounded-t-[1.75rem] bg-white/[0.03] md:rounded-l-3xl md:rounded-tr-none">
+                <div ref={galleryRef} className="relative aspect-square overflow-hidden rounded-t-[1.75rem] bg-white/[0.03] md:rounded-l-3xl md:rounded-tr-none">
                   {gallery[activeImage] ? (
                     <Image
                       src={gallery[activeImage]}

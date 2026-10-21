@@ -6,8 +6,8 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, ShoppingBag, Trash2, X } from "lucide-react";
-import { useCart } from "@/lib/cart-context";
 import { useCompare } from "@/lib/compare-context";
+import { useCartMotion } from "@/components/storefront/rider/use-cart-motion";
 import { RippleButton, Stars, useMounted } from "@/components/luxe/primitives";
 import { cn } from "@/lib/cn";
 
@@ -58,7 +58,7 @@ const ROWS: { label: string; render: (item: ReturnType<typeof useCompare>["items
 
 function CompareModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const compare = useCompare();
-  const cart = useCart();
+  const { addToCart } = useCartMotion();
   const mounted = useMounted();
 
   useEffect(() => {
@@ -185,17 +185,20 @@ function CompareModal({ open, onClose }: { open: boolean; onClose: () => void })
                       size="sm"
                       disabled={item.stock <= 0}
                       className="w-full"
-                      onClick={() =>
-                        void cart.addItem({
-                          productId: item.id,
-                          name: item.name,
-                          slug: item.slug,
-                          price: item.price,
-                          image: item.image,
-                          quantity: 1,
-                          size: item.sizes[0],
-                          color: item.colors[0],
-                        })
+                      onClick={(event) =>
+                        void addToCart(
+                          {
+                            productId: item.id,
+                            name: item.name,
+                            slug: item.slug,
+                            price: item.price,
+                            image: item.image,
+                            quantity: 1,
+                            size: item.sizes[0],
+                            color: item.colors[0],
+                          },
+                          { sourceEl: event.currentTarget },
+                        )
                       }
                     >
                       <ShoppingBag className="h-3.5 w-3.5" aria-hidden />

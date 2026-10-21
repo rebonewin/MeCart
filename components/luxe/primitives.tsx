@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { Loader2 } from "lucide-react";
 import {
   animate,
   motion,
   useInView,
   useMotionValue,
-  useReducedMotion,
   useSpring,
   useTransform,
 } from "framer-motion";
@@ -20,6 +20,7 @@ import {
   type ReactNode,
 } from "react";
 import { cn } from "@/lib/cn";
+import { usePrefersReducedMotion } from "@/lib/motion";
 
 /* ------------------------------------------------------------------ */
 /* useMounted — hydration-safe client flag (no setState in effects)    */
@@ -54,14 +55,14 @@ export function Reveal({
   once?: boolean;
   amount?: number;
 }) {
-  const reduced = useReducedMotion();
+  const reduced = usePrefersReducedMotion();
   return (
     <motion.div
       className={className}
-      initial={reduced ? { opacity: 0 } : { opacity: 0, y, filter: "blur(6px)" }}
-      whileInView={reduced ? { opacity: 1 } : { opacity: 1, y: 0, filter: "blur(0px)" }}
+      initial={{ opacity: 0, y, filter: "blur(6px)" }}
+      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
       viewport={{ once, amount }}
-      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: reduced ? 0 : 0.7, delay: reduced ? 0 : delay, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.div>
@@ -82,7 +83,7 @@ export function Magnetic({
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const reduced = useReducedMotion();
+  const reduced = usePrefersReducedMotion();
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const sx = useSpring(x, { stiffness: 220, damping: 18, mass: 0.4 });
@@ -132,7 +133,7 @@ export function Tilt({
   radiusClass?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const reduced = useReducedMotion();
+  const reduced = usePrefersReducedMotion();
   const rx = useMotionValue(0);
   const ry = useMotionValue(0);
   const gx = useMotionValue(50);
@@ -207,16 +208,18 @@ export function RippleButton({
   size = "md",
   type = "button",
   disabled,
+  loading,
   ariaLabel,
 }: {
   children: ReactNode;
   href?: string;
-  onClick?: () => void;
+  onClick?: (event: ReactMouseEvent<HTMLElement>) => void;
   className?: string;
   variant?: "primary" | "glass" | "ghost" | "gold";
   size?: "sm" | "md" | "lg";
   type?: "button" | "submit";
   disabled?: boolean;
+  loading?: boolean;
   ariaLabel?: string;
 }) {
   const [ripples, setRipples] = useState<Ripple[]>([]);
@@ -233,7 +236,7 @@ export function RippleButton({
   };
 
   const base =
-    "relative isolate inline-flex items-center justify-center gap-2 overflow-hidden rounded-full font-semibold tracking-tight transition-all duration-300 will-change-transform active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50";
+    "relative isolate inline-flex items-center justify-center gap-2 overflow-hidden rounded-full font-semibold tracking-tight transition-all duration-300 will-change-transform active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-55";
   const sizes = {
     sm: "h-9 px-4 text-sm",
     md: "h-11 px-6 text-sm",
@@ -241,16 +244,21 @@ export function RippleButton({
   } as const;
   const variants = {
     primary:
-      "bg-white text-[#05060e] shadow-[0_18px_50px_-18px_rgba(255,255,255,0.55)] hover:-translate-y-0.5 hover:shadow-[0_24px_60px_-16px_rgba(255,255,255,0.6)]",
-    gold: "bg-gradient-to-r from-[#f5d08a] via-[#f0c46c] to-[#e0a84e] text-[#241a05] shadow-[0_18px_50px_-18px_rgba(240,196,108,0.6)] hover:-translate-y-0.5",
-    glass: "lx-glass text-[var(--lx-text)] hover:-translate-y-0.5 hover:bg-white/10",
-    ghost: "text-[var(--lx-muted)] hover:bg-white/5 hover:text-white",
+      "bg-[var(--lx-text)] text-[var(--lx-bg)] shadow-[0_18px_50px_-20px_rgba(0,0,0,0.45)] hover:-translate-y-0.5 hover:shadow-[0_26px_60px_-20px_rgba(0,0,0,0.5)]",
+    gold: "bg-gradient-to-r from-[#f5d08a] via-[#f0c46c] to-[#e0a84e] text-[#241a05] shadow-[0_18px_50px_-18px_rgba(240,196,108,0.6)] hover:-translate-y-0.5 hover:brightness-105",
+    glass:
+      "lx-glass text-[var(--lx-text)] hover:-translate-y-0.5 hover:border-[var(--lx-border-strong)]",
+    ghost:
+      "text-[var(--lx-muted)] hover:bg-[color-mix(in_srgb,var(--lx-text)_6%,transparent)] hover:text-[var(--lx-text)]",
   } as const;
-  const cls = cn(base, sizes[size], variants[variant], className);
+  const cls = cn(base, sizes[size], variants[variant], loading && "cursor-wait", className);
 
   const content = (
     <>
-      <span className="relative z-10 inline-flex items-center gap-2">{children}</span>
+      <span className="relative z-10 inline-flex items-center gap-2">
+        {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : null}
+        {children}
+      </span>
       {ripples.map((ripple) => (
         <span
           key={ripple.id}
@@ -269,7 +277,7 @@ export function RippleButton({
         className={cls}
         onClick={(event) => {
           spawn(event);
-          onClick?.();
+          onClick?.(event);
         }}
       >
         {content}
@@ -280,12 +288,13 @@ export function RippleButton({
   return (
     <button
       type={type}
-      disabled={disabled}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
       aria-label={ariaLabel}
       className={cls}
       onClick={(event) => {
         spawn(event);
-        onClick?.();
+        onClick?.(event);
       }}
     >
       {content}
@@ -314,7 +323,7 @@ export function Counter({
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.5 });
-  const reduced = useReducedMotion();
+  const reduced = usePrefersReducedMotion();
   const [animated, setAnimated] = useState<string | null>(null);
 
   useEffect(() => {
@@ -409,7 +418,7 @@ export function SectionHeader({
             aria-hidden
           />
         </p>
-        <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-[2.6rem] lg:leading-[1.1]">
+        <h2 className="mt-4 text-3xl font-semibold tracking-tight text-[var(--lx-text)] sm:text-4xl lg:text-[2.6rem] lg:leading-[1.1]">
           {title}
         </h2>
         {description ? (
@@ -456,7 +465,7 @@ export function Stars({
       role="img"
       aria-label={`${rating.toFixed(1)} out of 5 stars`}
     >
-      <span className="flex items-center gap-0.5 text-white/20">
+      <span className="flex items-center gap-0.5 text-[var(--lx-muted)]/30">
         {[0, 1, 2, 3, 4].map((index) => (
           <StarShape key={index} size={size} />
         ))}
@@ -500,10 +509,10 @@ export function PriceTag({
         value={price}
         decimals={2}
         prefix="$"
-        className={cn("font-semibold text-white", sizes[size])}
+        className={cn("font-semibold text-[var(--lx-text)]", sizes[size])}
       />
       {discounted ? (
-        <span className="text-xs text-white/35 line-through">${original.toFixed(2)}</span>
+        <span className="text-xs text-[var(--lx-muted)]/70 line-through">${original.toFixed(2)}</span>
       ) : null}
       {discounted && showChip ? (
         <span className="rounded-full bg-[var(--lx-gold)]/15 px-2 py-0.5 text-[10px] font-bold tracking-wide text-[var(--lx-gold)]">

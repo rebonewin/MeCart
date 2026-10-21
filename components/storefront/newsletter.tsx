@@ -32,7 +32,7 @@ export function Newsletter() {
               <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-[var(--lx-gold)]">
                 The inner circle
               </p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-[2.6rem] lg:leading-[1.1]">
+              <h2 className="mt-4 text-3xl font-semibold tracking-tight text-[var(--lx-text)] sm:text-4xl lg:text-[2.6rem] lg:leading-[1.1]">
                 First access.
                 <br />
                 <span className="lx-serif text-[var(--lx-gold)]">Zero</span> noise.
@@ -54,7 +54,7 @@ export function Newsletter() {
                   >
                     <CheckCircle2 className="h-9 w-9 shrink-0 text-[var(--lx-emerald)]" aria-hidden />
                     <div>
-                      <p className="font-semibold text-white">You&apos;re on the list.</p>
+                      <p className="font-semibold text-[var(--lx-text)]">You&apos;re on the list.</p>
                       <p className="mt-1 text-sm text-[var(--lx-muted)]">
                         Welcome to the atelier — watch your inbox for the next drop.
                       </p>
@@ -69,7 +69,7 @@ export function Newsletter() {
                     exit={{ opacity: 0, y: -14 }}
                     className="space-y-4"
                   >
-                    <label className="lx-glass flex h-14 items-center gap-3 rounded-2xl px-5 transition focus-within:border-white/25 focus-within:bg-white/10">
+                    <label className="lx-glass flex h-14 items-center gap-3 rounded-2xl px-5 transition focus-within:border-[var(--lx-gold)]/45 focus-within:bg-[var(--lx-surface)]">
                       <Mail className="h-5 w-5 shrink-0 text-[var(--lx-muted)]" aria-hidden />
                       <input
                         type="email"
@@ -77,7 +77,7 @@ export function Newsletter() {
                         onChange={(event) => setEmail(event.target.value)}
                         placeholder="you@example.com"
                         aria-label="Email address"
-                        className="w-full bg-transparent text-sm text-white outline-none placeholder:text-[var(--lx-muted)]/70 sm:text-base"
+                        className="w-full bg-transparent text-sm text-[var(--lx-text)] outline-none placeholder:text-[var(--lx-muted)]/70 sm:text-base"
                       />
                     </label>
                     <RippleButton type="submit" size="lg" variant="gold" className="w-full">

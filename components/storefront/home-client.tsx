@@ -1,9 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
-import { AuroraBackdrop } from "@/components/luxe/aurora";
 import { CustomCursor, LoadingScreen, LenisProvider, ScrollProgress } from "@/components/storefront/cinematic";
-import { HeroSection } from "@/components/storefront/hero";
+import { PremiumHero } from "@/components/storefront/premium-hero";
 import { CategoryShowcase } from "@/components/storefront/categories";
 import { FeaturedProducts } from "@/components/storefront/products";
 import { BrandShowcase } from "@/components/storefront/brands";
@@ -24,26 +22,22 @@ function dedupeById(products: StorefrontProduct[]): StorefrontProduct[] {
 }
 
 export function HomePageClient({ data }: { data: StorefrontHomeData }) {
-  useEffect(() => {
-    document.documentElement.classList.add("dark");
-    return () => {
-      document.documentElement.classList.remove("dark");
-    };
-  }, []);
-
   const artifacts = dedupeById(data.featured).slice(0, 3);
 
   return (
     <LenisProvider>
-      <div className="relative min-h-screen overflow-hidden bg-[#05060e] text-[var(--lx-text)]">
+      <div className="lx-page relative min-h-screen overflow-hidden">
         <LoadingScreen />
         <CustomCursor />
         <ScrollProgress />
-        <AuroraBackdrop />
         <div className="noise-overlay" />
 
         <div className="relative z-10">
-          <HeroSection stats={data.stats} artifacts={artifacts} />
+          <PremiumHero stats={data.stats} artifacts={artifacts} />
+          <div
+            aria-hidden
+            className="pointer-events-none relative z-10 -mt-1 h-24 bg-gradient-to-b from-[#05060e] to-[var(--lx-bg)] sm:h-32"
+          />
           <CategoryShowcase categories={data.categories} />
           <FeaturedProducts products={data.featured} />
           <BrandShowcase brands={data.brands} />

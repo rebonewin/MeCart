@@ -6,6 +6,7 @@ import { CartProvider } from "@/lib/cart-context";
 import { WishlistProvider } from "@/lib/wishlist-context";
 import { CompareProvider } from "@/lib/compare-context";
 import { AuthProvider } from "@/components/providers/auth-provider";
+import { RiderProvider } from "@/components/storefront/rider/rider-provider";
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
   const [client] = useState(() => new QueryClient());
@@ -14,9 +15,11 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={client}>
       <AuthProvider>
         <CartProvider>
-          <WishlistProvider>
-            <CompareProvider>{children}</CompareProvider>
-          </WishlistProvider>
+          <RiderProvider>
+            <WishlistProvider>
+              <CompareProvider>{children}</CompareProvider>
+            </WishlistProvider>
+          </RiderProvider>
         </CartProvider>
       </AuthProvider>
     </QueryClientProvider>

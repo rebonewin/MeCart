@@ -55,7 +55,7 @@ function CategoryTileCard({ category, index, featured }: { category: CategoryTil
       <Link
         href={`/categories/${category.slug}`}
         className={cn(
-          "group relative flex h-full flex-col justify-between overflow-hidden rounded-[1.6rem] border border-white/[0.08] bg-[#0a0c1a] p-5 transition-shadow duration-500 hover:shadow-[0_40px_90px_-50px_rgba(99,102,241,0.75)]",
+          "lx-dark-scene group relative flex h-full flex-col justify-between overflow-hidden rounded-[1.6rem] border border-white/[0.08] bg-[#0a0c1a] p-5 transition-shadow duration-500 hover:shadow-[0_40px_90px_-50px_rgba(169,120,46,0.55)]",
           featured ? "min-h-[17rem] lg:min-h-[20rem]" : "min-h-[14rem]",
         )}
       >

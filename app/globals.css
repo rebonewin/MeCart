@@ -1,17 +1,145 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --font-display: var(--font-playfair, Georgia, "Times New Roman", serif);
+  --font-sans: var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif);
+  --font-mono: var(--font-geist-mono, ui-monospace, SFMono-Regular, monospace);
+}
+
+/* ============================================================
+   MeCart Atelier — premium storefront design tokens
+   Light: warm gallery ivory. Dark: obsidian atelier.
+   ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #0f172a;
+  color-scheme: light;
+
+  --background: #f7f4ed;
+  --foreground: #17181d;
   --mecart-primary: #4f46e5;
-  --mecart-secondary: #10b981;
-  --mecart-gray: #6b7280;
-  --font-sans: Arial, Helvetica, sans-serif;
+  --mecart-secondary: #0e7490;
+  --mecart-gray: #6c6a63;
+
+  --lx-bg: #f7f4ed;
+  --lx-bg-elevated: #fffdf8;
+  --lx-surface: #fffdf8;
+  --lx-surface-2: #f0eadf;
+  --lx-panel: #ffffff;
+  --lx-ink: #05060e;
+  --lx-ink-2: #090b18;
+  --lx-iris: #4f46e5;
+  --lx-cyan: #0e7490;
+  --lx-violet: #7c5bd6;
+  --lx-gold: #a9782e;
+  --lx-gold-soft: #c89a4b;
+  --lx-emerald: #047857;
+  --lx-rose: #be123c;
+  --lx-text: #17181d;
+  --lx-muted: #6c6a63;
+  --lx-faint: #969187;
+  --lx-border: rgba(23, 24, 29, 0.11);
+  --lx-border-strong: rgba(23, 24, 29, 0.2);
+  --lx-ring: rgba(169, 120, 46, 0.3);
+  --lx-glass-bg: linear-gradient(165deg, rgba(255, 255, 255, 0.82), rgba(255, 253, 248, 0.52));
+  --lx-glass-border: rgba(23, 24, 29, 0.1);
+  --lx-card-top: #fffdf9;
+  --lx-card-bottom: #fbf6eb;
+  --lx-card-edge: rgba(23, 24, 29, 0.08);
+  --lx-card-shadow:
+    0 34px 80px -52px rgba(23, 24, 29, 0.5),
+    0 10px 26px -20px rgba(23, 24, 29, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --lx-panel-shadow:
+    0 0 0 1px rgba(23, 24, 29, 0.04),
+    0 24px 60px -38px rgba(23, 24, 29, 0.3);
+  --lx-skeleton-a: #ece5d9;
+  --lx-skeleton-b: #f8f3e9;
+  --lx-selection: rgba(169, 120, 46, 0.26);
 }
 
 .dark {
-  --background: #0f172a;
-  --foreground: #f8fafc;
+  color-scheme: dark;
+
+  --background: #05060e;
+  --foreground: #e8eaf6;
+
+  --lx-bg: #05060e;
+  --lx-bg-elevated: #0a0c18;
+  --lx-surface: #0d1020;
+  --lx-surface-2: #12152a;
+  --lx-panel: #0d1020;
+  --lx-iris: #6366f1;
+  --lx-cyan: #22d3ee;
+  --lx-violet: #a78bfa;
+  --lx-gold: #f0c46c;
+  --lx-gold-soft: #e7b75a;
+  --lx-emerald: #34d399;
+  --lx-rose: #fb7185;
+  --lx-text: #e8eaf6;
+  --lx-muted: #9aa3c0;
+  --lx-faint: #6f7897;
+  --lx-border: rgba(255, 255, 255, 0.09);
+  --lx-border-strong: rgba(255, 255, 255, 0.2);
+  --lx-ring: rgba(240, 196, 108, 0.34);
+  --lx-glass-bg: linear-gradient(165deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+  --lx-glass-border: rgba(255, 255, 255, 0.09);
+  --lx-card-top: #13162a;
+  --lx-card-bottom: #080a16;
+  --lx-card-edge: rgba(255, 255, 255, 0.1);
+  --lx-card-shadow:
+    0 30px 70px -40px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --lx-panel-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 18px 50px -24px rgba(99, 102, 241, 0.55),
+    0 8px 24px -18px rgba(34, 211, 238, 0.4);
+  --lx-skeleton-a: rgba(255, 255, 255, 0.045);
+  --lx-skeleton-b: rgba(255, 255, 255, 0.12);
+  --lx-selection: rgba(240, 196, 108, 0.28);
+}
+
+/* Force the obsidian token set inside intentional dark scenes (hero, header,
+   footer, quick view) even while the document is in light mode. */
+.lx-dark-scene {
+  color-scheme: dark;
+  --background: #05060e;
+  --foreground: #e8eaf6;
+  --lx-bg: #05060e;
+  --lx-bg-elevated: #0a0c18;
+  --lx-surface: #0d1020;
+  --lx-surface-2: #12152a;
+  --lx-panel: #0d1020;
+  --lx-iris: #6366f1;
+  --lx-cyan: #22d3ee;
+  --lx-violet: #a78bfa;
+  --lx-gold: #f0c46c;
+  --lx-gold-soft: #e7b75a;
+  --lx-emerald: #34d399;
+  --lx-rose: #fb7185;
+  --lx-text: #e8eaf6;
+  --lx-muted: #9aa3c0;
+  --lx-faint: #6f7897;
+  --lx-border: rgba(255, 255, 255, 0.09);
+  --lx-border-strong: rgba(255, 255, 255, 0.2);
+  --lx-ring: rgba(240, 196, 108, 0.34);
+  --lx-glass-bg: linear-gradient(165deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+  --lx-glass-border: rgba(255, 255, 255, 0.09);
+  --lx-card-top: #13162a;
+  --lx-card-bottom: #080a16;
+  --lx-card-edge: rgba(255, 255, 255, 0.1);
+  --lx-card-shadow:
+    0 30px 70px -40px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --lx-panel-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 18px 50px -24px rgba(99, 102, 241, 0.55),
+    0 8px 24px -18px rgba(34, 211, 238, 0.4);
+  --lx-skeleton-a: rgba(255, 255, 255, 0.045);
+  --lx-skeleton-b: rgba(255, 255, 255, 0.12);
+  --lx-selection: rgba(240, 196, 108, 0.28);
+  color: var(--lx-text);
 }
 
 html,
@@ -21,14 +149,43 @@ body {
   padding: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+  scrollbar-color: color-mix(in srgb, var(--lx-muted) 45%, transparent) transparent;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans, Arial, Helvetica), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif);
+  font-feature-settings: "ss01" 1, "cv11" 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 * {
   box-sizing: border-box;
+}
+
+::selection {
+  background: var(--lx-selection);
+  color: var(--lx-text);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--lx-muted) 42%, transparent);
+  border: 3px solid var(--background);
 }
 
 @layer base {
@@ -36,53 +193,63 @@ body {
     color: inherit;
     text-decoration: none;
   }
-}
 
-.glass-float {
-  transform-style: preserve-3d;
-  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.12);
-}
+  button,
+  a,
+  input,
+  select,
+  textarea,
+  [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
 
-.glass-card {
-  transform-style: preserve-3d;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
+  :focus-visible {
+    outline: 2px solid var(--lx-gold);
+    outline-offset: 3px;
+  }
 
-.noise-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 5;
-  pointer-events: none;
-  opacity: 0.045;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  mix-blend-mode: overlay;
-}
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
 
-.magnetic-button:hover {
-  transform: translateY(-3px) scale(1.02);
+  p {
+    text-wrap: pretty;
+  }
 }
 
 /* ============================================================
-   MeCart Atelier — luxury storefront design system
+   Layout + typography primitives
    ============================================================ */
 
-@theme inline {
-  --font-display: var(--font-playfair, Georgia, "Times New Roman", serif);
+.lx-page {
+  position: relative;
+  min-height: 70svh;
+  background:
+    radial-gradient(80rem 44rem at 8% -10%, color-mix(in srgb, var(--lx-gold) 9%, transparent), transparent 58%),
+    radial-gradient(70rem 40rem at 96% 4%, color-mix(in srgb, var(--lx-cyan) 6%, transparent), transparent 62%),
+    var(--lx-bg);
+  color: var(--lx-text);
 }
 
-:root {
-  --lx-ink: #05060e;
-  --lx-ink-2: #090b18;
-  --lx-panel: #0d1020;
-  --lx-iris: #6366f1;
-  --lx-cyan: #22d3ee;
-  --lx-violet: #a78bfa;
-  --lx-gold: #f0c46c;
-  --lx-emerald: #34d399;
-  --lx-rose: #fb7185;
-  --lx-text: #e8eaf6;
-  --lx-muted: #9aa3c0;
-  --lx-border: rgba(255, 255, 255, 0.09);
+.lx-container {
+  width: 100%;
+  max-width: 80rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+@media (min-width: 640px) {
+  .lx-container {
+    padding-inline: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lx-container {
+    padding-inline: 2rem;
+  }
 }
 
 .lx-serif {
@@ -91,9 +258,56 @@ body {
   font-weight: 500;
 }
 
+.lx-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-geist-mono, ui-monospace, monospace);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--lx-gold);
+}
+
+.lx-eyebrow::before {
+  content: "";
+  width: 1.75rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, currentColor);
+}
+
+.lx-display {
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  font-weight: 550;
+}
+
+.lx-title {
+  font-size: clamp(1.9rem, 3vw, 2.9rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  font-weight: 550;
+}
+
+.lx-body {
+  color: var(--lx-muted);
+  line-height: 1.75;
+}
+
+.lx-rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--lx-border-strong), transparent);
+}
+
+/* ============================================================
+   Surfaces
+   ============================================================ */
+
 .lx-glass {
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
-  border: 1px solid var(--lx-border);
+  background: var(--lx-glass-bg);
+  border: 1px solid var(--lx-glass-border);
   backdrop-filter: blur(20px) saturate(1.5);
   -webkit-backdrop-filter: blur(20px) saturate(1.5);
 }
@@ -101,11 +315,9 @@ body {
 .lx-card {
   position: relative;
   border-radius: 1.5rem;
-  background: linear-gradient(170deg, rgba(19, 22, 42, 0.94), rgba(8, 10, 22, 0.98));
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow:
-    0 30px 70px -40px rgba(0, 0, 0, 0.9),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  background: linear-gradient(170deg, var(--lx-card-top), var(--lx-card-bottom));
+  border: 1px solid var(--lx-border);
+  box-shadow: var(--lx-card-shadow);
 }
 
 .lx-card::after {
@@ -116,10 +328,10 @@ body {
   padding: 1px;
   background: linear-gradient(
     150deg,
-    rgba(255, 255, 255, 0.28),
-    rgba(255, 255, 255, 0) 28%,
-    rgba(255, 255, 255, 0) 68%,
-    rgba(255, 255, 255, 0.1)
+    var(--lx-card-edge),
+    transparent 28%,
+    transparent 68%,
+    color-mix(in srgb, var(--lx-card-edge) 55%, transparent)
   );
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
@@ -133,21 +345,24 @@ body {
 }
 
 .lx-panel-glow {
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.06),
-    0 18px 50px -24px rgba(99, 102, 241, 0.55),
-    0 8px 24px -18px rgba(34, 211, 238, 0.4);
+  box-shadow: var(--lx-panel-shadow);
 }
 
 .lx-text-grad {
-  background: linear-gradient(100deg, #ffffff 8%, #c7d2fe 42%, #67e8f9 68%, #f0c46c 96%);
+  background: linear-gradient(
+    100deg,
+    var(--lx-text) 8%,
+    var(--lx-iris) 46%,
+    var(--lx-cyan) 70%,
+    var(--lx-gold) 96%
+  );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
 .lx-text-dim-grad {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(255, 255, 255, 0.5));
+  background: linear-gradient(180deg, var(--lx-text), color-mix(in srgb, var(--lx-text) 48%, transparent));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -157,18 +372,195 @@ body {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(99, 102, 241, 0.7),
-    rgba(34, 211, 238, 0.7),
-    rgba(240, 196, 108, 0.6),
+    color-mix(in srgb, var(--lx-iris) 70%, transparent),
+    color-mix(in srgb, var(--lx-cyan) 70%, transparent),
+    color-mix(in srgb, var(--lx-gold) 60%, transparent),
     transparent
   );
 }
+
+/* ============================================================
+   Fields, chips, buttons
+   ============================================================ */
+
+.lx-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-geist-mono, ui-monospace, monospace);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--lx-muted);
+}
+
+.lx-field {
+  width: 100%;
+  min-height: 3rem;
+  border-radius: 0.9rem;
+  border: 1px solid var(--lx-border);
+  background: color-mix(in srgb, var(--lx-surface) 88%, transparent);
+  padding: 0.75rem 0.95rem;
+  color: var(--lx-text);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.lx-field::placeholder {
+  color: color-mix(in srgb, var(--lx-muted) 72%, transparent);
+}
+
+.lx-field:hover {
+  border-color: var(--lx-border-strong);
+}
+
+.lx-field:focus {
+  border-color: color-mix(in srgb, var(--lx-gold) 65%, var(--lx-border));
+  box-shadow: 0 0 0 4px var(--lx-ring);
+  background: var(--lx-surface);
+}
+
+.lx-field:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.lx-field-error {
+  border-color: color-mix(in srgb, var(--lx-rose) 60%, var(--lx-border));
+}
+
+.lx-error {
+  margin-top: 0.4rem;
+  font-size: 0.72rem;
+  color: var(--lx-rose);
+}
+
+.lx-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  border: 1px solid var(--lx-border);
+  background: color-mix(in srgb, var(--lx-surface) 70%, transparent);
+  padding: 0.45rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--lx-muted);
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.lx-chip:hover {
+  border-color: var(--lx-border-strong);
+  color: var(--lx-text);
+  transform: translateY(-1px);
+}
+
+.lx-chip-active {
+  border-color: color-mix(in srgb, var(--lx-gold) 55%, var(--lx-border));
+  background: color-mix(in srgb, var(--lx-gold) 12%, var(--lx-surface));
+  color: var(--lx-text);
+}
+
+.lx-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.5rem;
+  width: 2.5rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  color: var(--lx-muted);
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.lx-icon-button:hover {
+  border-color: var(--lx-border);
+  background: color-mix(in srgb, var(--lx-surface) 70%, transparent);
+  color: var(--lx-text);
+  transform: translateY(-1px);
+}
+
+.lx-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--lx-text);
+  transition: color 0.2s ease;
+}
+
+.lx-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.2rem;
+  height: 1px;
+  transform: scaleX(0);
+  transform-origin: left;
+  background: var(--lx-gold);
+  transition: transform 0.3s ease;
+}
+
+.lx-link:hover::after {
+  transform: scaleX(1);
+}
+
+/* ============================================================
+   Shimmer + skeletons
+   ============================================================ */
+
+.lx-shimmer {
+  background: linear-gradient(
+    100deg,
+    var(--lx-skeleton-a) 25%,
+    var(--lx-skeleton-b) 45%,
+    var(--lx-skeleton-a) 65%
+  );
+  background-size: 220% 100%;
+  animation: lx-shimmer 1.5s linear infinite;
+}
+
+.lx-skeleton {
+  border-radius: 0.9rem;
+  background: linear-gradient(
+    100deg,
+    var(--lx-skeleton-a) 25%,
+    var(--lx-skeleton-b) 45%,
+    var(--lx-skeleton-a) 65%
+  );
+  background-size: 220% 100%;
+  animation: lx-shimmer 1.5s linear infinite;
+}
+
+@keyframes lx-shimmer {
+  to {
+    background-position: -220% 0;
+  }
+}
+
+/* ============================================================
+   Motion utilities
+   ============================================================ */
 
 .lx-ripple {
   position: absolute;
   border-radius: 9999px;
   background: currentColor;
-  opacity: 0.25;
+  opacity: 0.22;
   transform: scale(0);
   animation: lx-ripple 0.7s ease-out forwards;
   pointer-events: none;
@@ -178,23 +570,6 @@ body {
   to {
     transform: scale(3.4);
     opacity: 0;
-  }
-}
-
-.lx-shimmer {
-  background: linear-gradient(
-    100deg,
-    rgba(255, 255, 255, 0.045) 25%,
-    rgba(255, 255, 255, 0.14) 45%,
-    rgba(255, 255, 255, 0.045) 65%
-  );
-  background-size: 220% 100%;
-  animation: lx-shimmer 1.5s linear infinite;
-}
-
-@keyframes lx-shimmer {
-  to {
-    background-position: -220% 0;
   }
 }
 
@@ -231,6 +606,16 @@ body {
   background-size: 54px 54px;
   mask-image: radial-gradient(ellipse 75% 55% at 50% 0%, #000 25%, transparent 78%);
   -webkit-mask-image: radial-gradient(ellipse 75% 55% at 50% 0%, #000 25%, transparent 78%);
+}
+
+.lx-spotlight {
+  background: radial-gradient(
+    620px circle at var(--mx, 50%) var(--my, 38%),
+    rgba(129, 140, 248, 0.18),
+    rgba(34, 211, 238, 0.08) 38%,
+    transparent 66%
+  );
+  transition: opacity 0.4s ease;
 }
 
 .lx-blob {
@@ -284,7 +669,14 @@ body {
 }
 
 .lx-conic-ring {
-  background: conic-gradient(from 0deg, var(--lx-iris), var(--lx-cyan), var(--lx-gold), var(--lx-violet), var(--lx-iris));
+  background: conic-gradient(
+    from 0deg,
+    var(--lx-iris),
+    var(--lx-cyan),
+    var(--lx-gold),
+    var(--lx-violet),
+    var(--lx-iris)
+  );
   animation: lx-spin 7s linear infinite;
 }
 
@@ -326,6 +718,32 @@ body {
   animation: lx-scroll-cue 1.8s ease-in-out infinite;
 }
 
+.glass-float {
+  transform-style: preserve-3d;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.12);
+}
+
+.glass-card {
+  transform-style: preserve-3d;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+.magnetic-button:hover {
+  transform: translateY(-3px) scale(1.02);
+}
+
 .hide-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -335,7 +753,18 @@ body {
   display: none;
 }
 
+/* View transitions for Next.js route changes where supported */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   .lx-drift-a,
   .lx-drift-b,
   .lx-drift-c,
@@ -343,7 +772,16 @@ body {
   .lx-float,
   .lx-scroll-cue,
   .lx-marquee-track,
-  .lx-shimmer {
+  .lx-shimmer,
+  .lx-skeleton {
     animation: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

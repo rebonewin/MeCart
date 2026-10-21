@@ -39,12 +39,12 @@ const FALLBACK: StorefrontReview[] = [
 function ReviewCard({ review }: { review: StorefrontReview }) {
   const firstName = review.author.trim().split(/\s+/)[0] || "Customer";
   return (
-    <figure className="lx-glass flex h-full w-[19rem] shrink-0 snap-start flex-col rounded-2xl p-5 transition-colors duration-300 hover:bg-white/[0.08] sm:w-[21rem]">
+    <figure className="lx-glass flex h-full w-[19rem] shrink-0 snap-start flex-col rounded-2xl p-5 transition-colors duration-300 hover:border-[var(--lx-border-strong)] hover:bg-[var(--lx-surface-2)] sm:w-[21rem]">
       <div className="flex items-center justify-between">
         <Stars rating={review.rating} size={13} />
-        <Quote className="h-4 w-4 text-white/15" aria-hidden />
+        <Quote className="h-4 w-4 text-[var(--lx-muted)]/25" aria-hidden />
       </div>
-      {review.title ? <p className="mt-4 text-sm font-semibold text-white">{review.title}</p> : null}
+      {review.title ? <p className="mt-4 text-sm font-semibold text-[var(--lx-text)]">{review.title}</p> : null}
       <blockquote className="mt-2 line-clamp-4 text-sm leading-6 text-[var(--lx-muted)]">
         “{review.body ?? "Verified purchase — rated the experience highly."}”
       </blockquote>
@@ -53,7 +53,7 @@ function ReviewCard({ review }: { review: StorefrontReview }) {
           {firstName[0]}
         </span>
         <span className="min-w-0">
-          <span className="block truncate text-sm font-medium text-white">{firstName}</span>
+          <span className="block truncate text-sm font-medium text-[var(--lx-text)]">{firstName}</span>
           <span className="block truncate text-[11px] text-[var(--lx-muted)]">
             Verified buyer · {review.productName}
           </span>
@@ -112,11 +112,11 @@ export function CustomerReviews({ reviews, stats }: { reviews: StorefrontReview[
       </Reveal>
 
       <div className="mx-auto mt-10 flex max-w-7xl items-center gap-6 px-4 sm:px-6 lg:px-8">
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[var(--lx-border-strong)] to-transparent" />
         <p className={cn("font-mono text-[9px] uppercase tracking-[0.3em] text-[var(--lx-muted)]")}>
           Auto-advancing · hover to pause
         </p>
-        <div className="h-px flex-1 bg-gradient-to-l from-transparent via-white/15 to-transparent" />
+        <div className="h-px flex-1 bg-gradient-to-l from-transparent via-[var(--lx-border-strong)] to-transparent" />
       </div>
     </section>
   );
