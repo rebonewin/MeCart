@@ -37,7 +37,7 @@ export function SiteFooter() {
       <div className="relative mx-auto max-w-7xl px-4 pb-10 pt-16 sm:px-6 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-[1.3fr_1fr_1fr_1fr]">
           <div>
-            <Link href="/" className="flex items-center gap-2.5" aria-label="MeCart home">
+            <Link href="/" className="flex items-center gap-2.5">
               <span className="relative flex h-11 w-11 items-center justify-center">
                 <span className="lx-conic-ring absolute inset-0 rounded-[13px] opacity-90" />
                 <span className="relative z-10 flex h-[calc(100%-3px)] w-[calc(100%-3px)] items-center justify-center rounded-[11px] bg-[#05060e] text-base font-black text-white">
@@ -55,7 +55,7 @@ export function SiteFooter() {
               A premium commerce atelier — considered objects, live inventory and atelier care on every
               order. Built on a real-time catalogue, not a brochure.
             </p>
-            <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 font-mono text-[9px] uppercase tracking-[0.22em] text-white/45">
+            <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 font-mono text-[9px] uppercase tracking-[0.22em] text-white/55">
               <span>Curated in small batches</span>
               <span>Worldwide delivery</span>
               <span>7-day returns</span>
@@ -111,7 +111,7 @@ export function SiteFooter() {
             {["VISA", "MC", "AMEX", "PAYPAL"].map((method) => (
               <span
                 key={method}
-                className="rounded-md border border-white/10 px-2.5 py-1 font-mono text-[9px] tracking-[0.14em] text-white/45"
+                className="rounded-md border border-white/10 px-2.5 py-1 font-mono text-[9px] tracking-[0.14em] text-white/55"
               >
                 {method}
               </span>
