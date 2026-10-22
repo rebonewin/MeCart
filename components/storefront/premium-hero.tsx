@@ -164,15 +164,10 @@ export function PremiumHero({ stats, artifacts }: { stats: StorefrontStats; arti
           <span className="inline-flex h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--lx-emerald)]" />
         </motion.div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 26 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.85, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-7 max-w-4xl text-[2.6rem] font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-[4.4rem]"
-        >
+        <h1 className="mt-7 max-w-4xl text-[2.6rem] font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-[4.4rem]">
           Objects of <span className="lx-serif text-[var(--lx-gold)]">desire,</span>
           <br className="hidden sm:block" /> delivered in <span className="lx-text-grad">motion</span>.
-        </motion.h1>
+        </h1>
 
         <motion.p
           initial={{ opacity: 0, y: 22 }}

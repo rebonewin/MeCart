@@ -97,7 +97,7 @@ export function LoadingScreen() {
     const timer = window.setInterval(() => {
       setProgress((current) => Math.min(current + Math.ceil(Math.random() * 16), 100));
     }, 100);
-    const hide = window.setTimeout(() => setVisible(false), 1450);
+    const hide = window.setTimeout(() => setVisible(false), 900);
     return () => {
       window.clearInterval(timer);
       window.clearTimeout(hide);
@@ -111,7 +111,7 @@ export function LoadingScreen() {
           className="fixed inset-0 z-[200] flex items-center justify-center bg-[#04050d]"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0, filter: "blur(18px)" }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
           aria-hidden
         >
           <div className="text-center">
