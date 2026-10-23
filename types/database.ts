@@ -11,11 +11,24 @@
  * aliases used across the app.
  */
 
-import type { Database as GeneratedDatabase } from "./database.gen";
+import type { Database as MarketplaceDatabase } from "./marketplace-database";
 
 export type { Json } from "./database.gen";
+export type {
+  VendorStatus,
+  VendorVerificationStatus,
+  VendorMemberRole,
+  VendorStoreStatus,
+  VendorProductApproval,
+  VendorFulfillmentStatus,
+  VendorPayoutStatus,
+  VendorReturnStatus,
+  VendorLedgerType,
+  VendorMessageSender,
+  VendorConversationStatus,
+} from "./marketplace-database";
 
-export type Database = GeneratedDatabase;
+export type Database = MarketplaceDatabase;
 
 type PublicSchema = Database["public"];
 type Tables = PublicSchema["Tables"];
@@ -89,3 +102,22 @@ export type TaxRuleRow = Tables["tax_rules"]["Row"];
 
 export type SettingRow = Tables["settings"]["Row"];
 export type ThemeSettingRow = Tables["theme_settings"]["Row"];
+
+// --- marketplace rows -------------------------------------------------------
+export type VendorRow = Tables["vendors"]["Row"];
+export type StoreRow = Tables["stores"]["Row"];
+export type VendorMemberRow = Tables["vendor_members"]["Row"];
+export type VendorVerificationRow = Tables["vendor_verifications"]["Row"];
+export type VendorShippingProfileRow = Tables["vendor_shipping_profiles"]["Row"];
+export type VendorShippingRateRow = Tables["vendor_shipping_rates"]["Row"];
+export type VendorPayoutAccountRow = Tables["vendor_payout_accounts"]["Row"];
+export type VendorPayoutRow = Tables["vendor_payouts"]["Row"];
+export type VendorLedgerEntryRow = Tables["vendor_ledger_entries"]["Row"];
+export type VendorOrderAllocationRow = Tables["vendor_order_allocations"]["Row"];
+export type VendorReturnRow = Tables["vendor_returns"]["Row"];
+export type VendorConversationRow = Tables["vendor_conversations"]["Row"];
+export type VendorMessageRow = Tables["vendor_messages"]["Row"];
+export type VendorNotificationRow = Tables["vendor_notifications"]["Row"];
+export type VendorAuditLogRow = Tables["vendor_audit_logs"]["Row"];
+export type StoreFollowerRow = Tables["store_followers"]["Row"];
+export type PublicVendorProfileRow = PublicSchema["Views"]["public_vendor_profiles"]["Row"];

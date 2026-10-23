@@ -16,8 +16,11 @@ export type CompareItem = {
   id: string;
   name: string;
   slug: string;
+  sku: string;
+  description: string;
   brandName: string;
   categoryName: string;
+  subCategoryName: string;
   price: number;
   originalPrice: number;
   discountPercent: number;
@@ -29,6 +32,10 @@ export type CompareItem = {
   colors: string[];
   material: string;
   country: string;
+  weight: number;
+  createdAt: string;
+  bestSeller: boolean;
+  newArrival: boolean;
 };
 
 const MAX_ITEMS = 4;
@@ -46,13 +53,47 @@ type CompareContextValue = {
 
 const CompareContext = createContext<CompareContextValue | null>(null);
 
+function normalizeStored(value: unknown): CompareItem | null {
+  if (!value || typeof value !== "object") return null;
+  const item = value as Partial<CompareItem>;
+  if (!item.id || !item.name || !item.slug) return null;
+  return {
+    id: item.id,
+    name: item.name,
+    slug: item.slug,
+    sku: item.sku ?? "—",
+    description: item.description ?? "",
+    brandName: item.brandName ?? "—",
+    categoryName: item.categoryName ?? "—",
+    subCategoryName: item.subCategoryName ?? "—",
+    price: Number(item.price ?? 0),
+    originalPrice: Number(item.originalPrice ?? item.price ?? 0),
+    discountPercent: Number(item.discountPercent ?? 0),
+    rating: Number(item.rating ?? 0),
+    reviewCount: Number(item.reviewCount ?? 0),
+    stock: Number(item.stock ?? 0),
+    image: item.image ?? "",
+    sizes: Array.isArray(item.sizes) ? item.sizes.filter((entry): entry is string => typeof entry === "string") : [],
+    colors: Array.isArray(item.colors) ? item.colors.filter((entry): entry is string => typeof entry === "string") : [],
+    material: item.material ?? "—",
+    country: item.country ?? "—",
+    weight: Number(item.weight ?? 0),
+    createdAt: item.createdAt ?? new Date().toISOString(),
+    bestSeller: Boolean(item.bestSeller),
+    newArrival: Boolean(item.newArrival),
+  };
+}
+
 export function snapshotOf(product: StorefrontProduct): CompareItem {
   return {
     id: product.id,
     name: product.name,
     slug: product.slug,
+    sku: product.sku,
+    description: product.description,
     brandName: product.brandName || "—",
     categoryName: product.categoryName || "—",
+    subCategoryName: product.subCategoryName || "—",
     price: product.finalPrice,
     originalPrice: product.originalPrice,
     discountPercent: product.discountPercent,
@@ -64,6 +105,10 @@ export function snapshotOf(product: StorefrontProduct): CompareItem {
     colors: product.colors,
     material: product.material || "—",
     country: product.country || "—",
+    weight: product.weight,
+    createdAt: product.createdAt,
+    bestSeller: Boolean(product.bestSeller),
+    newArrival: Boolean(product.newArrival),
   };
 }
 
@@ -76,8 +121,15 @@ export function CompareProvider({ children }: { children: React.ReactNode }) {
       try {
         const raw = window.localStorage.getItem(STORAGE_KEY);
         if (raw) {
-          const parsed = JSON.parse(raw) as CompareItem[];
-          if (Array.isArray(parsed)) setItems(parsed.slice(0, MAX_ITEMS));
+          const parsed = JSON.parse(raw) as unknown;
+          if (Array.isArray(parsed)) {
+            setItems(
+              parsed
+                .map(normalizeStored)
+                .filter((item): item is CompareItem => Boolean(item))
+                .slice(0, MAX_ITEMS),
+            );
+          }
         }
       } catch {
         // corrupted storage — start fresh

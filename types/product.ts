@@ -45,6 +45,8 @@ export type Product = {
   coverImage: string;
   images: string[];
   createdAt: string;
+  storeName?: string;
+  storeSlug?: string;
 };
 
 /** Structural shape shared by storefront views (subset of the admin ProductView flags). */

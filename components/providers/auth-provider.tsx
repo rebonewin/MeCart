@@ -1,8 +1,8 @@
 "use client";
 
-import React, { createContext, useContext, useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import React, { createContext, useContext, useCallback, useEffect, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { getSupabase, hasSupabaseSessionCookie } from "@/lib/supabase/browser";
 import type { AppRole } from "@/types/database";
 
 export type AuthUser = {
@@ -28,10 +28,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
+  const lastPathname = useRef(pathname);
 
   const loadUser = useCallback(async () => {
     try {
-      const supabase = createClient();
+      const supabase = await getSupabase();
       const {
         data: { user: authUser },
       } = await supabase.auth.getUser();
@@ -65,36 +67,61 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    let supabase: ReturnType<typeof createClient> | null = null;
-    try {
-      supabase = createClient();
-    } catch {
-      supabase = null;
+    let cancelled = false;
+    let unsubscribe: (() => void) | undefined;
+    let timer = 0;
+
+    if (!hasSupabaseSessionCookie()) {
+      timer = window.setTimeout(() => {
+        if (!cancelled) setLoading(false);
+      }, 0);
+      return () => {
+        cancelled = true;
+        window.clearTimeout(timer);
+      };
     }
 
-    const timer = window.setTimeout(() => void loadUser(), 0);
-
-    const subscription = supabase
-      ? supabase.auth.onAuthStateChange((event) => {
-          if (
-            event === "SIGNED_IN" ||
-            event === "SIGNED_OUT" ||
-            event === "USER_UPDATED" ||
-            event === "INITIAL_SESSION"
-          ) {
-            void loadUser().then(() => router.refresh());
-          }
-        }).data.subscription
-      : null;
+    // Returning visitors already have a session; hydrate auth just after the
+    // first paint so the storefront can become interactive sooner.
+    timer = window.setTimeout(() => {
+      void loadUser();
+      void getSupabase()
+        .then((supabase) => {
+          if (cancelled) return;
+          const { data } = supabase.auth.onAuthStateChange((event) => {
+            if (
+              event === "SIGNED_IN" ||
+              event === "SIGNED_OUT" ||
+              event === "USER_UPDATED" ||
+              event === "INITIAL_SESSION"
+            ) {
+              void loadUser().then(() => router.refresh());
+            }
+          });
+          unsubscribe = () => data.subscription.unsubscribe();
+        })
+        .catch(() => undefined);
+    }, 900);
 
     return () => {
+      cancelled = true;
       window.clearTimeout(timer);
-      subscription?.unsubscribe();
+      unsubscribe?.();
     };
   }, [loadUser, router]);
 
+  // A client-side sign-in or sign-out changes the cookie without remounting
+  // the provider. Reconcile the visible account on the next route change.
+  useEffect(() => {
+    if (lastPathname.current === pathname) return;
+    lastPathname.current = pathname;
+    if (!hasSupabaseSessionCookie()) return;
+    const timer = window.setTimeout(() => void loadUser(), 0);
+    return () => window.clearTimeout(timer);
+  }, [pathname, loadUser]);
+
   const signOut = useCallback(async () => {
-    const supabase = createClient();
+    const supabase = await getSupabase();
     await supabase.auth.signOut();
     setUser(null);
     router.push("/login");

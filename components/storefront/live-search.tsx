@@ -1,11 +1,13 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Clock3, Flame, Loader2, Search, X } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import { ArrowRight, Camera, Clock3, Flame, Loader2, Mic, Search, X } from "lucide-react";
+import { getSupabase } from "@/lib/supabase/browser";
+import { useVoiceSearch } from "@/lib/hooks/use-voice-search";
 import { cn } from "@/lib/cn";
 import { Shimmer } from "@/components/luxe/primitives";
 
@@ -29,6 +31,20 @@ type HitRow = {
 
 const RECENT_KEY = "mecart.recent-searches";
 const POPULAR = ["Watches", "Sneakers", "Headphones", "Fragrance", "New arrivals"];
+
+const VisualSearchPanel = dynamic(
+  () => import("@/components/storefront/visual-search-panel").then((module) => module.VisualSearchPanel),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="space-y-3 p-4" aria-hidden>
+        <div className="h-3 w-32 animate-pulse rounded-full bg-white/10" />
+        <div className="h-40 animate-pulse rounded-2xl bg-white/5" />
+        <div className="h-3 w-2/3 animate-pulse rounded-full bg-white/10" />
+      </div>
+    ),
+  },
+);
 
 function readRecent(): string[] {
   try {
@@ -61,6 +77,7 @@ export function LiveSearch({
   const listId = useId();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState<"search" | "visual">("search");
   const [loading, setLoading] = useState(false);
   const [hits, setHits] = useState<Hit[]>([]);
   const [active, setActive] = useState(-1);
@@ -97,6 +114,7 @@ export function LiveSearch({
 
   const handleChange = (value: string) => {
     setQuery(value);
+    setMode("search");
     setActive(-1);
     const term = value.trim();
     if (term.length >= 2) {
@@ -115,7 +133,7 @@ export function LiveSearch({
     if (term.length < 2) return;
     const timer = window.setTimeout(async () => {
       try {
-        const supabase = createClient();
+        const supabase = await getSupabase();
         const { data } = await supabase
           .from("products")
           .select("id, name, slug, final_price, product_images(url, position), categories(name)")
@@ -151,7 +169,10 @@ export function LiveSearch({
 
   useEffect(() => {
     const onPointerDown = (event: PointerEvent) => {
-      if (!boxRef.current?.contains(event.target as Node)) setOpen(false);
+      if (!boxRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+        setMode("search");
+      }
     };
     window.addEventListener("pointerdown", onPointerDown);
     return () => window.removeEventListener("pointerdown", onPointerDown);
@@ -179,9 +200,22 @@ export function LiveSearch({
     setQuery(term);
     remember(term);
     setOpen(false);
+    setMode("search");
     setActive(-1);
     onNavigate?.();
     router.push(`/search?q=${encodeURIComponent(term)}`);
+  };
+
+  const voice = useVoiceSearch({
+    onResult: (transcript) => runTerm(transcript),
+  });
+
+  const openVisual = () => {
+    setMode("visual");
+    setOpen(true);
+    setHits([]);
+    setActive(-1);
+    inputRef.current?.blur();
   };
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -193,6 +227,7 @@ export function LiveSearch({
       setActive((current) => Math.max(current - 1, -1));
     } else if (event.key === "Escape") {
       setOpen(false);
+      setMode("search");
       setActive(-1);
       inputRef.current?.blur();
     } else if (event.key === "Enter") {
@@ -259,6 +294,40 @@ export function LiveSearch({
           {loading ? (
             <Loader2 className="h-4 w-4 shrink-0 animate-spin text-[var(--lx-cyan)]" aria-hidden />
           ) : null}
+          {voice.supported ? (
+            <button
+              type="button"
+              onClick={() => {
+                setMode("search");
+                if (voice.listening) voice.stop();
+                else voice.start();
+              }}
+              aria-label={voice.listening ? "Stop voice search" : "Search by voice"}
+              aria-pressed={voice.listening}
+              title={voice.listening ? "Listening… tap to stop" : "Search by voice"}
+              className={cn(
+                "flex shrink-0 items-center justify-center rounded-full transition",
+                large ? "h-10 w-10" : "h-8 w-8",
+                voice.listening
+                  ? "bg-[var(--lx-cyan)]/20 text-[var(--lx-cyan)]"
+                  : "text-[var(--lx-muted)] hover:bg-white/10 hover:text-white",
+              )}
+            >
+              <Mic className={cn("h-4 w-4", voice.listening && "animate-pulse")} aria-hidden />
+            </button>
+          ) : null}
+          <button
+            type="button"
+            onClick={openVisual}
+            aria-label="Search by image"
+            title="Search by image"
+            className={cn(
+              "flex shrink-0 items-center justify-center rounded-full text-[var(--lx-muted)] transition hover:bg-white/10 hover:text-white",
+              large ? "h-10 w-10" : "h-8 w-8",
+            )}
+          >
+            <Camera className="h-4 w-4" aria-hidden />
+          </button>
           <button
             type="submit"
             className={cn(
@@ -285,6 +354,40 @@ export function LiveSearch({
                 : "absolute left-0 right-0 top-[calc(100%+10px)] z-[70]",
             )}
           >
+            {mode === "visual" ? (
+              <div className="absolute inset-0 z-20 overflow-y-auto rounded-2xl bg-[#0a0c1a]">
+                <VisualSearchPanel
+                  onClose={() => {
+                    setMode("search");
+                    window.setTimeout(() => inputRef.current?.focus(), 30);
+                  }}
+                  onNavigate={() => {
+                    setOpen(false);
+                    setMode("search");
+                    onNavigate?.();
+                  }}
+                />
+              </div>
+            ) : null}
+
+            <div className={mode === "visual" ? "hidden" : undefined}>
+            {voice.listening || voice.error ? (
+              <div
+                className="mx-2 mt-1 flex items-center gap-2 rounded-xl border border-[var(--lx-cyan)]/20 bg-[var(--lx-cyan)]/[0.06] px-3 py-2 text-[11px] text-white/65"
+                role="status"
+                aria-live="polite"
+              >
+                {voice.listening ? (
+                  <>
+                    <span className="h-2 w-2 animate-pulse rounded-full bg-[var(--lx-cyan)]" />
+                    Listening… say what you&apos;re looking for.
+                  </>
+                ) : (
+                  voice.error
+                )}
+              </div>
+            ) : null}
+
             {showMemory ? (
               <div className="p-2">
                 {recent.length ? (
@@ -414,6 +517,7 @@ export function LiveSearch({
                 <ArrowRight className="h-4 w-4" aria-hidden />
               </button>
             ) : null}
+            </div>
           </motion.div>
         ) : null}
       </AnimatePresence>

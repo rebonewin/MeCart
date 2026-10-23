@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useCallback, useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { getSupabase, hasSupabaseSessionCookie } from "@/lib/supabase/browser";
 import { ensureSession } from "@/lib/auth/guest-session";
 import {
   addToWishlist,
@@ -34,7 +34,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
 
   const refresh = useCallback(async (userId: string) => {
     try {
-      const supabase = createClient();
+      const supabase = await getSupabase();
       const rows = await listWishlist(supabase, userId);
       setItems(rows.map((r) => ({ productId: r.productId, name: r.name, slug: r.slug, price: r.price, image: r.image })));
     } catch {
@@ -47,16 +47,17 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let active = true;
     let unsubscribe: (() => void) | undefined;
+    let timer = 0;
 
     async function boot() {
       const userId = await ensureSession();
       if (!active || !userId) {
-        setLoading(false);
+        if (active) setLoading(false);
         return;
       }
       await refresh(userId);
 
-      const supabase = createClient();
+      const supabase = await getSupabase();
       const {
         data: { subscription },
       } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -72,10 +73,16 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       unsubscribe = () => subscription.unsubscribe();
     }
 
-    void boot();
+    // The header can render its empty wishlist immediately; the SDK only needs
+    // to arrive for returning sessions or after a real save interaction.
+    const delay = hasSupabaseSessionCookie() ? 1100 : 7000;
+    timer = window.setTimeout(() => {
+      if (active) void boot();
+    }, delay);
 
     return () => {
       active = false;
+      window.clearTimeout(timer);
       unsubscribe?.();
     };
   }, [refresh]);
@@ -85,7 +92,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const add = useCallback(async (item: WishlistItem) => {
     const userId = await ensureSession();
     if (!userId) return;
-    const supabase = createClient();
+    const supabase = await getSupabase();
     await addToWishlist(supabase, userId, item.productId);
     await refresh(userId);
   }, [refresh]);
@@ -93,7 +100,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const remove = useCallback(async (productId: string) => {
     const userId = await ensureSession();
     if (!userId) return;
-    const supabase = createClient();
+    const supabase = await getSupabase();
     await removeFromWishlist(supabase, userId, productId);
     await refresh(userId);
   }, [refresh]);

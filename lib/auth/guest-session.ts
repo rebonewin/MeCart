@@ -1,9 +1,9 @@
 "use client";
 
-import { createClient } from "@/lib/supabase/client";
+import { getSupabase } from "@/lib/supabase/browser";
 
-// A guest visit mounts the cart and wishlist providers at the same time; both
-// must share one anonymous session instead of racing to create several.
+// A guest visit can mount the cart and wishlist providers at the same time;
+// both must share one anonymous session instead of racing to create several.
 let pendingGuestSession: Promise<string | null> | null = null;
 
 /**
@@ -11,7 +11,7 @@ let pendingGuestSession: Promise<string | null> | null = null;
  * Returns the user id, or null when no session could be established.
  */
 export async function ensureSession(): Promise<string | null> {
-  const supabase = createClient();
+  const supabase = await getSupabase();
   const {
     data: { user },
   } = await supabase.auth.getUser();

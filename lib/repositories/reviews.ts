@@ -1,7 +1,10 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import { unwrapList, unwrapVoid } from "@/lib/repositories/utils";
-import type { ReviewRow, ReviewStatus } from "@/types/database";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database, ReviewRow, ReviewStatus } from "@/types/database";
+
+type Supabase = SupabaseClient<Database>;
 
 export type ReviewWithAuthor = ReviewRow & { author: string; productName: string };
 
@@ -17,16 +20,16 @@ export async function listReviewsForProduct(productId: string): Promise<ReviewRo
   );
 }
 
-export async function listAllReviews(status?: ReviewStatus): Promise<ReviewWithAuthor[]> {
-  const supabase = await createClient();
-  let query = supabase.from("reviews").select("*").order("created_at", { ascending: false }).limit(300);
+export async function listAllReviews(status?: ReviewStatus, supabase?: Supabase): Promise<ReviewWithAuthor[]> {
+  const client = supabase ?? (await createClient());
+  let query = client.from("reviews").select("*").order("created_at", { ascending: false }).limit(300);
   if (status) query = query.eq("status", status);
   const reviews = unwrapList(await query);
   if (!reviews.length) return [];
 
   const [profilesRes, productsRes] = await Promise.all([
-    supabase.from("profiles").select("id, full_name, username"),
-    supabase.from("products").select("id, name"),
+    client.from("profiles").select("id, full_name, username"),
+    client.from("products").select("id, name"),
   ]);
 
   const profileMap = new Map((profilesRes.data ?? []).map((p) => [p.id, p]));

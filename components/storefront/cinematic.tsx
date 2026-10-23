@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Lenis from "lenis";
 import { AnimatePresence, motion } from "framer-motion";
 import { completeIntro } from "@/lib/motion";
 
@@ -12,23 +11,41 @@ import { completeIntro } from "@/lib/motion";
 export function LenisProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Touch devices already have native momentum scrolling. Running Lenis there
+    // only adds a permanent rAF loop and main-thread work.
+    if (window.matchMedia("(pointer: coarse)").matches) return;
+    if (window.innerWidth < 1024) return;
 
-    const lenis = new Lenis({
-      duration: 1.05,
-      smoothWheel: true,
-      wheelMultiplier: 0.95,
-    });
-
+    let cancelled = false;
+    let destroyed = false;
     let frame = 0;
-    const raf = (time: number) => {
-      lenis.raf(time);
-      frame = requestAnimationFrame(raf);
-    };
-    frame = requestAnimationFrame(raf);
+    let instance: { raf: (time: number) => void; destroy: () => void } | undefined;
+
+    void import("lenis")
+      .then(({ default: Lenis }) => {
+        if (cancelled) return;
+        const lenis = new Lenis({
+          duration: 1.05,
+          smoothWheel: true,
+          wheelMultiplier: 0.95,
+        });
+        instance = lenis;
+
+        const raf = (time: number) => {
+          lenis.raf(time);
+          frame = requestAnimationFrame(raf);
+        };
+        frame = requestAnimationFrame(raf);
+      })
+      .catch(() => undefined);
 
     return () => {
+      cancelled = true;
       cancelAnimationFrame(frame);
-      lenis.destroy();
+      if (!destroyed) {
+        destroyed = true;
+        instance?.destroy();
+      }
     };
   }, []);
 
@@ -74,10 +91,21 @@ export function CustomCursor() {
 
 export function LoadingScreen() {
   const [visible, setVisible] = useState(false);
-  const [progress, setProgress] = useState(6);
+  const [progress, setProgress] = useState(12);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      completeIntro();
+      return;
+    }
+    if (window.matchMedia("(max-width: 1023px)").matches) {
+      completeIntro();
+      return;
+    }
+    const connection = (
+      navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }
+    ).connection;
+    if (connection?.saveData || connection?.effectiveType === "2g") {
       completeIntro();
       return;
     }
@@ -95,9 +123,9 @@ export function LoadingScreen() {
   useEffect(() => {
     if (!visible) return;
     const timer = window.setInterval(() => {
-      setProgress((current) => Math.min(current + Math.ceil(Math.random() * 16), 100));
-    }, 100);
-    const hide = window.setTimeout(() => setVisible(false), 900);
+      setProgress((current) => Math.min(current + Math.ceil(Math.random() * 18), 100));
+    }, 90);
+    const hide = window.setTimeout(() => setVisible(false), 560);
     return () => {
       window.clearInterval(timer);
       window.clearTimeout(hide);
@@ -111,7 +139,7 @@ export function LoadingScreen() {
           className="fixed inset-0 z-[200] flex items-center justify-center bg-[#04050d]"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0, filter: "blur(18px)" }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
+          transition={{ duration: 0.28, ease: "easeOut" }}
           aria-hidden
         >
           <div className="text-center">

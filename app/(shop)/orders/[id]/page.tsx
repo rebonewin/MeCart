@@ -1,12 +1,21 @@
-import { getOrderById } from "@/lib/actions/orders";
+import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
+import { auth } from "@/lib/auth";
+import { getOrderById } from "@/lib/actions/orders";
+import { MapPin } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const session = await auth();
+  if (!session?.user?.id) redirect("/login");
+
   const order = await getOrderById(id);
-  if (!order) return <div className="p-8 text-center">Order not found.</div>;
+  if (!order) notFound();
+
+  const isStaff = session.user.role === "admin" || session.user.role === "manager";
+  if (order.userId !== session.user.id && !isStaff) notFound();
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
@@ -31,7 +40,11 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           ))}
         </ul>
       </div>
-      <div className="mt-6 flex gap-3">
+      <div className="mt-6 flex flex-wrap gap-3">
+        <Link href={`/orders/${order.id}/track`} className="inline-flex items-center gap-2 rounded-md bg-[var(--lx-gold)] px-4 py-2 font-medium text-[#17120a]">
+          <MapPin className="h-4 w-4" aria-hidden />
+          Track order
+        </Link>
         <Link href={`/orders/${order.id}/invoice`} className="rounded-md bg-indigo-600 px-4 py-2 text-white">View Invoice</Link>
         <Link href="/orders" className="rounded-md border px-4 py-2">Back</Link>
       </div>

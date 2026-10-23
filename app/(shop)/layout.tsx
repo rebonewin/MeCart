@@ -3,6 +3,9 @@ import { ShopNavbar } from "@/components/shop/shop-navbar";
 import { SiteFooter } from "@/components/shop/site-footer";
 import { CompareBar } from "@/components/shop/compare-bar";
 import { WelcomeToast } from "@/components/shop/welcome-toast";
+import { OfflineBanner } from "@/components/pwa/offline-banner";
+import { PwaInstallPrompt } from "@/components/pwa/pwa-install-prompt";
+import { MecoAssistantMount } from "@/components/storefront/meco/meco-assistant-mount";
 import { getActiveTheme } from "@/lib/repositories/theme";
 import { varsForTheme } from "@/lib/theme";
 
@@ -15,10 +18,13 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
   return (
     <div className="flex min-h-screen flex-col" style={themeVars}>
       <WelcomeToast />
+      <OfflineBanner />
       <ShopNavbar />
       <main className="flex-1">{children}</main>
       <SiteFooter />
       <CompareBar />
+      <PwaInstallPrompt />
+      <MecoAssistantMount />
     </div>
   );
 }

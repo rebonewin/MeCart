@@ -2,8 +2,9 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import type { Database } from "@/types/database";
 
-const protectedUserRoutes = ["/checkout", "/orders", "/profile", "/wishlist"];
+const protectedUserRoutes = ["/checkout", "/orders", "/profile", "/wishlist", "/messages"];
 const adminRoutes = ["/admin"];
+const sellerRoutes = ["/seller"];
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -62,6 +63,28 @@ export async function updateSession(request: NextRequest) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  if (sellerRoutes.some((route) => pathname.startsWith(route))) {
+    if (!user) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    if (pathname !== "/seller/onboarding") {
+      const { data: membership } = await supabase
+        .from("vendor_members")
+        .select("vendor_id")
+        .eq("user_id", user.id)
+        .eq("status", "ACTIVE")
+        .limit(1)
+        .maybeSingle();
+
+      if (!membership) {
+        return NextResponse.redirect(new URL("/seller/onboarding", request.url));
+      }
     }
   }
 

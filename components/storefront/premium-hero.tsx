@@ -76,8 +76,6 @@ export function PremiumHero({ stats, artifacts }: { stats: StorefrontStats; arti
   const spotlightRef = usePointerSpotlight<HTMLDivElement>();
 
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
-  const contentY = useTransform(scrollYProgress, [0, 1], [0, 150]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.85], [1, 0.04]);
   const backdropScale = useTransform(scrollYProgress, [0, 1], [1, 1.14]);
   const backdropY = useTransform(scrollYProgress, [0, 1], [0, 90]);
 
@@ -147,43 +145,31 @@ export function PremiumHero({ stats, artifacts }: { stats: StorefrontStats; arti
         })}
       </div>
 
-      <motion.div
-        style={{ y: contentY, opacity: contentOpacity }}
-        className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col items-center justify-center px-4 pb-24 pt-14 text-center sm:px-6 lg:px-8"
-      >
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="lx-glass inline-flex items-center gap-2.5 rounded-full px-4 py-2"
-        >
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col items-center justify-center px-4 pb-24 pt-14 text-center sm:px-6 lg:px-8">
+        <div className="lx-rise lx-glass inline-flex items-center gap-2.5 rounded-full px-4 py-2">
           <Sparkles className="h-3.5 w-3.5 text-[var(--lx-gold)]" aria-hidden />
           <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/80">
             The MeCart Atelier — SS26 drop, live now
           </span>
           <span className="inline-flex h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--lx-emerald)]" />
-        </motion.div>
+        </div>
 
-        <h1 className="mt-7 max-w-4xl text-[2.6rem] font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-[4.4rem]">
+        <h1 className="lx-hero-title mt-7 max-w-4xl text-[2.6rem] font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-[4.4rem]">
           Objects of <span className="lx-serif text-[var(--lx-gold)]">desire,</span>
           <br className="hidden sm:block" /> delivered in <span className="lx-text-grad">motion</span>.
         </h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 22 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-6 max-w-2xl text-base leading-7 text-[var(--lx-muted)] sm:text-lg"
+        <p
+          className="lx-rise mt-6 max-w-2xl text-base leading-7 text-[var(--lx-muted)] sm:text-lg"
+          style={{ animationDelay: "60ms" }}
         >
           Fashion, audio, timepieces and technology — gathered from the world&apos;s most considered
           makers, then sent to your door like a small event.
-        </motion.p>
+        </p>
 
-        <motion.div
-          initial={{ opacity: 0, y: 22 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.28, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-8 flex flex-wrap items-center justify-center gap-4"
+        <div
+          className="lx-rise mt-8 flex flex-wrap items-center justify-center gap-4"
+          style={{ animationDelay: "120ms" }}
         >
           <Magnetic>
             <RippleButton href="/products" size="lg" variant="primary">
@@ -196,22 +182,18 @@ export function PremiumHero({ stats, artifacts }: { stats: StorefrontStats; arti
               Browse collections
             </RippleButton>
           </Magnetic>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 22 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.38, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-9 w-full max-w-xl"
+        <div
+          className="lx-rise mt-9 w-full max-w-xl"
+          style={{ animationDelay: "180ms" }}
         >
           <LiveSearch />
-        </motion.div>
+        </div>
 
-        <motion.dl
-          initial={{ opacity: 0, y: 22 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.48, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-10 grid w-full max-w-2xl grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4"
+        <dl
+          className="lx-rise mt-10 grid w-full max-w-2xl grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4"
+          style={{ animationDelay: "240ms" }}
         >
           {statItems.map((item) => (
             <div key={item.label} className="border-l border-white/10 pl-4 text-left">
@@ -221,13 +203,11 @@ export function PremiumHero({ stats, artifacts }: { stats: StorefrontStats; arti
               <dt className="mt-1 text-[11px] uppercase tracking-[0.14em] text-[var(--lx-muted)]">{item.label}</dt>
             </div>
           ))}
-        </motion.dl>
+        </dl>
 
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.58, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-12 grid w-full grid-cols-2 gap-3 lg:grid-cols-4"
+        <div
+          className="lx-rise mt-12 grid w-full grid-cols-2 gap-3 lg:grid-cols-4"
+          style={{ animationDelay: "300ms" }}
         >
           {SERVICES.map((service) => (
             <div
@@ -241,20 +221,18 @@ export function PremiumHero({ stats, artifacts }: { stats: StorefrontStats; arti
               </div>
             </div>
           ))}
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.7 }}
-          className="mt-8 flex items-center gap-3"
+        <div
+          className="lx-rise mt-8 flex items-center gap-3"
+          style={{ animationDelay: "360ms" }}
         >
           <Stars rating={stats.rating} size={14} />
           <span className="text-xs text-[var(--lx-muted)]">
             <Counter value={stats.rating} decimals={1} /> / 5.0 from verified atelier clients
           </span>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
 
       <div className="pointer-events-none absolute bottom-6 left-1/2 z-10 -translate-x-1/2 text-center">
         <div className="mx-auto flex h-9 w-[22px] items-start justify-center rounded-full border border-white/25 p-1.5">

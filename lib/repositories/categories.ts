@@ -1,8 +1,11 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import { unwrap, unwrapList, unwrapVoid } from "@/lib/repositories/utils";
-import type { CategoryRow, SubCategoryRow } from "@/types/database";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { CategoryRow, Database, SubCategoryRow } from "@/types/database";
 import type { Category, SubCategory } from "@/types/product";
+
+type Supabase = SupabaseClient<Database>;
 
 export type CategoryWithCount = Category & {
   productCount: number;
@@ -32,15 +35,15 @@ export async function listCategories(): Promise<Category[]> {
   return (data ?? []).map(toCategory);
 }
 
-export async function listCategoriesWithCounts(): Promise<CategoryWithCount[]> {
-  const supabase = await createClient();
+export async function listCategoriesWithCounts(supabase?: Supabase): Promise<CategoryWithCount[]> {
+  const client = supabase ?? (await createClient());
   const [categoriesRes, productsRes] = await Promise.all([
-    supabase
+    client
       .from("categories")
       .select("*")
       .is("deleted_at", null)
       .order("position", { ascending: true }),
-    supabase.from("products").select("category_id").is("deleted_at", null).eq("status", "ACTIVE"),
+    client.from("products").select("category_id").is("deleted_at", null).eq("status", "ACTIVE"),
   ]);
 
   const categories = categoriesRes.data ?? [];

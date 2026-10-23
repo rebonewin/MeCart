@@ -14,6 +14,7 @@ const SHOP_LINKS = [
 const ACCOUNT_LINKS = [
   { label: "Profile", href: "/profile" },
   { label: "Orders", href: "/orders" },
+  { label: "Rewards & standing", href: "/rewards" },
   { label: "Cart", href: "/cart" },
   { label: "Checkout", href: "/checkout" },
 ];
@@ -98,7 +99,7 @@ export function SiteFooter() {
         {/* watermark */}
         <div
           aria-hidden
-          className="pointer-events-none mt-16 select-none text-center text-[18vw] font-black leading-none tracking-tighter text-white/[0.03] lg:text-[11rem]"
+          className="pointer-events-none mt-16 select-none bg-gradient-to-b from-white/[0.055] to-white/[0.012] bg-clip-text text-center text-[18vw] font-black leading-none tracking-tighter text-transparent lg:text-[11rem]"
         >
           MECART
         </div>

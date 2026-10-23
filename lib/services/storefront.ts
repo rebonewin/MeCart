@@ -1,8 +1,10 @@
 import "server-only";
+import { unstable_cache } from "next/cache";
 import { countProducts, listProducts, type ProductView } from "@/lib/repositories/products";
 import { listCategoriesWithCounts } from "@/lib/repositories/categories";
 import { listBrandsWithMeta, type BrandWithMeta } from "@/lib/repositories/brands";
 import { listAllReviews } from "@/lib/repositories/reviews";
+import { getPublicSupabaseClient } from "@/lib/supabase/public";
 import type { StorefrontReview, StorefrontStats } from "@/types/product";
 
 export type StorefrontHomeData = {
@@ -11,6 +13,8 @@ export type StorefrontHomeData = {
   newArrivals: ProductView[];
   flashSale: ProductView[];
   recommended: ProductView[];
+  /** Full live catalogue pool used by the recommendation and assistant layers. */
+  catalog: ProductView[];
   categories: Awaited<ReturnType<typeof listCategoriesWithCounts>>;
   brands: BrandWithMeta[];
   reviews: StorefrontReview[];
@@ -26,25 +30,50 @@ function dedupeById<T extends { id: string }>(items: T[]): T[] {
   });
 }
 
-export async function getStorefrontHomeData(): Promise<StorefrontHomeData> {
-  const [featuredRaw, bestSellersRaw, newArrivalsRaw, categories, brands, pool, allReviews, counts] =
-    await Promise.all([
-      listProducts({ featured: true, limit: 8 }),
-      listProducts({ bestSeller: true, limit: 8 }),
-      listProducts({ newArrival: true, limit: 8 }),
-      listCategoriesWithCounts(),
-      listBrandsWithMeta(),
-      listProducts({ sort: "rating", limit: 36 }),
-      listAllReviews("APPROVED"),
-      countProducts(),
-    ]);
+function newestFirst(a: ProductView, b: ProductView) {
+  return b.createdAt.localeCompare(a.createdAt);
+}
 
-  const poolUnique = dedupeById(pool);
-  const featured = dedupeById(featuredRaw.length ? featuredRaw : poolUnique).slice(0, 8);
-  const bestSellers = dedupeById(bestSellersRaw.length ? bestSellersRaw : poolUnique).slice(0, 8);
-  const newArrivals = dedupeById(newArrivalsRaw.length ? newArrivalsRaw : poolUnique).slice(0, 8);
+async function loadStorefrontHomeData(): Promise<StorefrontHomeData> {
+  // One catalogue read plus one set of category/brand/review queries. The home
+  // experience derives every edit and rail from this single ranked pool rather
+  // than issuing a separate product query for each section.
+  const supabase = getPublicSupabaseClient();
+  const [catalogue, categories, brands, allReviews, counts] = await Promise.all([
+    listProducts({ sort: "rating", limit: 100 }, supabase),
+    listCategoriesWithCounts(supabase),
+    listBrandsWithMeta(supabase),
+    listAllReviews("APPROVED", supabase),
+    countProducts(supabase),
+  ]);
 
-  const flashSale = dedupeById([...bestSellersRaw, ...poolUnique])
+  const poolUnique = dedupeById(catalogue);
+
+  const featured = [
+    ...(poolUnique.filter((product) => product.featured).length
+      ? poolUnique.filter((product) => product.featured)
+      : poolUnique),
+  ]
+    .sort(newestFirst)
+    .slice(0, 8);
+
+  const bestSellers = [
+    ...(poolUnique.filter((product) => product.bestSeller).length
+      ? poolUnique.filter((product) => product.bestSeller)
+      : poolUnique),
+  ]
+    .sort(newestFirst)
+    .slice(0, 8);
+
+  const newArrivals = [
+    ...(poolUnique.filter((product) => product.newArrival).length
+      ? poolUnique.filter((product) => product.newArrival)
+      : poolUnique),
+  ]
+    .sort(newestFirst)
+    .slice(0, 8);
+
+  const flashSale = poolUnique
     .filter((product) => product.discountPercent > 0)
     .sort((a, b) => b.discountPercent - a.discountPercent)
     .slice(0, 4);
@@ -101,12 +130,23 @@ export async function getStorefrontHomeData(): Promise<StorefrontHomeData> {
     newArrivals,
     flashSale,
     recommended,
+    catalog: poolUnique,
     categories,
     brands,
     reviews,
     stats,
   };
 }
+
+/**
+ * The home page is merchandised from live inventory, but a small read-through
+ * window keeps first paint from paying for every upstream round-trip. Admin
+ * writes can invalidate the `storefront:home` tag immediately.
+ */
+export const getStorefrontHomeData = unstable_cache(loadStorefrontHomeData, ["storefront-home-v3"], {
+  revalidate: 30,
+  tags: ["storefront:home"],
+});
 
 export async function getCategoryPageData(slug: string) {
   const [products, categories] = await Promise.all([

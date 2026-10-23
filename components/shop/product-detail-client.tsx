@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight,
@@ -18,20 +19,29 @@ import {
   Scale,
   ShieldCheck,
   ShoppingBag,
-  Sparkles,
+  Store,
   Truck,
 } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
+import { useRecentlyViewed } from "@/lib/recently-viewed-context";
 import { useCartMotion } from "@/components/storefront/rider/use-cart-motion";
 import { useWishlist } from "@/lib/wishlist-context";
 import { snapshotOf, useCompare } from "@/lib/compare-context";
-import { ProductCard } from "@/components/shop/product-card";
 import { RippleButton, Stars } from "@/components/luxe/primitives";
-import { Breadcrumbs, SectionTitle } from "@/components/shop/storefront-ui";
+import { Breadcrumbs } from "@/components/shop/storefront-ui";
+import { LazySection } from "@/components/ui/lazy-section";
 import { cn } from "@/lib/cn";
 import type { Product } from "@/types/product";
 
 type DetailProduct = Product & { newArrival?: boolean; bestSeller?: boolean };
+
+const ProductRecommendations = dynamic(
+  () =>
+    import("@/components/shop/product-recommendations").then(
+      (module) => module.ProductRecommendations,
+    ),
+  { ssr: false },
+);
 
 function slugify(value: string) {
   return value
@@ -40,19 +50,32 @@ function slugify(value: string) {
     .replace(/(^-|-$)/g, "");
 }
 
+function dedupeProducts(products: DetailProduct[]): DetailProduct[] {
+  const seen = new Set<string>();
+  return products.filter((product) => {
+    if (seen.has(product.id)) return false;
+    seen.add(product.id);
+    return true;
+  });
+}
+
 export function ProductDetailClient({
   product,
   related = [],
+  catalog = [],
 }: {
   product: DetailProduct;
   related?: Product[];
+  catalog?: Product[];
 }) {
   const cart = useCart();
   const { addToCart } = useCartMotion();
   const wishlist = useWishlist();
+  const { track } = useRecentlyViewed();
   const compare = useCompare();
   const router = useRouter();
   const imageRef = useRef<HTMLDivElement>(null);
+  const recommendationPool = dedupeProducts([product, ...catalog, ...related]);
 
   const gallery =
     product.images.length && !product.images.includes(product.coverImage)
@@ -79,6 +102,10 @@ export function ProductDetailClient({
   const inCompare = compare.has(product.id);
   const maxQuantity = Math.max(1, Math.min(product.stock || 1, 20));
   const currentImage = gallery[activeImage] ?? product.coverImage;
+
+  useEffect(() => {
+    track(product);
+  }, [product, track]);
 
   const payload = {
     productId: product.id,
@@ -247,6 +274,14 @@ export function ProductDetailClient({
               >
                 {product.brandName || "MeCart atelier"}
               </Link>
+              {product.storeName && product.storeSlug ? (
+                <Link
+                  href={`/stores/${product.storeSlug}`}
+                  className="inline-flex items-center gap-1 font-mono text-[8px] uppercase tracking-[0.2em] text-[var(--lx-muted)] transition hover:text-[var(--lx-text)]"
+                >
+                  <Store className="h-3 w-3" aria-hidden /> {product.storeName}
+                </Link>
+              ) : null}
               <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-[var(--lx-muted)]">
                 {product.sku}
               </span>
@@ -535,31 +570,9 @@ export function ProductDetailClient({
           </div>
         </div>
 
-        {related.length ? (
-          <section className="mt-20 border-t border-[var(--lx-border)] pt-12">
-            <SectionTitle
-              eyebrow="Complete the edit"
-              title={
-                <>
-                  Pairs well with <span className="lx-serif text-[var(--lx-gold)]">this object</span>
-                </>
-              }
-              aside={
-                <Link
-                  href="/products"
-                  className="inline-flex items-center gap-2 text-sm text-[var(--lx-muted)] transition hover:text-[var(--lx-text)]"
-                >
-                  View all <Sparkles className="h-4 w-4" aria-hidden />
-                </Link>
-              }
-            />
-            <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
-              {related.map((item) => (
-                <ProductCard key={item.id} product={item} />
-              ))}
-            </div>
-          </section>
-        ) : null}
+        <LazySection minHeight={680} label="Loading recommendations for this piece">
+          <ProductRecommendations pool={recommendationPool} product={product} />
+        </LazySection>
       </div>
     </div>
   );

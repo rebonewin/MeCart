@@ -49,6 +49,19 @@ const navGroups = [
     ],
   },
   {
+    title: "Marketplace",
+    items: [
+      { href: "/admin/marketplace", label: "Marketplace Overview", icon: Store },
+      { href: "/admin/marketplace/vendors", label: "Vendors", icon: Users },
+      { href: "/admin/marketplace/products", label: "Product Review", icon: ShoppingBag },
+      { href: "/admin/marketplace/stores", label: "Stores", icon: Store },
+      { href: "/admin/marketplace/ownership", label: "Product Ownership", icon: Package },
+      { href: "/admin/marketplace/payouts", label: "Payouts", icon: CreditCard },
+      { href: "/admin/marketplace/returns", label: "Returns", icon: Receipt },
+      { href: "/admin/marketplace/commissions", label: "Commissions", icon: BarChart3 },
+    ],
+  },
+  {
     title: "Commerce",
     items: [
       { href: "/admin/products", label: "Products", icon: ShoppingBag },

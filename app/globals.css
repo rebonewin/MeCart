@@ -258,6 +258,18 @@ body {
   font-weight: 500;
 }
 
+/* The mobile LCP headline uses platform fonts so it can paint before any
+   webfont request is resolved. Desktop keeps the full editorial type pairing. */
+@media (max-width: 1023px) {
+  .lx-hero-title {
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  .lx-hero-title .lx-serif {
+    font-family: Georgia, "Times New Roman", serif;
+  }
+}
+
 .lx-eyebrow {
   display: inline-flex;
   align-items: center;
@@ -570,6 +582,28 @@ body {
   to {
     transform: scale(3.4);
     opacity: 0;
+  }
+}
+
+/* Entrance fade that starts at first paint instead of waiting for hydration. */
+.lx-rise {
+  animation: lx-rise-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes lx-rise-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 1023px), (prefers-reduced-motion: reduce) {
+  .lx-rise {
+    animation: none;
   }
 }
 

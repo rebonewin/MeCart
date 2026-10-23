@@ -1,8 +1,11 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import { toNumber, unwrap, unwrapList, unwrapVoid } from "@/lib/repositories/utils";
-import type { ProductRow, ProductStatus } from "@/types/database";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database, ProductRow, ProductStatus } from "@/types/database";
 import type { Product } from "@/types/product";
+
+type Supabase = SupabaseClient<Database>;
 
 export type ProductView = Product & {
   status: ProductStatus;
@@ -12,6 +15,10 @@ export type ProductView = Product & {
   category_id: string;
   sub_category_id: string | null;
   brand_id: string | null;
+  vendorId: string | null;
+  storeId: string | null;
+  storeName?: string;
+  storeSlug?: string;
 };
 
 export type ProductQuery = {
@@ -27,6 +34,8 @@ export type ProductQuery = {
   featured?: boolean;
   bestSeller?: boolean;
   newArrival?: boolean;
+  vendorId?: string;
+  storeId?: string;
 };
 
 type LookupData = {
@@ -36,9 +45,7 @@ type LookupData = {
   images: Map<string, string[]>;
 };
 
-async function loadLookups(productIds: string[]): Promise<LookupData> {
-  const supabase = await createClient();
-
+async function loadLookups(productIds: string[], supabase: Supabase): Promise<LookupData> {
   const [categoriesRes, subCategoriesRes, brandsRes, imagesRes] = await Promise.all([
     supabase.from("categories").select("id, name, slug"),
     supabase.from("sub_categories").select("id, name, slug"),
@@ -108,11 +115,17 @@ export function toProductView(row: ProductRow, lookups: LookupData): ProductView
     category_id: row.category_id,
     sub_category_id: row.sub_category_id,
     brand_id: row.brand_id,
+    vendorId: row.vendor_id,
+    storeId: row.store_id,
   };
 }
 
-async function queryProducts(query: ProductQuery, includeInactive = false) {
-  const supabase = await createClient();
+async function queryProducts(
+  query: ProductQuery,
+  includeInactive = false,
+  injected?: Supabase,
+): Promise<{ rows: ProductRow[]; lookups: LookupData }> {
+  const supabase = injected ?? (await createClient());
 
   let categoryId: string | undefined;
   let subCategoryId: string | undefined;
@@ -124,7 +137,7 @@ async function queryProducts(query: ProductQuery, includeInactive = false) {
       .select("id")
       .eq("slug", query.categorySlug)
       .maybeSingle();
-    if (!data) return { rows: [] as ProductRow[], lookups: await loadLookups([]) };
+    if (!data) return { rows: [] as ProductRow[], lookups: await loadLookups([], supabase) };
     categoryId = data.id;
   }
 
@@ -135,13 +148,13 @@ async function queryProducts(query: ProductQuery, includeInactive = false) {
       .eq("slug", query.subCategorySlug)
       .eq("category_id", categoryId)
       .maybeSingle();
-    if (!data) return { rows: [] as ProductRow[], lookups: await loadLookups([]) };
+    if (!data) return { rows: [] as ProductRow[], lookups: await loadLookups([], supabase) };
     subCategoryId = data.id;
   }
 
   if (query.brandSlug) {
     const { data } = await supabase.from("brands").select("id").eq("slug", query.brandSlug).maybeSingle();
-    if (!data) return { rows: [] as ProductRow[], lookups: await loadLookups([]) };
+    if (!data) return { rows: [] as ProductRow[], lookups: await loadLookups([], supabase) };
     brandId = data.id;
   }
 
@@ -154,6 +167,8 @@ async function queryProducts(query: ProductQuery, includeInactive = false) {
   if (query.featured) builder = builder.eq("featured", true);
   if (query.bestSeller) builder = builder.eq("best_seller", true);
   if (query.newArrival) builder = builder.eq("new_arrival", true);
+  if (query.vendorId) builder = builder.eq("vendor_id", query.vendorId);
+  if (query.storeId) builder = builder.eq("store_id", query.storeId);
   if (query.minPrice !== undefined) builder = builder.gte("final_price", query.minPrice);
   if (query.maxPrice !== undefined) builder = builder.lte("final_price", query.maxPrice);
   if (query.search) builder = builder.ilike("name", `%${query.search}%`);
@@ -180,12 +195,12 @@ async function queryProducts(query: ProductQuery, includeInactive = false) {
   builder = builder.range(offset, offset + limit - 1);
 
   const rows = unwrapList(await builder);
-  const lookups = await loadLookups(rows.map((r) => r.id));
+  const lookups = await loadLookups(rows.map((r) => r.id), supabase);
   return { rows, lookups };
 }
 
-export async function listProducts(query: ProductQuery = {}): Promise<ProductView[]> {
-  const { rows, lookups } = await queryProducts(query);
+export async function listProducts(query: ProductQuery = {}, supabase?: Supabase): Promise<ProductView[]> {
+  const { rows, lookups } = await queryProducts(query, false, supabase);
   return rows.map((row) => toProductView(row, lookups));
 }
 
@@ -203,15 +218,27 @@ export async function getProductBySlug(slug: string): Promise<ProductView | null
     .is("deleted_at", null)
     .maybeSingle();
   if (!data) return null;
-  const lookups = await loadLookups([data.id]);
-  return toProductView(data, lookups);
+  const lookups = await loadLookups([data.id], supabase);
+  const view = toProductView(data, lookups);
+  if (data.store_id) {
+    const { data: store } = await supabase
+      .from("stores")
+      .select("name, slug")
+      .eq("id", data.store_id)
+      .maybeSingle();
+    if (store) {
+      view.storeName = store.name;
+      view.storeSlug = store.slug;
+    }
+  }
+  return view;
 }
 
 export async function getProductById(id: string): Promise<ProductView | null> {
   const supabase = await createClient();
   const { data } = await supabase.from("products").select("*").eq("id", id).maybeSingle();
   if (!data) return null;
-  const lookups = await loadLookups([data.id]);
+  const lookups = await loadLookups([data.id], supabase);
   return toProductView(data, lookups);
 }
 
@@ -227,7 +254,7 @@ export async function getRelatedProducts(product: ProductView, limit = 4): Promi
       .neq("id", product.id)
       .limit(limit),
   );
-  const lookups = await loadLookups(rows.map((r) => r.id));
+  const lookups = await loadLookups(rows.map((r) => r.id), supabase);
   return rows.map((row) => toProductView(row, lookups));
 }
 
@@ -410,10 +437,10 @@ export async function adjustStock(id: string, delta: number, reason = "adjustmen
   );
 }
 
-export async function countProducts(): Promise<{ total: number; active: number; lowStock: number; drafts: number }> {
-  const supabase = await createClient();
+export async function countProducts(supabase?: Supabase): Promise<{ total: number; active: number; lowStock: number; drafts: number }> {
+  const client = supabase ?? (await createClient());
   const rows = unwrapList(
-    await supabase.from("products").select("status, stock").is("deleted_at", null),
+    await client.from("products").select("status, stock").is("deleted_at", null),
   );
   return {
     total: rows.length,

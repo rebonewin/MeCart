@@ -562,9 +562,11 @@ export type Database = {
           min_order_value: number | null
           per_user_limit: number
           starts_at: string | null
+          store_id: string | null
           updated_at: string
           usage_limit: number | null
           used_count: number
+          vendor_id: string | null
         }
         Insert: {
           active?: boolean
@@ -580,9 +582,11 @@ export type Database = {
           min_order_value?: number | null
           per_user_limit?: number
           starts_at?: string | null
+          store_id?: string | null
           updated_at?: string
           usage_limit?: number | null
           used_count?: number
+          vendor_id?: string | null
         }
         Update: {
           active?: boolean
@@ -598,11 +602,28 @@ export type Database = {
           min_order_value?: number | null
           per_user_limit?: number
           starts_at?: string | null
+          store_id?: string | null
           updated_at?: string
           usage_limit?: number | null
           used_count?: number
+          vendor_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "coupons_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coupons_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       customers: {
         Row: {
@@ -954,6 +975,8 @@ export type Database = {
       order_items: {
         Row: {
           color: string | null
+          commission_amount: number
+          commission_rate: number
           created_at: string
           id: string
           name: string
@@ -963,10 +986,16 @@ export type Database = {
           quantity: number
           size: string | null
           sku: string
+          store_id: string | null
           total: number
+          vendor_earnings: number
+          vendor_id: string | null
+          vendor_sku: string | null
         }
         Insert: {
           color?: string | null
+          commission_amount?: number
+          commission_rate?: number
           created_at?: string
           id?: string
           name: string
@@ -976,10 +1005,16 @@ export type Database = {
           quantity: number
           size?: string | null
           sku: string
+          store_id?: string | null
           total: number
+          vendor_earnings?: number
+          vendor_id?: string | null
+          vendor_sku?: string | null
         }
         Update: {
           color?: string | null
+          commission_amount?: number
+          commission_rate?: number
           created_at?: string
           id?: string
           name?: string
@@ -989,7 +1024,11 @@ export type Database = {
           quantity?: number
           size?: string | null
           sku?: string
+          store_id?: string | null
           total?: number
+          vendor_earnings?: number
+          vendor_id?: string | null
+          vendor_sku?: string | null
         }
         Relationships: [
           {
@@ -1004,6 +1043,20 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
             referencedColumns: ["id"]
           },
         ]
@@ -1023,6 +1076,7 @@ export type Database = {
           grand_total: number
           id: string
           invoice_number: string
+          marketplace_order: boolean
           notes: string | null
           order_number: string
           payment_status: Database["public"]["Enums"]["payment_status"]
@@ -1033,6 +1087,7 @@ export type Database = {
           tax: number
           updated_at: string
           user_id: string | null
+          vendor_count: number
           zip: string
         }
         Insert: {
@@ -1049,6 +1104,7 @@ export type Database = {
           grand_total?: number
           id?: string
           invoice_number: string
+          marketplace_order?: boolean
           notes?: string | null
           order_number: string
           payment_status?: Database["public"]["Enums"]["payment_status"]
@@ -1059,6 +1115,7 @@ export type Database = {
           tax?: number
           updated_at?: string
           user_id?: string | null
+          vendor_count?: number
           zip: string
         }
         Update: {
@@ -1075,6 +1132,7 @@ export type Database = {
           grand_total?: number
           id?: string
           invoice_number?: string
+          marketplace_order?: boolean
           notes?: string | null
           order_number?: string
           payment_status?: Database["public"]["Enums"]["payment_status"]
@@ -1085,6 +1143,7 @@ export type Database = {
           tax?: number
           updated_at?: string
           user_id?: string | null
+          vendor_count?: number
           zip?: string
         }
         Relationships: [
@@ -1333,10 +1392,15 @@ export type Database = {
       }
       products: {
         Row: {
+          approval_notes: string | null
+          approval_status: Database["public"]["Enums"]["vendor_product_approval"]
+          approved_at: string | null
+          approved_by: string | null
           best_seller: boolean
           brand_id: string | null
           category_id: string
           colors: string[]
+          commission_rate: number | null
           country: string | null
           created_at: string
           deleted_at: string | null
@@ -1345,26 +1409,37 @@ export type Database = {
           featured: boolean
           final_price: number
           id: string
+          marketplace_metadata: Json
           material: string | null
           name: string
           new_arrival: boolean
           original_price: number
           rating: number
           review_count: number
+          shipping_profile_id: string | null
           sizes: string[]
           sku: string
           slug: string
           status: Database["public"]["Enums"]["product_status"]
           stock: number
+          store_id: string | null
           sub_category_id: string | null
+          submitted_at: string | null
           updated_at: string
+          vendor_id: string | null
+          vendor_sku: string | null
           weight: number | null
         }
         Insert: {
+          approval_notes?: string | null
+          approval_status?: Database["public"]["Enums"]["vendor_product_approval"]
+          approved_at?: string | null
+          approved_by?: string | null
           best_seller?: boolean
           brand_id?: string | null
           category_id: string
           colors?: string[]
+          commission_rate?: number | null
           country?: string | null
           created_at?: string
           deleted_at?: string | null
@@ -1373,26 +1448,37 @@ export type Database = {
           featured?: boolean
           final_price: number
           id?: string
+          marketplace_metadata?: Json
           material?: string | null
           name: string
           new_arrival?: boolean
           original_price: number
           rating?: number
           review_count?: number
+          shipping_profile_id?: string | null
           sizes?: string[]
           sku: string
           slug: string
           status?: Database["public"]["Enums"]["product_status"]
           stock?: number
+          store_id?: string | null
           sub_category_id?: string | null
+          submitted_at?: string | null
           updated_at?: string
+          vendor_id?: string | null
+          vendor_sku?: string | null
           weight?: number | null
         }
         Update: {
+          approval_notes?: string | null
+          approval_status?: Database["public"]["Enums"]["vendor_product_approval"]
+          approved_at?: string | null
+          approved_by?: string | null
           best_seller?: boolean
           brand_id?: string | null
           category_id?: string
           colors?: string[]
+          commission_rate?: number | null
           country?: string | null
           created_at?: string
           deleted_at?: string | null
@@ -1401,22 +1487,35 @@ export type Database = {
           featured?: boolean
           final_price?: number
           id?: string
+          marketplace_metadata?: Json
           material?: string | null
           name?: string
           new_arrival?: boolean
           original_price?: number
           rating?: number
           review_count?: number
+          shipping_profile_id?: string | null
           sizes?: string[]
           sku?: string
           slug?: string
           status?: Database["public"]["Enums"]["product_status"]
           stock?: number
+          store_id?: string | null
           sub_category_id?: string | null
+          submitted_at?: string | null
           updated_at?: string
+          vendor_id?: string | null
+          vendor_sku?: string | null
           weight?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "products_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "products_brand_id_fkey"
             columns: ["brand_id"]
@@ -1432,10 +1531,31 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "products_shipping_profile_id_fkey"
+            columns: ["shipping_profile_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_shipping_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "products_sub_category_id_fkey"
             columns: ["sub_category_id"]
             isOneToOne: false
             referencedRelation: "sub_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
             referencedColumns: ["id"]
           },
         ]
@@ -1547,9 +1667,13 @@ export type Database = {
           product_id: string
           rating: number
           status: Database["public"]["Enums"]["review_status"]
+          store_id: string | null
           title: string | null
           updated_at: string
           user_id: string | null
+          vendor_id: string | null
+          vendor_replied_at: string | null
+          vendor_reply: string | null
         }
         Insert: {
           author_name?: string | null
@@ -1561,9 +1685,13 @@ export type Database = {
           product_id: string
           rating: number
           status?: Database["public"]["Enums"]["review_status"]
+          store_id?: string | null
           title?: string | null
           updated_at?: string
           user_id?: string | null
+          vendor_id?: string | null
+          vendor_replied_at?: string | null
+          vendor_reply?: string | null
         }
         Update: {
           author_name?: string | null
@@ -1575,9 +1703,13 @@ export type Database = {
           product_id?: string
           rating?: number
           status?: Database["public"]["Enums"]["review_status"]
+          store_id?: string | null
           title?: string | null
           updated_at?: string
           user_id?: string | null
+          vendor_id?: string | null
+          vendor_replied_at?: string | null
+          vendor_reply?: string | null
         }
         Relationships: [
           {
@@ -1595,10 +1727,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "reviews_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "reviews_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
             referencedColumns: ["id"]
           },
         ]
@@ -1817,6 +1963,180 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      store_followers: {
+        Row: {
+          created_at: string
+          id: string
+          store_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          store_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          store_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_followers_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "store_followers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stores: {
+        Row: {
+          address_line1: string | null
+          approved_at: string | null
+          approved_by: string | null
+          banner_url: string | null
+          brand_accent_color: string
+          brand_primary_color: string
+          city: string | null
+          country: string
+          created_at: string
+          currency: string
+          deleted_at: string | null
+          description: string | null
+          email: string | null
+          follower_count: number
+          id: string
+          is_featured: boolean
+          logo_url: string | null
+          name: string
+          phone: string | null
+          privacy_policy: string | null
+          product_count: number
+          rating: number
+          return_policy: string | null
+          review_count: number
+          seo_description: string | null
+          seo_title: string | null
+          settings: Json
+          shipping_policy: string | null
+          slug: string
+          social_links: Json
+          state: string | null
+          status: Database["public"]["Enums"]["vendor_store_status"]
+          tagline: string | null
+          theme_mode: string
+          total_sales: number
+          updated_at: string
+          vendor_id: string
+          zip: string | null
+        }
+        Insert: {
+          address_line1?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          banner_url?: string | null
+          brand_accent_color?: string
+          brand_primary_color?: string
+          city?: string | null
+          country?: string
+          created_at?: string
+          currency?: string
+          deleted_at?: string | null
+          description?: string | null
+          email?: string | null
+          follower_count?: number
+          id?: string
+          is_featured?: boolean
+          logo_url?: string | null
+          name: string
+          phone?: string | null
+          privacy_policy?: string | null
+          product_count?: number
+          rating?: number
+          return_policy?: string | null
+          review_count?: number
+          seo_description?: string | null
+          seo_title?: string | null
+          settings?: Json
+          shipping_policy?: string | null
+          slug: string
+          social_links?: Json
+          state?: string | null
+          status?: Database["public"]["Enums"]["vendor_store_status"]
+          tagline?: string | null
+          theme_mode?: string
+          total_sales?: number
+          updated_at?: string
+          vendor_id: string
+          zip?: string | null
+        }
+        Update: {
+          address_line1?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          banner_url?: string | null
+          brand_accent_color?: string
+          brand_primary_color?: string
+          city?: string | null
+          country?: string
+          created_at?: string
+          currency?: string
+          deleted_at?: string | null
+          description?: string | null
+          email?: string | null
+          follower_count?: number
+          id?: string
+          is_featured?: boolean
+          logo_url?: string | null
+          name?: string
+          phone?: string | null
+          privacy_policy?: string | null
+          product_count?: number
+          rating?: number
+          return_policy?: string | null
+          review_count?: number
+          seo_description?: string | null
+          seo_title?: string | null
+          settings?: Json
+          shipping_policy?: string | null
+          slug?: string
+          social_links?: Json
+          state?: string | null
+          status?: Database["public"]["Enums"]["vendor_store_status"]
+          tagline?: string | null
+          theme_mode?: string
+          total_sales?: number
+          updated_at?: string
+          vendor_id?: string
+          zip?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stores_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stores_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sub_categories: {
         Row: {
@@ -2172,6 +2492,1014 @@ export type Database = {
         }
         Relationships: []
       }
+      vendor_audit_logs: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          id: string
+          metadata: Json
+          resource: string | null
+          vendor_id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          resource?: string | null
+          vendor_id: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          resource?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_audit_logs_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_audit_logs_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_conversations: {
+        Row: {
+          created_at: string
+          customer_id: string
+          id: string
+          last_message_at: string
+          last_message_preview: string | null
+          order_id: string | null
+          status: Database["public"]["Enums"]["vendor_conversation_status"]
+          store_id: string | null
+          subject: string
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          id?: string
+          last_message_at?: string
+          last_message_preview?: string | null
+          order_id?: string | null
+          status?: Database["public"]["Enums"]["vendor_conversation_status"]
+          store_id?: string | null
+          subject: string
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          id?: string
+          last_message_at?: string
+          last_message_preview?: string | null
+          order_id?: string | null
+          status?: Database["public"]["Enums"]["vendor_conversation_status"]
+          store_id?: string | null
+          subject?: string
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_conversations_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_conversations_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_conversations_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_conversations_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_ledger_entries: {
+        Row: {
+          amount: number
+          available_at: string
+          created_at: string
+          currency: string
+          description: string | null
+          id: string
+          metadata: Json
+          order_id: string | null
+          order_item_id: string | null
+          payout_id: string | null
+          store_id: string | null
+          type: Database["public"]["Enums"]["vendor_ledger_type"]
+          vendor_id: string
+        }
+        Insert: {
+          amount: number
+          available_at?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          metadata?: Json
+          order_id?: string | null
+          order_item_id?: string | null
+          payout_id?: string | null
+          store_id?: string | null
+          type: Database["public"]["Enums"]["vendor_ledger_type"]
+          vendor_id: string
+        }
+        Update: {
+          amount?: number
+          available_at?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          metadata?: Json
+          order_id?: string | null
+          order_item_id?: string | null
+          payout_id?: string | null
+          store_id?: string | null
+          type?: Database["public"]["Enums"]["vendor_ledger_type"]
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_ledger_entries_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_ledger_entries_order_item_id_fkey"
+            columns: ["order_item_id"]
+            isOneToOne: false
+            referencedRelation: "order_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_ledger_entries_payout_id_fkey"
+            columns: ["payout_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_payouts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_ledger_entries_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_ledger_entries_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_members: {
+        Row: {
+          created_at: string
+          id: string
+          invited_by: string | null
+          joined_at: string | null
+          permissions: string[]
+          role: Database["public"]["Enums"]["vendor_member_role"]
+          status: string
+          updated_at: string
+          user_id: string
+          vendor_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          joined_at?: string | null
+          permissions?: string[]
+          role?: Database["public"]["Enums"]["vendor_member_role"]
+          status?: string
+          updated_at?: string
+          user_id: string
+          vendor_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          joined_at?: string | null
+          permissions?: string[]
+          role?: Database["public"]["Enums"]["vendor_member_role"]
+          status?: string
+          updated_at?: string
+          user_id?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_members_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_members_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_messages: {
+        Row: {
+          attachments: string[]
+          body: string
+          conversation_id: string
+          created_at: string
+          id: string
+          read_at: string | null
+          sender_id: string | null
+          sender_type: Database["public"]["Enums"]["vendor_message_sender"]
+        }
+        Insert: {
+          attachments?: string[]
+          body: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sender_id?: string | null
+          sender_type: Database["public"]["Enums"]["vendor_message_sender"]
+        }
+        Update: {
+          attachments?: string[]
+          body?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sender_id?: string | null
+          sender_type?: Database["public"]["Enums"]["vendor_message_sender"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          data: Json
+          id: string
+          link: string | null
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string | null
+          vendor_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          data?: Json
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          title: string
+          type?: string
+          user_id?: string | null
+          vendor_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          data?: Json
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_notifications_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_order_allocations: {
+        Row: {
+          cancelled_at: string | null
+          carrier: string | null
+          commission_amount: number
+          commission_rate: number
+          created_at: string
+          delivered_at: string | null
+          discount_amount: number
+          fulfillment_status: Database["public"]["Enums"]["vendor_fulfillment_status"]
+          id: string
+          order_id: string
+          shipped_at: string | null
+          shipping_amount: number
+          store_id: string | null
+          subtotal: number
+          tax_amount: number
+          tracking_number: string | null
+          tracking_url: string | null
+          updated_at: string
+          vendor_earnings: number
+          vendor_id: string
+        }
+        Insert: {
+          cancelled_at?: string | null
+          carrier?: string | null
+          commission_amount?: number
+          commission_rate?: number
+          created_at?: string
+          delivered_at?: string | null
+          discount_amount?: number
+          fulfillment_status?: Database["public"]["Enums"]["vendor_fulfillment_status"]
+          id?: string
+          order_id: string
+          shipped_at?: string | null
+          shipping_amount?: number
+          store_id?: string | null
+          subtotal?: number
+          tax_amount?: number
+          tracking_number?: string | null
+          tracking_url?: string | null
+          updated_at?: string
+          vendor_earnings?: number
+          vendor_id: string
+        }
+        Update: {
+          cancelled_at?: string | null
+          carrier?: string | null
+          commission_amount?: number
+          commission_rate?: number
+          created_at?: string
+          delivered_at?: string | null
+          discount_amount?: number
+          fulfillment_status?: Database["public"]["Enums"]["vendor_fulfillment_status"]
+          id?: string
+          order_id?: string
+          shipped_at?: string | null
+          shipping_amount?: number
+          store_id?: string | null
+          subtotal?: number
+          tax_amount?: number
+          tracking_number?: string | null
+          tracking_url?: string | null
+          updated_at?: string
+          vendor_earnings?: number
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_order_allocations_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_order_allocations_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_order_allocations_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_payout_accounts: {
+        Row: {
+          account_email: string | null
+          account_last4: string | null
+          account_name: string
+          bank_name: string | null
+          created_at: string
+          id: string
+          is_default: boolean
+          metadata: Json
+          provider: string
+          routing_last4: string | null
+          status: string
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          account_email?: string | null
+          account_last4?: string | null
+          account_name: string
+          bank_name?: string | null
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          metadata?: Json
+          provider: string
+          routing_last4?: string | null
+          status?: string
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          account_email?: string | null
+          account_last4?: string | null
+          account_name?: string
+          bank_name?: string | null
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          metadata?: Json
+          provider?: string
+          routing_last4?: string | null
+          status?: string
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_payout_accounts_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_payouts: {
+        Row: {
+          adjustments: number
+          commissions: number
+          created_at: string
+          gross_sales: number
+          id: string
+          method: string
+          net_amount: number
+          notes: string | null
+          payout_number: string
+          period_end: string
+          period_start: string
+          processed_at: string | null
+          reference: string | null
+          refunds: number
+          requested_by: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["vendor_payout_status"]
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          adjustments?: number
+          commissions?: number
+          created_at?: string
+          gross_sales?: number
+          id?: string
+          method?: string
+          net_amount?: number
+          notes?: string | null
+          payout_number: string
+          period_end: string
+          period_start: string
+          processed_at?: string | null
+          reference?: string | null
+          refunds?: number
+          requested_by?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["vendor_payout_status"]
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          adjustments?: number
+          commissions?: number
+          created_at?: string
+          gross_sales?: number
+          id?: string
+          method?: string
+          net_amount?: number
+          notes?: string | null
+          payout_number?: string
+          period_end?: string
+          period_start?: string
+          processed_at?: string | null
+          reference?: string | null
+          refunds?: number
+          requested_by?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["vendor_payout_status"]
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_payouts_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_payouts_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_payouts_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_returns: {
+        Row: {
+          commission_reversal: number
+          created_at: string
+          id: string
+          notes: string | null
+          order_id: string
+          order_item_id: string | null
+          quantity: number
+          reason: string
+          received_at: string | null
+          refund_amount: number
+          refunded_at: string | null
+          requested_at: string
+          resolution_notes: string | null
+          reviewed_at: string | null
+          rma_number: string
+          status: Database["public"]["Enums"]["vendor_return_status"]
+          store_id: string | null
+          updated_at: string
+          user_id: string | null
+          vendor_id: string
+        }
+        Insert: {
+          commission_reversal?: number
+          created_at?: string
+          id?: string
+          notes?: string | null
+          order_id: string
+          order_item_id?: string | null
+          quantity?: number
+          reason: string
+          received_at?: string | null
+          refund_amount?: number
+          refunded_at?: string | null
+          requested_at?: string
+          resolution_notes?: string | null
+          reviewed_at?: string | null
+          rma_number: string
+          status?: Database["public"]["Enums"]["vendor_return_status"]
+          store_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+          vendor_id: string
+        }
+        Update: {
+          commission_reversal?: number
+          created_at?: string
+          id?: string
+          notes?: string | null
+          order_id?: string
+          order_item_id?: string | null
+          quantity?: number
+          reason?: string
+          received_at?: string | null
+          refund_amount?: number
+          refunded_at?: string | null
+          requested_at?: string
+          resolution_notes?: string | null
+          reviewed_at?: string | null
+          rma_number?: string
+          status?: Database["public"]["Enums"]["vendor_return_status"]
+          store_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_returns_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_returns_order_item_id_fkey"
+            columns: ["order_item_id"]
+            isOneToOne: false
+            referencedRelation: "order_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_returns_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_returns_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_returns_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_shipping_profiles: {
+        Row: {
+          created_at: string
+          id: string
+          is_default: boolean
+          metadata: Json
+          name: string
+          processing_max_days: number
+          processing_min_days: number
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          metadata?: Json
+          name: string
+          processing_max_days?: number
+          processing_min_days?: number
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          metadata?: Json
+          name?: string
+          processing_max_days?: number
+          processing_min_days?: number
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_shipping_profiles_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_shipping_rates: {
+        Row: {
+          countries: string[]
+          created_at: string
+          free_over: number | null
+          id: string
+          is_active: boolean
+          max_days: number
+          max_weight: number | null
+          min_days: number
+          min_weight: number | null
+          name: string
+          profile_id: string
+          rate: number
+          states: string[]
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          countries?: string[]
+          created_at?: string
+          free_over?: number | null
+          id?: string
+          is_active?: boolean
+          max_days?: number
+          max_weight?: number | null
+          min_days?: number
+          min_weight?: number | null
+          name: string
+          profile_id: string
+          rate?: number
+          states?: string[]
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          countries?: string[]
+          created_at?: string
+          free_over?: number | null
+          id?: string
+          is_active?: boolean
+          max_days?: number
+          max_weight?: number | null
+          min_days?: number
+          min_weight?: number | null
+          name?: string
+          profile_id?: string
+          rate?: number
+          states?: string[]
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_shipping_rates_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_shipping_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_shipping_rates_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_verifications: {
+        Row: {
+          business_registration_url: string | null
+          contact_name: string | null
+          created_at: string
+          id: string
+          identity_document_url: string | null
+          notes: string | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["vendor_verification_status"]
+          tax_document_url: string | null
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          business_registration_url?: string | null
+          contact_name?: string | null
+          created_at?: string
+          id?: string
+          identity_document_url?: string | null
+          notes?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["vendor_verification_status"]
+          tax_document_url?: string | null
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          business_registration_url?: string | null
+          contact_name?: string | null
+          created_at?: string
+          id?: string
+          identity_document_url?: string | null
+          notes?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["vendor_verification_status"]
+          tax_document_url?: string | null
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_verifications_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_verifications_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendors: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          banner_url: string | null
+          business_type: string | null
+          commission_rate: number
+          country: string
+          created_at: string
+          currency: string
+          deleted_at: string | null
+          description: string | null
+          display_name: string
+          email: string
+          follower_count: number
+          id: string
+          legal_name: string
+          logo_url: string | null
+          metadata: Json
+          owner_id: string
+          payout_cycle: string
+          phone: string | null
+          product_count: number
+          rating: number
+          return_policy: string | null
+          review_count: number
+          shipping_policy: string | null
+          slug: string
+          status: Database["public"]["Enums"]["vendor_status"]
+          support_email: string | null
+          support_phone: string | null
+          suspended_at: string | null
+          suspension_reason: string | null
+          tax_id: string | null
+          total_sales: number
+          updated_at: string
+          verification_status: Database["public"]["Enums"]["vendor_verification_status"]
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          banner_url?: string | null
+          business_type?: string | null
+          commission_rate?: number
+          country?: string
+          created_at?: string
+          currency?: string
+          deleted_at?: string | null
+          description?: string | null
+          display_name: string
+          email: string
+          follower_count?: number
+          id?: string
+          legal_name: string
+          logo_url?: string | null
+          metadata?: Json
+          owner_id: string
+          payout_cycle?: string
+          phone?: string | null
+          product_count?: number
+          rating?: number
+          return_policy?: string | null
+          review_count?: number
+          shipping_policy?: string | null
+          slug: string
+          status?: Database["public"]["Enums"]["vendor_status"]
+          support_email?: string | null
+          support_phone?: string | null
+          suspended_at?: string | null
+          suspension_reason?: string | null
+          tax_id?: string | null
+          total_sales?: number
+          updated_at?: string
+          verification_status?: Database["public"]["Enums"]["vendor_verification_status"]
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          banner_url?: string | null
+          business_type?: string | null
+          commission_rate?: number
+          country?: string
+          created_at?: string
+          currency?: string
+          deleted_at?: string | null
+          description?: string | null
+          display_name?: string
+          email?: string
+          follower_count?: number
+          id?: string
+          legal_name?: string
+          logo_url?: string | null
+          metadata?: Json
+          owner_id?: string
+          payout_cycle?: string
+          phone?: string | null
+          product_count?: number
+          rating?: number
+          return_policy?: string | null
+          review_count?: number
+          shipping_policy?: string | null
+          slug?: string
+          status?: Database["public"]["Enums"]["vendor_status"]
+          support_email?: string | null
+          support_phone?: string | null
+          suspended_at?: string | null
+          suspension_reason?: string | null
+          tax_id?: string | null
+          total_sales?: number
+          updated_at?: string
+          verification_status?: Database["public"]["Enums"]["vendor_verification_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendors_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendors_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wishlists: {
         Row: {
           created_at: string
@@ -2210,9 +3538,32 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_vendor_profiles: {
+        Row: {
+          banner_url: string | null
+          country: string | null
+          created_at: string | null
+          description: string | null
+          display_name: string | null
+          id: string | null
+          logo_url: string | null
+          product_count: number | null
+          rating: number | null
+          review_count: number | null
+          slug: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      can_access_vendor_conversation: {
+        Args: { p_conversation_id: string }
+        Returns: boolean
+      }
+      can_access_vendor_order: {
+        Args: { p_order_id: string }
+        Returns: boolean
+      }
       check_signup_available: {
         Args: { p_email: string; p_username: string }
         Returns: Json
@@ -2245,19 +3596,62 @@ export type Database = {
         }
         Returns: Json
       }
+      create_vendor_application: { Args: { payload: Json }; Returns: Json }
       current_app_role: {
         Args: never
         Returns: Database["public"]["Enums"]["app_role"]
       }
-      debug_pw: { Args: { p_user_id: string }; Returns: Json }
-      debug2_pw: { Args: { p_user_id: string }; Returns: Json }
       expire_stale_phone_otp_requests: {
         Args: { p_limit?: number }
         Returns: number
       }
       has_permission: { Args: { p_key: string }; Returns: boolean }
+      has_vendor_permission: {
+        Args: { p_permission: string; p_vendor_id: string }
+        Returns: boolean
+      }
       is_admin: { Args: never; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
+      is_vendor_admin: { Args: { p_vendor_id: string }; Returns: boolean }
+      is_vendor_member: { Args: { p_vendor_id: string }; Returns: boolean }
+      log_vendor_audit: {
+        Args: {
+          p_action: string
+          p_metadata?: Json
+          p_resource?: string
+          p_vendor_id: string
+        }
+        Returns: undefined
+      }
+      marketplace_commission_for: {
+        Args: { p_explicit?: number; p_vendor_id: string }
+        Returns: number
+      }
+      marketplace_public_store_exists: {
+        Args: { p_store_id: string }
+        Returns: boolean
+      }
+      marketplace_public_vendor_directory: {
+        Args: never
+        Returns: {
+          banner_url: string
+          country: string
+          created_at: string
+          description: string
+          display_name: string
+          id: string
+          logo_url: string
+          product_count: number
+          rating: number
+          review_count: number
+          slug: string
+        }[]
+      }
+      marketplace_public_vendor_exists: {
+        Args: { p_vendor_id: string }
+        Returns: boolean
+      }
+      marketplace_slugify: { Args: { p_value: string }; Returns: string }
       merge_guest_cart: { Args: { p_from_user: string }; Returns: undefined }
       pending_otp_request: {
         Args: { p_email: string; p_purpose: string }
@@ -2268,6 +3662,25 @@ export type Database = {
         Returns: Json
       }
       place_order: { Args: { payload: Json }; Returns: Json }
+      process_vendor_payout: {
+        Args: {
+          p_notes?: string
+          p_payout_id: string
+          p_reference?: string
+          p_status: Database["public"]["Enums"]["vendor_payout_status"]
+        }
+        Returns: undefined
+      }
+      process_vendor_return: {
+        Args: {
+          p_notes?: string
+          p_refund_amount?: number
+          p_return_id: string
+          p_status: Database["public"]["Enums"]["vendor_return_status"]
+        }
+        Returns: undefined
+      }
+      request_vendor_payout: { Args: { p_vendor_id: string }; Returns: Json }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
       user_has_password: { Args: { p_user_id: string }; Returns: boolean }
@@ -2323,6 +3736,58 @@ export type Database = {
       product_status: "ACTIVE" | "DRAFT" | "HIDDEN"
       review_status: "PENDING" | "APPROVED" | "REJECTED"
       txn_type: "CHARGE" | "REFUND" | "ADJUSTMENT" | "PAYOUT"
+      vendor_conversation_status: "OPEN" | "PENDING" | "RESOLVED" | "CLOSED"
+      vendor_fulfillment_status:
+        | "PENDING"
+        | "PROCESSING"
+        | "PACKED"
+        | "SHIPPED"
+        | "DELIVERED"
+        | "CANCELLED"
+        | "RETURNED"
+      vendor_ledger_type:
+        | "SALE"
+        | "COMMISSION"
+        | "REFUND"
+        | "ADJUSTMENT"
+        | "PAYOUT"
+        | "RESERVE_RELEASE"
+      vendor_member_role: "OWNER" | "ADMIN" | "MANAGER" | "ANALYST" | "SUPPORT"
+      vendor_message_sender: "CUSTOMER" | "VENDOR" | "STAFF" | "SYSTEM"
+      vendor_payout_status:
+        | "PENDING"
+        | "APPROVED"
+        | "PROCESSING"
+        | "PAID"
+        | "FAILED"
+        | "CANCELLED"
+      vendor_product_approval: "PENDING" | "APPROVED" | "REJECTED"
+      vendor_return_status:
+        | "REQUESTED"
+        | "APPROVED"
+        | "REJECTED"
+        | "RECEIVED"
+        | "REFUNDED"
+        | "CLOSED"
+        | "CANCELLED"
+      vendor_status:
+        | "PENDING"
+        | "UNDER_REVIEW"
+        | "APPROVED"
+        | "SUSPENDED"
+        | "REJECTED"
+        | "CLOSED"
+      vendor_store_status:
+        | "DRAFT"
+        | "PENDING_REVIEW"
+        | "ACTIVE"
+        | "SUSPENDED"
+        | "CLOSED"
+      vendor_verification_status:
+        | "UNVERIFIED"
+        | "PENDING"
+        | "VERIFIED"
+        | "REJECTED"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2480,6 +3945,65 @@ export const Constants = {
       product_status: ["ACTIVE", "DRAFT", "HIDDEN"],
       review_status: ["PENDING", "APPROVED", "REJECTED"],
       txn_type: ["CHARGE", "REFUND", "ADJUSTMENT", "PAYOUT"],
+      vendor_conversation_status: ["OPEN", "PENDING", "RESOLVED", "CLOSED"],
+      vendor_fulfillment_status: [
+        "PENDING",
+        "PROCESSING",
+        "PACKED",
+        "SHIPPED",
+        "DELIVERED",
+        "CANCELLED",
+        "RETURNED",
+      ],
+      vendor_ledger_type: [
+        "SALE",
+        "COMMISSION",
+        "REFUND",
+        "ADJUSTMENT",
+        "PAYOUT",
+        "RESERVE_RELEASE",
+      ],
+      vendor_member_role: ["OWNER", "ADMIN", "MANAGER", "ANALYST", "SUPPORT"],
+      vendor_message_sender: ["CUSTOMER", "VENDOR", "STAFF", "SYSTEM"],
+      vendor_payout_status: [
+        "PENDING",
+        "APPROVED",
+        "PROCESSING",
+        "PAID",
+        "FAILED",
+        "CANCELLED",
+      ],
+      vendor_product_approval: ["PENDING", "APPROVED", "REJECTED"],
+      vendor_return_status: [
+        "REQUESTED",
+        "APPROVED",
+        "REJECTED",
+        "RECEIVED",
+        "REFUNDED",
+        "CLOSED",
+        "CANCELLED",
+      ],
+      vendor_status: [
+        "PENDING",
+        "UNDER_REVIEW",
+        "APPROVED",
+        "SUSPENDED",
+        "REJECTED",
+        "CLOSED",
+      ],
+      vendor_store_status: [
+        "DRAFT",
+        "PENDING_REVIEW",
+        "ACTIVE",
+        "SUSPENDED",
+        "CLOSED",
+      ],
+      vendor_verification_status: [
+        "UNVERIFIED",
+        "PENDING",
+        "VERIFIED",
+        "REJECTED",
+      ],
     },
   },
 } as const

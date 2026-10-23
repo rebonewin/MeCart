@@ -25,6 +25,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "No files provided" }, { status: 400 });
   }
 
+  const isVendorBucket = bucket === "vendor-assets" || bucket === "vendor-documents";
+  if (isVendorBucket) {
+    const vendorId = folder.split("/")[0];
+    const { data: membership } = await supabase
+      .from("vendor_members")
+      .select("vendor_id")
+      .eq("user_id", user.id)
+      .eq("vendor_id", vendorId)
+      .eq("status", "ACTIVE")
+      .maybeSingle();
+    if (!membership) {
+      return NextResponse.json({ error: "Vendor access required" }, { status: 403 });
+    }
+  }
+
   const urls: string[] = [];
 
   for (const file of files) {
@@ -41,18 +56,20 @@ export async function POST(request: Request) {
     }
 
     const { data: publicUrl } = supabase.storage.from(bucket).getPublicUrl(path);
-    urls.push(publicUrl.publicUrl);
+    urls.push(isVendorBucket && bucket === "vendor-documents" ? path : publicUrl.publicUrl);
 
-    await registerMedia({
-      bucket,
-      path,
-      url: publicUrl.publicUrl,
-      name: file.name,
-      mimeType: file.type || null,
-      sizeBytes: file.size,
-      folder: folder || null,
-      uploadedBy: user.id,
-    });
+    if (!isVendorBucket) {
+      await registerMedia({
+        bucket,
+        path,
+        url: publicUrl.publicUrl,
+        name: file.name,
+        mimeType: file.type || null,
+        sizeBytes: file.size,
+        folder: folder || null,
+        uploadedBy: user.id,
+      });
+    }
   }
 
   return NextResponse.json({ urls, bucket });

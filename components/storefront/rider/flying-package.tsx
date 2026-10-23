@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { gsap } from "@/lib/motion";
+import { loadGsap } from "@/lib/motion/load-gsap";
 import { useMounted } from "@/components/luxe/primitives";
 import { useRider } from "./rider-provider";
 
@@ -61,21 +61,29 @@ export function PackageFlights() {
     writeTransform(startX - size / 2, startY - size / 2, 1, 0);
 
     const proxy = { t: 0 };
-    const tween = gsap.to(proxy, {
-      t: 1,
-      duration: 0.54,
-      ease: "power2.inOut",
-      onUpdate: () => {
-        const t = proxy.t;
-        const inverse = 1 - t;
-        const x = inverse * inverse * startX + 2 * inverse * t * controlX + t * t * endX;
-        const y = inverse * inverse * startY + 2 * inverse * t * controlY + t * t * endY;
-        writeTransform(x - size / 2, y - size / 2, 1 - 0.32 * t, (t - 0.5) * 28);
-      },
-    });
+    let disposed = false;
+    let tween: { kill: () => void } | undefined;
+    void loadGsap()
+      .then((gsap) => {
+        if (disposed) return;
+        tween = gsap.to(proxy, {
+          t: 1,
+          duration: 0.54,
+          ease: "power2.inOut",
+          onUpdate: () => {
+            const t = proxy.t;
+            const inverse = 1 - t;
+            const x = inverse * inverse * startX + 2 * inverse * t * controlX + t * t * endX;
+            const y = inverse * inverse * startY + 2 * inverse * t * controlY + t * t * endY;
+            writeTransform(x - size / 2, y - size / 2, 1 - 0.32 * t, (t - 0.5) * 28);
+          },
+        });
+      })
+      .catch(() => undefined);
 
     return () => {
-      tween.kill();
+      disposed = true;
+      tween?.kill();
     };
   }, [active, reduce, writeTransform]);
 
@@ -87,22 +95,30 @@ export function PackageFlights() {
     if (phase !== "load") return;
 
     const proxy = { t: 0 };
-    const tween = gsap.to(proxy, {
-      t: 1,
-      duration: 0.26,
-      ease: "power2.in",
-      onUpdate: () => {
-        const t = proxy.t;
-        const scale = (1 - 0.32) * (1 - t);
-        const x = geometry.endX - geometry.size / 2 + t * 5;
-        const y = geometry.endY - geometry.size / 2 + t * 10;
-        element.style.opacity = `${1 - t}`;
-        writeTransform(x, y, Math.max(scale, 0), 0);
-      },
-    });
+    let disposed = false;
+    let tween: { kill: () => void } | undefined;
+    void loadGsap()
+      .then((gsap) => {
+        if (disposed) return;
+        tween = gsap.to(proxy, {
+          t: 1,
+          duration: 0.26,
+          ease: "power2.in",
+          onUpdate: () => {
+            const t = proxy.t;
+            const scale = (1 - 0.32) * (1 - t);
+            const x = geometry.endX - geometry.size / 2 + t * 5;
+            const y = geometry.endY - geometry.size / 2 + t * 10;
+            element.style.opacity = `${1 - t}`;
+            writeTransform(x, y, Math.max(scale, 0), 0);
+          },
+        });
+      })
+      .catch(() => undefined);
 
     return () => {
-      tween.kill();
+      disposed = true;
+      tween?.kill();
     };
   }, [phase, reduce, writeTransform]);
 

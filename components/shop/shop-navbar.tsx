@@ -5,10 +5,12 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowUpRight,
+  Award,
   Heart,
   LayoutDashboard,
   LogOut,
   Menu,
+  MessageCircle,
   Moon,
   Package,
   Search,
@@ -27,13 +29,16 @@ import { cn } from "@/lib/cn";
 
 const NAV_LINKS = [
   { label: "Products", href: "/products" },
+  { label: "Stores", href: "/stores" },
   { label: "Collections", href: "/categories" },
   { label: "Deals", href: "/#flash-deals" },
+  { label: "Rewards", href: "/rewards" },
   { label: "About", href: "/about" },
 ];
 
 const QUICK_LINKS = [
   { label: "New in", href: "/products?sort=newest" },
+  { label: "Marketplace stores", href: "/stores" },
   { label: "Collections", href: "/categories" },
   { label: "Flash deals", href: "/#flash-deals" },
   { label: "Wishlist", href: "/wishlist" },
@@ -368,12 +373,28 @@ export function ShopNavbar() {
                           <User className="h-4 w-4" aria-hidden /> Profile
                         </Link>
                         <Link
+                          href="/rewards"
+                          role="menuitem"
+                          onClick={() => setAccountOpen(false)}
+                          className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm text-white/75 transition hover:bg-white/[0.07] hover:text-white"
+                        >
+                          <Award className="h-4 w-4" aria-hidden /> Rewards & standing
+                        </Link>
+                        <Link
                           href="/orders"
                           role="menuitem"
                           onClick={() => setAccountOpen(false)}
                           className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm text-white/75 transition hover:bg-white/[0.07] hover:text-white"
                         >
                           <Package className="h-4 w-4" aria-hidden /> Orders
+                        </Link>
+                        <Link
+                          href="/messages"
+                          role="menuitem"
+                          onClick={() => setAccountOpen(false)}
+                          className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm text-white/75 transition hover:bg-white/[0.07] hover:text-white"
+                        >
+                          <MessageCircle className="h-4 w-4" aria-hidden /> Messages
                         </Link>
                         {isStaff ? (
                           <Link

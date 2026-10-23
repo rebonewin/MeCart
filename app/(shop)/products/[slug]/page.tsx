@@ -1,5 +1,5 @@
 import { ProductDetailClient } from "@/components/shop/product-detail-client";
-import { getProductBySlug, getRelatedProducts } from "@/lib/repositories/products";
+import { getProductBySlug, getRelatedProducts, listProducts } from "@/lib/repositories/products";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +15,10 @@ export default async function ProductDetailPage({
     return <div className="mx-auto max-w-7xl px-4 py-16 text-center">Product not found.</div>;
   }
 
-  const related = await getRelatedProducts(product, 8);
+  const [related, catalog] = await Promise.all([
+    getRelatedProducts(product, 8),
+    listProducts({ sort: "rating", limit: 36 }),
+  ]);
 
-  return <ProductDetailClient product={product} related={related} />;
+  return <ProductDetailClient product={product} related={related} catalog={catalog} />;
 }

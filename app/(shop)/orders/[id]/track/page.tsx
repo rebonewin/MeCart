@@ -1,35 +1,49 @@
+import { notFound, redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 import { getOrderById } from "@/lib/actions/orders";
-import Link from "next/link";
+import { OrderTracking } from "@/components/shop/order-tracking";
+import type { TrackingOrder } from "@/lib/tracking";
 
 export const dynamic = "force-dynamic";
 
-const steps = ["PENDING", "CONFIRMED", "PROCESSING", "PACKED", "SHIPPED", "DELIVERED"];
-
 export default async function TrackOrderPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const session = await auth();
+  if (!session?.user?.id) redirect("/login");
+
   const order = await getOrderById(id);
-  if (!order) return <div className="p-8 text-center">Order not found.</div>;
+  if (!order) notFound();
 
-  const currentIndex = steps.indexOf(order.status);
+  const isStaff = session.user.role === "admin" || session.user.role === "manager";
+  if (order.userId !== session.user.id && !isStaff) notFound();
 
-  return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <h1 className="text-2xl font-bold">Track Order {order.orderNumber}</h1>
-      <div className="mt-6 space-y-4">
-        {steps.map((step, idx) => (
-          <div key={step} className="flex items-center gap-3">
-            <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${idx <= currentIndex ? "bg-emerald-500 text-white" : "bg-gray-200 text-gray-500"}`}>
-              {idx + 1}
-            </div>
-            <div className="flex-1">
-              <p className={`text-sm font-medium ${idx <= currentIndex ? "text-gray-900 dark:text-gray-100" : "text-gray-400"}`}>{step}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="mt-6">
-        <Link href={`/orders/${order.id}`} className="rounded-md border px-4 py-2 text-sm">Back to Order</Link>
-      </div>
-    </div>
-  );
+  const trackingOrder: TrackingOrder = {
+    id: order.id,
+    orderNumber: order.orderNumber,
+    status: order.status,
+    paymentStatus: order.paymentStatus,
+    createdAt: order.createdAt,
+    updatedAt: order.updatedAt,
+    customerName: order.customerName,
+    customerEmail: order.customerEmail,
+    shippingAddress: order.shippingAddress,
+    city: order.city,
+    zip: order.zip,
+    grandTotal: order.grandTotal,
+    subtotal: order.subtotal,
+    shippingCost: order.shippingCost,
+    discount: order.discount,
+    items: order.items.map((item) => ({
+      id: item.id,
+      name: item.name,
+      sku: item.sku,
+      quantity: item.quantity,
+      size: item.size,
+      color: item.color,
+      price: item.price,
+      total: item.total,
+    })),
+  };
+
+  return <OrderTracking order={trackingOrder} />;
 }

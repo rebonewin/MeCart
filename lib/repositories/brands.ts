@@ -1,7 +1,11 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import { unwrap, unwrapVoid } from "@/lib/repositories/utils";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database";
 import type { Brand } from "@/types/product";
+
+type Supabase = SupabaseClient<Database>;
 
 export type BrandWithMeta = Brand & { logoUrl: string | null; productCount: number; description: string | null };
 
@@ -16,11 +20,11 @@ export async function listBrands(): Promise<Brand[]> {
   return (data ?? []).map((row) => ({ id: row.id, name: row.name, slug: row.slug }));
 }
 
-export async function listBrandsWithMeta(): Promise<BrandWithMeta[]> {
-  const supabase = await createClient();
+export async function listBrandsWithMeta(supabase?: Supabase): Promise<BrandWithMeta[]> {
+  const client = supabase ?? (await createClient());
   const [brandsRes, productsRes] = await Promise.all([
-    supabase.from("brands").select("*").is("deleted_at", null).order("name"),
-    supabase.from("products").select("brand_id").is("deleted_at", null),
+    client.from("brands").select("*").is("deleted_at", null).order("name"),
+    client.from("products").select("brand_id").is("deleted_at", null),
   ]);
   const products = productsRes.data ?? [];
   return (brandsRes.data ?? []).map((row) => ({

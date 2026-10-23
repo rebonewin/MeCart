@@ -145,6 +145,14 @@ export function ParticleField({
 
     const startLoop = () => {
       if (raf || reduce) return;
+      const connection = (
+        navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }
+      ).connection;
+      const lightweight =
+        window.matchMedia("(pointer: coarse)").matches ||
+        connection?.saveData ||
+        connection?.effectiveType === "2g";
+      if (lightweight) return;
       last = performance.now();
       raf = requestAnimationFrame(loop);
     };

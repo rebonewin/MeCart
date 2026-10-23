@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { ArrowUpRight, Search, SearchX, Sparkles } from "lucide-react";
 import { ProductCard } from "@/components/shop/product-card";
+import { StoreCard } from "@/components/marketplace/store-card";
+import { VendorCard } from "@/components/marketplace/vendor-card";
 import { EmptyState, PageHeader, Breadcrumbs } from "@/components/shop/storefront-ui";
 import { RecentSearches } from "@/components/storefront/recent-searches";
-import { listProducts } from "@/lib/repositories/products";
+import { searchMarketplace } from "@/lib/repositories/marketplace";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +18,10 @@ export default async function SearchPage({
 }) {
   const { q } = await searchParams;
   const query = (q ?? "").trim();
-  const results = query ? await listProducts({ search: query, limit: 60 }) : [];
+  const results = query
+    ? await searchMarketplace(query)
+    : { products: [], stores: [], vendors: [] };
+  const total = results.products.length + results.stores.length + results.vendors.length;
 
   return (
     <div className="lx-page">
@@ -105,7 +110,7 @@ export default async function SearchPage({
               </div>
             </div>
           </>
-        ) : results.length ? (
+        ) : total ? (
           <section className="mt-14" aria-label="Search results">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
@@ -113,7 +118,7 @@ export default async function SearchPage({
                   Search result
                 </p>
                 <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[var(--lx-text)]">
-                  {results.length} {results.length === 1 ? "piece" : "pieces"} for “{query}”
+                  {total} {total === 1 ? "match" : "matches"} for “{query}”
                 </h2>
               </div>
               <Link
@@ -123,11 +128,42 @@ export default async function SearchPage({
                 Browse the full collection <ArrowUpRight className="h-4 w-4" aria-hidden />
               </Link>
             </div>
-            <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
-              {results.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+            {results.products.length > 0 && (
+              <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
+                {results.products.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            )}
+
+            {results.stores.length > 0 && (
+              <div className="mt-12">
+                <div className="flex items-end justify-between gap-4">
+                  <div>
+                    <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-[var(--lx-gold)]">Storefronts</p>
+                    <h2 className="mt-2 text-xl font-semibold tracking-tight text-[var(--lx-text)]">Stores matching “{query}”</h2>
+                  </div>
+                  <Link href={`/stores?q=${encodeURIComponent(query)}`} className="text-xs text-[var(--lx-muted)] hover:text-[var(--lx-text)]">All stores</Link>
+                </div>
+                <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {results.stores.map((store) => <StoreCard key={store.id} store={store} />)}
+                </div>
+              </div>
+            )}
+
+            {results.vendors.length > 0 && (
+              <div className="mt-12">
+                <div className="flex items-end justify-between gap-4">
+                  <div>
+                    <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-[var(--lx-gold)]">Sellers</p>
+                    <h2 className="mt-2 text-xl font-semibold tracking-tight text-[var(--lx-text)]">Marketplace sellers</h2>
+                  </div>
+                </div>
+                <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {results.vendors.map((vendor) => <VendorCard key={vendor.id} vendor={vendor} />)}
+                </div>
+              </div>
+            )}
           </section>
         ) : (
           <div className="mx-auto mt-14 max-w-2xl">

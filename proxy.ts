@@ -12,6 +12,8 @@ export const config = {
     "/orders/:path*",
     "/profile/:path*",
     "/wishlist/:path*",
+    "/messages/:path*",
+    "/seller/:path*",
     "/login/:path*",
     "/register/:path*",
     "/forgot-password/:path*",

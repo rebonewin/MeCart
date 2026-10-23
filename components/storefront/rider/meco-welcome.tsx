@@ -35,6 +35,11 @@ export function MecoWelcome({ onStart, onDone }: { onStart: () => void; onDone: 
 
   useEffect(() => {
     if (!mounted || reduce || pathname !== "/") return;
+    if (window.matchMedia("(max-width: 1023px)").matches) return;
+    const connection = (
+      navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }
+    ).connection;
+    if (connection?.saveData || connection?.effectiveType === "2g") return;
 
     try {
       if (window.sessionStorage.getItem(STORAGE_KEY)) return;
