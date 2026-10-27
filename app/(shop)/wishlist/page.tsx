@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
@@ -71,19 +72,19 @@ function SavedCard({
             </span>
           )}
         </Link>
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#05060e]/35 via-transparent to-transparent opacity-60" />
-        <button
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0B0B0F]/35 via-transparent to-transparent opacity-60" />
+        <Button
           type="button"
           onClick={() => {
             void onRemove();
             toast.success("Removed from saved pieces", { description: item.name });
           }}
           aria-label={`Remove ${item.name} from wishlist`}
-          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-[#05060e]/45 text-white/80 backdrop-blur-xl transition hover:border-[var(--lx-rose)]/50 hover:bg-[var(--lx-rose)]/20 hover:text-white"
+          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-[#0B0B0F]/45 text-white/80 backdrop-blur-xl transition hover:border-[var(--lx-rose)]/50 hover:bg-[var(--lx-rose)]/20 hover:text-white"
         >
           <Trash2 className="h-3.5 w-3.5" aria-hidden />
-        </button>
-        <span className="absolute bottom-3 left-3 rounded-full border border-white/20 bg-[#05060e]/40 px-2.5 py-1 font-mono text-[8px] uppercase tracking-[0.2em] text-white/70 backdrop-blur-md">
+        </Button>
+        <span className="absolute bottom-3 left-3 rounded-full border border-white/20 bg-[#0B0B0F]/40 px-2.5 py-1 font-mono text-[8px] uppercase tracking-[0.2em] text-white/70 backdrop-blur-md">
           Saved piece
         </span>
       </div>
@@ -104,7 +105,7 @@ function SavedCard({
           <span className="text-sm font-semibold tabular-nums text-[var(--lx-text)]">
             ${item.price.toFixed(2)}
           </span>
-          <button
+          <Button
             type="button"
             onClick={() => void moveToBag()}
             disabled={busy}
@@ -112,7 +113,7 @@ function SavedCard({
           >
             <ShoppingBag className="h-3.5 w-3.5" aria-hidden />
             {busy ? "Moving…" : "Move to bag"}
-          </button>
+          </Button>
         </div>
       </div>
     </motion.article>

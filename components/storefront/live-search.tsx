@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -61,7 +62,7 @@ function readRecent(): string[] {
 export function LiveSearch({
   size = "lg",
   className,
-  placeholder = "Search the atelier — products, collections, drops…",
+  placeholder = "Search objects…",
   onNavigate,
   autoFocus = false,
   inline = false,
@@ -277,7 +278,7 @@ export function LiveSearch({
             )}
           />
           {query ? (
-            <button
+            <Button
               type="button"
               onClick={() => {
                 setQuery("");
@@ -289,13 +290,13 @@ export function LiveSearch({
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[var(--lx-muted)] transition hover:bg-white/10 hover:text-white"
             >
               <X className="h-4 w-4" aria-hidden />
-            </button>
+            </Button>
           ) : null}
           {loading ? (
             <Loader2 className="h-4 w-4 shrink-0 animate-spin text-[var(--lx-cyan)]" aria-hidden />
           ) : null}
           {voice.supported ? (
-            <button
+            <Button
               type="button"
               onClick={() => {
                 setMode("search");
@@ -314,9 +315,9 @@ export function LiveSearch({
               )}
             >
               <Mic className={cn("h-4 w-4", voice.listening && "animate-pulse")} aria-hidden />
-            </button>
+            </Button>
           ) : null}
-          <button
+          <Button
             type="button"
             onClick={openVisual}
             aria-label="Search by image"
@@ -327,8 +328,8 @@ export function LiveSearch({
             )}
           >
             <Camera className="h-4 w-4" aria-hidden />
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
             className={cn(
               "shrink-0 rounded-full bg-gradient-to-r from-[var(--lx-iris)] to-[var(--lx-cyan)] font-semibold text-white shadow-lg shadow-indigo-500/25 transition hover:brightness-110 active:scale-95",
@@ -336,7 +337,7 @@ export function LiveSearch({
             )}
           >
             Search
-          </button>
+          </Button>
         </div>
       </form>
 
@@ -396,7 +397,7 @@ export function LiveSearch({
                       <p className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.24em] text-[var(--lx-muted)]">
                         <Clock3 className="h-3 w-3" aria-hidden /> Recent
                       </p>
-                      <button
+                      <Button
                         type="button"
                         onClick={() => {
                           setRecent([]);
@@ -409,18 +410,18 @@ export function LiveSearch({
                         className="text-[10px] text-[var(--lx-muted)] transition hover:text-white"
                       >
                         Clear
-                      </button>
+                      </Button>
                     </div>
                     <div className="mt-2 flex flex-wrap gap-2 px-2">
                       {recent.map((term) => (
-                        <button
+                        <Button
                           key={term}
                           type="button"
                           onClick={() => runTerm(term)}
                           className="rounded-full border border-white/10 px-3 py-1.5 text-xs text-white/75 transition hover:border-white/30 hover:bg-white/5 hover:text-white"
                         >
                           {term}
-                        </button>
+                        </Button>
                       ))}
                     </div>
                   </div>
@@ -432,14 +433,14 @@ export function LiveSearch({
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2 px-2 pb-1">
                     {POPULAR.map((term) => (
-                      <button
+                      <Button
                         key={term}
                         type="button"
                         onClick={() => runTerm(term)}
                         className="rounded-full border border-white/10 px-3 py-1.5 text-xs text-white/75 transition hover:border-[var(--lx-gold)]/40 hover:bg-[var(--lx-gold)]/10 hover:text-[var(--lx-gold)]"
                       >
                         {term}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </div>
@@ -462,14 +463,14 @@ export function LiveSearch({
                 <p className="mt-1 text-xs text-[var(--lx-muted)]">Try a category, a brand or a shorter keyword.</p>
                 <div className="mt-4 flex flex-wrap justify-center gap-2">
                   {POPULAR.slice(0, 3).map((term) => (
-                    <button
+                    <Button
                       key={term}
                       type="button"
                       onClick={() => runTerm(term)}
                       className="rounded-full border border-white/10 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/30 hover:text-white"
                     >
                       {term}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -477,7 +478,7 @@ export function LiveSearch({
               <ul id={listId} role="listbox" aria-label="Search results" className="space-y-0.5">
                 {hits.map((hit, index) => (
                   <li key={hit.id} role="option" aria-selected={index === active}>
-                    <button
+                    <Button
                       type="button"
                       onMouseEnter={() => setActive(index)}
                       onClick={() => {
@@ -501,21 +502,21 @@ export function LiveSearch({
                       <span className="shrink-0 text-sm font-semibold text-[var(--lx-gold)]">
                         ${hit.price.toFixed(2)}
                       </span>
-                    </button>
+                    </Button>
                   </li>
                 ))}
               </ul>
             )}
 
             {!showMemory ? (
-              <button
+              <Button
                 type="button"
                 onClick={submit}
                 className="mt-1 flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-medium text-[var(--lx-cyan)] transition hover:bg-white/5"
               >
                 View all results for “{query.trim()}”
                 <ArrowRight className="h-4 w-4" aria-hidden />
-              </button>
+              </Button>
             ) : null}
             </div>
           </motion.div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -105,7 +106,7 @@ export function QuickViewModal({
           aria-modal="true"
           aria-label={`Quick view — ${product.name}`}
         >
-          <button
+          <Button
             type="button"
             aria-label="Close quick view"
             onClick={onClose}
@@ -118,14 +119,14 @@ export function QuickViewModal({
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             className="lx-card relative z-10 max-h-[92svh] w-full max-w-4xl overflow-y-auto rounded-t-[1.75rem] sm:rounded-3xl"
           >
-            <button
+            <Button
               type="button"
               onClick={onClose}
               aria-label="Close"
               className="lx-glass absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full text-white/80 transition hover:text-white"
             >
               <X className="h-4 w-4" aria-hidden />
-            </button>
+            </Button>
 
             <div className="grid gap-0 md:grid-cols-2">
               {/* gallery */}
@@ -145,7 +146,7 @@ export function QuickViewModal({
                     </span>
                   )}
                   {product.discountPercent > 0 ? (
-                    <span className="absolute left-4 top-4 rounded-full bg-[var(--lx-gold)] px-3 py-1 text-xs font-bold text-[#241a05]">
+                    <span className="absolute left-4 top-4 rounded-full bg-[var(--lx-gold)] px-3 py-1 text-xs font-bold text-[#0B0B0F]">
                       −{Math.round(product.discountPercent)}%
                     </span>
                   ) : null}
@@ -153,7 +154,7 @@ export function QuickViewModal({
                 {gallery.length > 1 ? (
                   <div className="flex gap-2 p-4">
                     {gallery.map((image, index) => (
-                      <button
+                      <Button
                         key={image}
                         type="button"
                         onClick={() => setActiveImage(index)}
@@ -166,7 +167,7 @@ export function QuickViewModal({
                         )}
                       >
                         <Image src={image} alt="" fill sizes="56px" className="object-cover" />
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 ) : null}
@@ -217,7 +218,7 @@ export function QuickViewModal({
                     <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--lx-muted)]">Size</p>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {product.sizes.map((option) => (
-                        <button
+                        <Button
                           key={option}
                           type="button"
                           onClick={() => setSize(option)}
@@ -229,7 +230,7 @@ export function QuickViewModal({
                           )}
                         >
                           {option}
-                        </button>
+                        </Button>
                       ))}
                     </div>
                   </div>
@@ -240,7 +241,7 @@ export function QuickViewModal({
                     <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--lx-muted)]">Colour</p>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {product.colors.map((option) => (
-                        <button
+                        <Button
                           key={option}
                           type="button"
                           onClick={() => setColor(option)}
@@ -252,7 +253,7 @@ export function QuickViewModal({
                           )}
                         >
                           {option}
-                        </button>
+                        </Button>
                       ))}
                     </div>
                   </div>
@@ -260,23 +261,23 @@ export function QuickViewModal({
 
                 <div className="mt-7 flex items-center gap-4">
                   <div className="flex h-12 items-center rounded-full border border-white/10">
-                    <button
+                    <Button
                       type="button"
                       onClick={() => setQuantity((value) => Math.max(1, value - 1))}
                       aria-label="Decrease quantity"
                       className="flex h-full w-11 items-center justify-center text-[var(--lx-muted)] transition hover:text-white"
                     >
                       <Minus className="h-4 w-4" aria-hidden />
-                    </button>
+                    </Button>
                     <span className="w-8 text-center text-sm font-semibold text-white">{quantity}</span>
-                    <button
+                    <Button
                       type="button"
                       onClick={() => setQuantity((value) => Math.min(99, value + 1))}
                       aria-label="Increase quantity"
                       className="flex h-full w-11 items-center justify-center text-[var(--lx-muted)] transition hover:text-white"
                     >
                       <Plus className="h-4 w-4" aria-hidden />
-                    </button>
+                    </Button>
                   </div>
 
                   <RippleButton
@@ -299,7 +300,7 @@ export function QuickViewModal({
                 </div>
 
                 <div className="mt-5 flex items-center gap-3">
-                  <button
+                  <Button
                     type="button"
                     onClick={() =>
                       void wishlist.toggle({
@@ -319,8 +320,8 @@ export function QuickViewModal({
                   >
                     <Heart className={cn("h-4 w-4", inWishlist && "fill-current")} aria-hidden />
                     {inWishlist ? "In wishlist" : "Wishlist"}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
                     onClick={() => compare.toggle(snapshotOf(product))}
                     className={cn(
@@ -332,7 +333,7 @@ export function QuickViewModal({
                   >
                     <Scale className="h-4 w-4" aria-hidden />
                     {inCompare ? "Comparing" : "Compare"}
-                  </button>
+                  </Button>
                 </div>
 
                 <Link

@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -105,8 +106,8 @@ export function CategoryManager({ categories: initialCats, subCategories: initia
           <input value={editingCat ? editingCat.slug : catSlug} onChange={(e) => (editingCat ? setEditingCat({ ...editingCat, slug: e.target.value }) : setCatSlug(e.target.value))} placeholder="slug" className="rounded border px-3 py-2 dark:bg-gray-800" />
         </div>
         <div className="mt-3">
-          <button onClick={saveCat} disabled={pending} className="rounded-md bg-indigo-600 px-4 py-2 text-sm text-white">Save Category</button>
-          {editingCat && <button onClick={() => setEditingCat(null)} className="ml-2 rounded-md border px-4 py-2 text-sm">Cancel</button>}
+          <Button onClick={saveCat} disabled={pending} className="rounded-md bg-indigo-600 px-4 py-2 text-sm text-white">Save Category</Button>
+          {editingCat && <Button onClick={() => setEditingCat(null)} className="ml-2 rounded-md border px-4 py-2 text-sm">Cancel</Button>}
         </div>
       </div>
 
@@ -119,8 +120,8 @@ export function CategoryManager({ categories: initialCats, subCategories: initia
                 <td className="p-3">{c.name}</td>
                 <td className="p-3">{c.slug}</td>
                 <td className="p-3 flex gap-2">
-                  <button onClick={() => setEditingCat(c)} className="text-indigo-600 hover:underline">Edit</button>
-                  <button onClick={() => removeCat(c.id)} className="text-rose-600 hover:underline">Delete</button>
+                  <Button onClick={() => setEditingCat(c)} className="text-indigo-600 hover:underline">Edit</Button>
+                  <Button onClick={() => removeCat(c.id)} className="text-rose-600 hover:underline">Delete</Button>
                 </td>
               </tr>
             ))}
@@ -138,7 +139,7 @@ export function CategoryManager({ categories: initialCats, subCategories: initia
           <input value={subName} onChange={(e) => setSubName(e.target.value)} placeholder="Name" className="rounded border px-3 py-2 dark:bg-gray-800" />
           <input value={subSlug} onChange={(e) => setSubSlug(e.target.value)} placeholder="slug" className="rounded border px-3 py-2 dark:bg-gray-800" />
         </div>
-        <button onClick={saveSub} disabled={pending} className="mt-3 rounded-md bg-indigo-600 px-4 py-2 text-sm text-white">Add Subcategory</button>
+        <Button onClick={saveSub} disabled={pending} className="mt-3 rounded-md bg-indigo-600 px-4 py-2 text-sm text-white">Add Subcategory</Button>
       </div>
 
       <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
@@ -150,7 +151,7 @@ export function CategoryManager({ categories: initialCats, subCategories: initia
                 <td className="p-3">{s.name}</td>
                 <td className="p-3">{cats.find((c) => c.id === s.categoryId)?.name ?? s.categoryId}</td>
                 <td className="p-3">
-                  <button onClick={() => removeSub(s.id)} className="text-rose-600 hover:underline">Delete</button>
+                  <Button onClick={() => removeSub(s.id)} className="text-rose-600 hover:underline">Delete</Button>
                 </td>
               </tr>
             ))}

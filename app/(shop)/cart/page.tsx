@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -37,7 +38,7 @@ function QuantityStepper({
 }) {
   return (
     <div className="flex h-9 items-center rounded-full border border-[var(--lx-border)] bg-[var(--lx-surface)]">
-      <button
+      <Button
         type="button"
         onClick={() => onChange(quantity - 1)}
         disabled={disabled || quantity <= 1}
@@ -45,14 +46,14 @@ function QuantityStepper({
         className="flex h-full w-9 items-center justify-center rounded-l-full text-[var(--lx-muted)] transition hover:bg-[var(--lx-surface-2)] hover:text-[var(--lx-text)] disabled:cursor-not-allowed disabled:opacity-35"
       >
         <Minus className="h-3.5 w-3.5" aria-hidden />
-      </button>
+      </Button>
       <span
         aria-live="polite"
         className="w-8 text-center text-xs font-semibold tabular-nums text-[var(--lx-text)]"
       >
         {quantity}
       </span>
-      <button
+      <Button
         type="button"
         onClick={() => onChange(quantity + 1)}
         disabled={disabled || quantity >= 20}
@@ -60,7 +61,7 @@ function QuantityStepper({
         className="flex h-full w-9 items-center justify-center rounded-r-full text-[var(--lx-muted)] transition hover:bg-[var(--lx-surface-2)] hover:text-[var(--lx-text)] disabled:cursor-not-allowed disabled:opacity-35"
       >
         <Plus className="h-3.5 w-3.5" aria-hidden />
-      </button>
+      </Button>
     </div>
   );
 }
@@ -138,7 +139,7 @@ function CartLine({
             <QuantityStepper quantity={item.quantity} onChange={onQuantity} disabled={busy} />
 
             <div className="flex items-center gap-1">
-              <button
+              <Button
                 type="button"
                 onClick={onSave}
                 disabled={busy || saved}
@@ -151,8 +152,8 @@ function CartLine({
                   <Heart className="h-3.5 w-3.5" aria-hidden />
                 )}
                 <span className="hidden sm:inline">{saved ? "Saved" : "Save"}</span>
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={onRemove}
                 disabled={busy}
@@ -160,7 +161,7 @@ function CartLine({
                 aria-label={`Remove ${item.name}`}
               >
                 <Trash2 className="h-3.5 w-3.5" aria-hidden />
-              </button>
+              </Button>
             </div>
           </div>
         </div>

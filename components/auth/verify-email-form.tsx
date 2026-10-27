@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -77,7 +78,7 @@ function OtpBoxes({
           autoComplete={index === 0 ? "one-time-code" : "off"}
           disabled={disabled}
           aria-label={`Digit ${index + 1} of 6`}
-          className="h-14 w-full rounded-2xl border border-white/10 bg-slate-950/70 text-center text-xl font-bold text-white caret-blue-400 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-500/20 disabled:opacity-50"
+          className="h-14 w-full rounded-2xl border border-white/10 bg-slate-950/70 text-center text-xl font-bold text-white caret-[var(--lx-gold)] outline-none transition focus:border-[var(--lx-gold)] focus:ring-4 focus:ring-[var(--lx-ring)] disabled:opacity-50"
         />
       ))}
     </div>
@@ -160,15 +161,15 @@ export function VerifyEmailForm({ presetEmail }: { presetEmail: string }) {
   const resendDisabled = resendInSeconds > 0 || maxResendsReached || loading;
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#030712] px-4 py-10 text-white">
+    <div className="lx-dark-scene relative flex min-h-screen items-center justify-center overflow-hidden bg-[var(--lx-bg)] px-4 py-10 text-[var(--lx-text)]">
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         <motion.div
-          className="absolute -left-24 top-16 h-72 w-72 rounded-full bg-blue-500/25 blur-3xl"
+          className="absolute -left-24 top-16 h-72 w-72 rounded-full bg-[var(--lx-champagne)]/12 blur-3xl"
           animate={{ x: [0, 40, 0], y: [0, 18, 0] }}
           transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute -right-24 bottom-10 h-96 w-96 rounded-full bg-cyan-400/20 blur-3xl"
+          className="absolute -right-24 bottom-10 h-96 w-96 rounded-full bg-[var(--lx-champagne-warm)]/10 blur-3xl"
           animate={{ x: [0, -36, 0], y: [0, -22, 0] }}
           transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
         />
@@ -182,14 +183,14 @@ export function VerifyEmailForm({ presetEmail }: { presetEmail: string }) {
       >
         <div className="relative">
           <div className="mb-8 text-center">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-blue-500/15">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-[var(--lx-gold)]/12">
               {done ? (
                 <ShieldCheck className="h-7 w-7 text-emerald-300" />
               ) : (
-                <MailCheck className="h-7 w-7 text-blue-300" />
+                <MailCheck className="h-7 w-7 text-[var(--lx-gold-soft)]" />
               )}
             </div>
-            <p className="text-xs uppercase tracking-[0.35em] text-blue-300">MeCart Security</p>
+            <p className="text-xs uppercase tracking-[0.35em] text-[var(--lx-gold-soft)]">MeCart Security</p>
             <h1 className="mt-3 text-3xl font-black tracking-tight">Verify your email</h1>
             <p className="mt-3 text-sm text-slate-300" aria-live="polite">
               {stage === "email" && "Confirm your address to unlock your account."}
@@ -215,7 +216,7 @@ export function VerifyEmailForm({ presetEmail }: { presetEmail: string }) {
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                     placeholder="you@example.com"
-                    className="h-12 w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 text-white outline-none transition placeholder:text-slate-500 focus:border-blue-400 focus:ring-4 focus:ring-blue-500/15"
+                    className="h-12 w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 text-white outline-none transition placeholder:text-slate-500 focus:border-[var(--lx-gold)] focus:ring-4 focus:ring-[var(--lx-ring)]"
                     required
                   />
                 </label>
@@ -231,7 +232,7 @@ export function VerifyEmailForm({ presetEmail }: { presetEmail: string }) {
                   disabled={loading}
                   whileHover={{ scale: loading ? 1 : 1.015, y: loading ? 0 : -1 }}
                   whileTap={{ scale: 0.985 }}
-                  className="flex h-12 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 font-bold text-white shadow-xl shadow-blue-600/25 transition disabled:cursor-not-allowed disabled:opacity-70"
+                  className="lx-btn lx-btn--brand lx-btn--lg flex h-12 w-full items-center justify-center rounded-full transition disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   {loading ? "Sending code…" : "Send verification code"}
                 </motion.button>
@@ -256,18 +257,18 @@ export function VerifyEmailForm({ presetEmail }: { presetEmail: string }) {
                       ? `Code expires in ${String(Math.floor(secondsRemaining / 60)).padStart(2, "0")}:${String(secondsRemaining % 60).padStart(2, "0")}`
                       : "Your code has expired."}
                   </span>
-                  <button
+                  <Button
                     type="button"
                     onClick={() => sendCode()}
                     disabled={resendDisabled}
-                    className="font-semibold text-blue-300 transition hover:text-blue-200 disabled:text-slate-500"
+                    className="font-semibold text-[var(--lx-gold-soft)] transition hover:text-[var(--lx-champagne-warm)] disabled:text-[var(--lx-faint)]"
                   >
                     {maxResendsReached
                       ? "Maximum resends reached"
                       : resendInSeconds > 0
                         ? `Resend in ${resendInSeconds}s`
                         : "Resend code"}
-                  </button>
+                  </Button>
                 </div>
 
                 {otpError && (
@@ -288,18 +289,18 @@ export function VerifyEmailForm({ presetEmail }: { presetEmail: string }) {
                     disabled={loading || code.length !== 6 || done}
                     whileHover={{ scale: loading ? 1 : 1.015, y: loading ? 0 : -1 }}
                     whileTap={{ scale: 0.985 }}
-                    className="flex h-12 flex-1 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 font-bold text-white shadow-xl shadow-blue-600/25 transition disabled:cursor-not-allowed disabled:opacity-50"
+                    className="lx-btn lx-btn--brand lx-btn--lg flex h-12 flex-1 items-center justify-center rounded-full transition disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {loading ? "Verifying…" : "Verify email"}
                   </motion.button>
-                  <button
+                  <Button
                     type="button"
                     onClick={() => setStage("email")}
                     disabled={loading}
                     className="h-12 rounded-2xl border border-white/10 px-4 text-sm font-medium text-slate-200 transition hover:border-white/25"
                   >
                     Change email
-                  </button>
+                  </Button>
                 </div>
               </motion.form>
             )}

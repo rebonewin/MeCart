@@ -61,13 +61,13 @@ export default async function SellerSettingsPage() {
         <div className="space-y-5">
           <SellerCard>
             <div className="flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4 text-[#d8b45a]" />
+              <ShieldCheck className="h-4 w-4 text-[#D4AF37]" />
               <h3 className="text-sm font-semibold text-white">Verification</h3>
             </div>
             <div className="mt-4 space-y-3 text-xs">
               <div className="flex items-center justify-between"><span className="text-slate-500">Account status</span><SellerBadge tone={context.vendor.status === "APPROVED" ? "success" : context.vendor.status === "REJECTED" ? "danger" : "warning"}>{context.vendor.status.replaceAll("_", " ")}</SellerBadge></div>
               <div className="flex items-center justify-between"><span className="text-slate-500">Verification</span><SellerBadge tone={context.vendor.verification_status === "VERIFIED" ? "success" : "warning"}>{context.vendor.verification_status}</SellerBadge></div>
-              <div className="flex items-center justify-between"><span className="text-slate-500">Commission</span><span className="font-semibold text-[#f5dfa2]">{context.vendor.commission_rate}%</span></div>
+              <div className="flex items-center justify-between"><span className="text-slate-500">Commission</span><span className="font-semibold text-[#E6C768]">{context.vendor.commission_rate}%</span></div>
               <div className="flex items-center justify-between"><span className="text-slate-500">Payout cycle</span><span className="text-slate-300">{context.vendor.payout_cycle}</span></div>
               <div className="flex items-center justify-between"><span className="text-slate-500">Member since</span><span className="text-slate-300">{dateLabel(context.vendor.created_at)}</span></div>
             </div>
@@ -80,12 +80,12 @@ export default async function SellerSettingsPage() {
 
           <SellerCard>
             <div className="flex items-center gap-2">
-              <Store className="h-4 w-4 text-[#d8b45a]" />
+              <Store className="h-4 w-4 text-[#D4AF37]" />
               <h3 className="text-sm font-semibold text-white">Stores</h3>
             </div>
             <div className="mt-3 space-y-2">
               {stores.length ? stores.map((store) => (
-                <Link key={store.id} href={`/seller/stores/${store.id}`} className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-xs hover:border-[#d8b45a]/25">
+                <Link key={store.id} href={`/seller/stores/${store.id}`} className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-xs hover:border-[#D4AF37]/25">
                   <span className="text-slate-300">{store.name}</span>
                   <SellerBadge tone={store.status === "ACTIVE" ? "success" : "warning"}>{store.status}</SellerBadge>
                 </Link>
@@ -95,7 +95,7 @@ export default async function SellerSettingsPage() {
 
           <SellerCard>
             <div className="flex items-center gap-2">
-              <KeyRound className="h-4 w-4 text-[#d8b45a]" />
+              <KeyRound className="h-4 w-4 text-[#D4AF37]" />
               <h3 className="text-sm font-semibold text-white">Your permissions</h3>
             </div>
             <p className="mt-1 text-[11px] text-slate-500">Role: {context.membership.role}</p>
@@ -110,7 +110,7 @@ export default async function SellerSettingsPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-[#d8b45a]" />
+              <Users className="h-4 w-4 text-[#D4AF37]" />
               <h3 className="text-sm font-semibold text-white">Team</h3>
             </div>
             <p className="mt-1 text-xs text-slate-500">Granular permissions are enforced by role at the database and action layers.</p>
@@ -134,7 +134,7 @@ export default async function SellerSettingsPage() {
                   <tr key={member.id} className="border-b border-white/[0.04] last:border-0">
                     <td className="py-3">
                       <div className="flex items-center gap-2">
-                        <span className="flex h-7 w-7 items-center justify-center rounded-full border border-[#d8b45a]/20 bg-[#d8b45a]/10 text-[10px] font-semibold text-[#f5dfa2]">
+                        <span className="flex h-7 w-7 items-center justify-center rounded-full border border-[#D4AF37]/20 bg-[#D4AF37]/10 text-[10px] font-semibold text-[#E6C768]">
                           {(profile?.full_name || profile?.email || "?").charAt(0).toUpperCase()}
                         </span>
                         <div>

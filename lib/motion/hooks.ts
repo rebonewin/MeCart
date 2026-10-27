@@ -5,6 +5,7 @@ import { useScroll, useSpring, useTransform, type MotionValue } from "framer-mot
 
 const REDUCED_QUERY = "(prefers-reduced-motion: reduce)";
 const COARSE_QUERY = "(pointer: coarse)";
+const MIN_LG_QUERY = "(min-width: 1024px)";
 
 function subscribeMedia(query: string, callback: () => void): () => void {
   if (typeof window === "undefined") return () => {};
@@ -32,6 +33,15 @@ export function useIsCoarsePointer(): boolean {
   return useSyncExternalStore(
     (cb) => subscribeMedia(COARSE_QUERY, cb),
     () => matchesMedia(COARSE_QUERY),
+    () => false,
+  );
+}
+
+/** SSR-safe viewport check — true below the flagship desktop breakpoint. */
+export function useIsSmallScreen(): boolean {
+  return useSyncExternalStore(
+    (cb) => subscribeMedia(MIN_LG_QUERY, cb),
+    () => !matchesMedia(MIN_LG_QUERY),
     () => false,
   );
 }

@@ -6,6 +6,7 @@ import { CompareProvider } from "@/lib/compare-context";
 import { RecentlyViewedProvider } from "@/lib/recently-viewed-context";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { RiderProvider } from "@/components/storefront/rider/rider-provider";
+import { MaisonCursor } from "@/components/luxe/maison-cursor";
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
   return (
@@ -19,6 +20,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
           </WishlistProvider>
         </RiderProvider>
       </CartProvider>
+      <MaisonCursor />
     </AuthProvider>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCheck, Loader2, Send } from "lucide-react";
@@ -81,24 +82,24 @@ export function SellerConversation({
           <p className="mt-0.5 text-[11px] text-slate-500">{customerName} · {customerEmail}</p>
         </div>
         <div className="flex items-center gap-2">
-          <button type="button" onClick={markRead} disabled={pending} className="rounded-full border border-white/10 px-3 py-1.5 text-[10px] text-slate-400 hover:text-white disabled:opacity-50">
+          <Button type="button" onClick={markRead} disabled={pending} className="rounded-full border border-white/10 px-3 py-1.5 text-[10px] text-slate-400 hover:text-white disabled:opacity-50">
             Mark read
-          </button>
-          <button type="button" onClick={resolve} disabled={pending} className="rounded-full border border-[#d8b45a]/25 bg-[#d8b45a]/10 px-3 py-1.5 text-[10px] font-medium text-[#f5dfa2] disabled:opacity-50">
+          </Button>
+          <Button type="button" onClick={resolve} disabled={pending} className="rounded-full border border-[#D4AF37]/25 bg-[#D4AF37]/10 px-3 py-1.5 text-[10px] font-medium text-[#E6C768] disabled:opacity-50">
             {status === "RESOLVED" ? "Reopen" : "Resolve"}
-          </button>
+          </Button>
         </div>
       </div>
 
-      <div className="flex-1 space-y-4 overflow-y-auto bg-[#07090f]/60 p-5">
+      <div className="flex-1 space-y-4 overflow-y-auto bg-[#101116]/60 p-5">
         {messages.length === 0 && <p className="py-10 text-center text-xs text-slate-600">No messages yet. Start the conversation.</p>}
         {messages.map((message) => {
           const mine = message.sender_type === "VENDOR";
           return (
             <div key={message.id} className={cn("flex", mine ? "justify-end" : "justify-start")}>
-              <div className={cn("max-w-[82%] rounded-2xl px-4 py-3 text-sm leading-6", mine ? "bg-[#d8b45a] text-[#1e1708]" : "border border-white/[0.07] bg-white/[0.04] text-slate-200")}>
+              <div className={cn("max-w-[82%] rounded-2xl px-4 py-3 text-sm leading-6", mine ? "bg-[#D4AF37] text-[#0B0B0F]" : "border border-white/[0.07] bg-white/[0.04] text-slate-200")}>
                 <p className="whitespace-pre-wrap">{message.body}</p>
-                <p className={cn("mt-1.5 text-[9px]", mine ? "text-[#1e1708]/60" : "text-slate-600")}>
+                <p className={cn("mt-1.5 text-[9px]", mine ? "text-[#0B0B0F]/60" : "text-slate-600")}>
                   {message.sender_type === "STAFF" ? "MeCart support · " : ""}{dateTimeLabel(message.created_at)}
                 </p>
               </div>
@@ -121,11 +122,11 @@ export function SellerConversation({
             }}
             rows={2}
             placeholder="Write a reply… (Ctrl + Enter to send)"
-            className="min-h-[46px] flex-1 resize-none rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-[#d8b45a]/40"
+            className="min-h-[46px] flex-1 resize-none rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-[#D4AF37]/40"
           />
-          <button type="button" onClick={send} disabled={pending || !body.trim()} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#d8b45a] text-[#1e1708] transition hover:bg-[#e7c778] disabled:opacity-40" aria-label="Send message">
+          <Button type="button" onClick={send} disabled={pending || !body.trim()} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#D4AF37] text-[#0B0B0F] transition hover:bg-[#E6C768] disabled:opacity-40" aria-label="Send message">
             {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-          </button>
+          </Button>
         </div>
         <p className="mt-2 flex items-center gap-1.5 text-[10px] text-slate-600"><CheckCheck className="h-3 w-3" /> Messages are private to you, the customer and MeCart support.</p>
       </div>

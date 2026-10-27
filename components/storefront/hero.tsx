@@ -53,7 +53,7 @@ function ProductChip({
           {product.coverImage ? (
             <Image src={product.coverImage} alt="" fill sizes="48px" className="object-cover" />
           ) : (
-            <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-indigo-500/30 to-cyan-400/20 text-sm font-bold text-white">
+            <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--lx-champagne)]/25 to-[var(--lx-champagne-warm)]/10 text-sm font-bold text-white">
               {product.name[0]}
             </span>
           )}
@@ -127,8 +127,8 @@ export function HeroSection({ stats, artifacts }: { stats: StorefrontStats; arti
       {/* 3D stage */}
       <motion.div className="absolute inset-0 z-0" style={{ scale: sceneScale }} aria-hidden>
         {sceneOn && !reduced ? <HeroScene /> : null}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_110%_70%_at_18%_42%,rgba(5,6,14,0.82)_0%,transparent_58%)]" />
-        <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-b from-transparent via-[#05060e]/70 to-[#05060e]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_110%_70%_at_18%_42%,rgba(11,11,15,0.82)_0%,transparent_58%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-b from-transparent via-[#0B0B0F]/70 to-[#0B0B0F]" />
       </motion.div>
 
       <motion.div

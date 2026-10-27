@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -238,7 +239,7 @@ export function PhoneSettings({ initialPhone }: { initialPhone: PhoneInfo }) {
       {mode === "idle" && (
         <div className="mt-4 flex flex-wrap gap-2">
           {!initialPhone.number && (
-            <button
+            <Button
               onClick={() => {
                 setIntent("link");
                 setMode("form");
@@ -246,10 +247,10 @@ export function PhoneSettings({ initialPhone }: { initialPhone: PhoneInfo }) {
               className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
             >
               Add phone number
-            </button>
+            </Button>
           )}
           {initialPhone.number && !initialPhone.verified && (
-            <button
+            <Button
               onClick={() => {
                 setIntent("link");
                 setNumber(initialPhone.number?.replace(/^\+\d+/, "") ?? "");
@@ -258,11 +259,11 @@ export function PhoneSettings({ initialPhone }: { initialPhone: PhoneInfo }) {
               className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
             >
               Verify phone
-            </button>
+            </Button>
           )}
           {initialPhone.number && (
             <>
-              <button
+              <Button
                 onClick={() => {
                   setIntent("change");
                   setMode("form");
@@ -270,14 +271,14 @@ export function PhoneSettings({ initialPhone }: { initialPhone: PhoneInfo }) {
                 className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium dark:border-gray-700"
               >
                 Change number
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => void remove()}
                 disabled={busy}
                 className="flex items-center gap-1 rounded-md border border-rose-300 px-4 py-2 text-sm font-medium text-rose-600 disabled:opacity-50 dark:border-rose-500/40 dark:text-rose-400"
               >
                 <Trash2 className="h-3.5 w-3.5" /> Remove
-              </button>
+              </Button>
             </>
           )}
         </div>
@@ -308,19 +309,19 @@ export function PhoneSettings({ initialPhone }: { initialPhone: PhoneInfo }) {
             />
           </div>
           <div className="flex gap-2">
-            <button
+            <Button
               onClick={() => void start(intent)}
               disabled={loading}
               className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
             >
               {loading ? "Sending…" : "Send code"}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={reset}
               className="rounded-md border border-gray-300 px-4 py-2 text-sm dark:border-gray-700"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -358,16 +359,16 @@ export function PhoneSettings({ initialPhone }: { initialPhone: PhoneInfo }) {
             </p>
           )}
           <div className="flex gap-2">
-            <button
+            <Button
               type="submit"
               disabled={loading || digits.join("").length !== 6}
               className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
             >
               {loading ? "Verifying…" : "Verify"}
-            </button>
-            <button type="button" onClick={reset} className="rounded-md border border-gray-300 px-4 py-2 text-sm dark:border-gray-700">
+            </Button>
+            <Button type="button" onClick={reset} className="rounded-md border border-gray-300 px-4 py-2 text-sm dark:border-gray-700">
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       )}

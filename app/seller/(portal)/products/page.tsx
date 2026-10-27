@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Search, SlidersHorizontal, ShoppingBag } from "lucide-react";
 import { requireSellerContext } from "@/lib/marketplace/context";
@@ -48,29 +49,29 @@ export default async function SellerProductsPage({
             name="q"
             defaultValue={params.q ?? ""}
             placeholder="Search by name, SKU or vendor SKU…"
-            className="h-11 w-full rounded-2xl border border-white/[0.07] bg-[#07090f] pl-11 pr-4 text-sm text-white outline-none placeholder:text-slate-600 focus:border-[#d8b45a]/40"
+            className="h-11 w-full rounded-2xl border border-white/[0.07] bg-[#101116] pl-11 pr-4 text-sm text-white outline-none placeholder:text-slate-600 focus:border-[#D4AF37]/40"
           />
         </label>
         <div className="flex flex-wrap gap-2">
           <label className="relative">
             <span className="sr-only">Lifecycle status</span>
             <SlidersHorizontal className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500" />
-            <select name="status" defaultValue={params.status ?? ""} className="h-11 rounded-2xl border border-white/[0.07] bg-[#07090f] pl-9 pr-8 text-xs text-slate-300 outline-none">
+            <select name="status" defaultValue={params.status ?? ""} className="h-11 rounded-2xl border border-white/[0.07] bg-[#101116] pl-9 pr-8 text-xs text-slate-300 outline-none">
               <option value="">All statuses</option>
               <option value="ACTIVE">Active</option>
               <option value="DRAFT">Draft</option>
               <option value="HIDDEN">Hidden</option>
             </select>
           </label>
-          <select name="approval" defaultValue={params.approval ?? ""} className="h-11 rounded-2xl border border-white/[0.07] bg-[#07090f] px-3 text-xs text-slate-300 outline-none">
+          <select name="approval" defaultValue={params.approval ?? ""} className="h-11 rounded-2xl border border-white/[0.07] bg-[#101116] px-3 text-xs text-slate-300 outline-none">
             <option value="">All approvals</option>
             <option value="PENDING">Pending review</option>
             <option value="APPROVED">Approved</option>
             <option value="REJECTED">Rejected</option>
           </select>
-          <button type="submit" className="h-11 rounded-2xl bg-[#d8b45a] px-5 text-xs font-semibold text-[#1e1708] transition hover:bg-[#e7c778]">
+          <Button type="submit" className="h-11 rounded-2xl bg-[#D4AF37] px-5 text-xs font-semibold text-[#0B0B0F] transition hover:bg-[#E6C768]">
             Filter
-          </button>
+          </Button>
         </div>
       </form>
 
@@ -118,7 +119,7 @@ export default async function SellerProductsPage({
                           )}
                         </div>
                         <div className="min-w-0">
-                          <Link href={`/seller/products/${product.id}/edit`} className="block truncate font-medium text-white transition hover:text-[#f5dfa2]">
+                          <Link href={`/seller/products/${product.id}/edit`} className="block truncate font-medium text-white transition hover:text-[#E6C768]">
                             {product.name}
                           </Link>
                           <p className="mt-0.5 text-[11px] text-slate-500">
@@ -160,12 +161,12 @@ export default async function SellerProductsPage({
       {pages > 1 && (
         <div className="flex items-center justify-end gap-2 text-xs">
           {page > 1 && (
-            <Link href={`/seller/products?${new URLSearchParams({ ...Object.fromEntries(query), page: String(page - 1) })}`} className="rounded-full border border-white/10 px-4 py-2 text-slate-300 hover:border-[#d8b45a]/40">
+            <Link href={`/seller/products?${new URLSearchParams({ ...Object.fromEntries(query), page: String(page - 1) })}`} className="rounded-full border border-white/10 px-4 py-2 text-slate-300 hover:border-[#D4AF37]/40">
               Previous
             </Link>
           )}
           {page < pages && (
-            <Link href={`/seller/products?${new URLSearchParams({ ...Object.fromEntries(query), page: String(page + 1) })}`} className="rounded-full border border-white/10 px-4 py-2 text-slate-300 hover:border-[#d8b45a]/40">
+            <Link href={`/seller/products?${new URLSearchParams({ ...Object.fromEntries(query), page: String(page + 1) })}`} className="rounded-full border border-white/10 px-4 py-2 text-slate-300 hover:border-[#D4AF37]/40">
               Next
             </Link>
           )}

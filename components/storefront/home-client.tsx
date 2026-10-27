@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { CustomCursor, LoadingScreen, LenisProvider, ScrollProgress } from "@/components/storefront/cinematic";
+import { LoadingScreen, LenisProvider, ScrollProgress } from "@/components/storefront/cinematic";
 import { PremiumHero } from "@/components/storefront/premium-hero";
 import { CategoryShowcase } from "@/components/storefront/categories";
 import { FeaturedProducts } from "@/components/storefront/products";
@@ -68,22 +68,20 @@ function dedupeById(products: StorefrontProduct[]): StorefrontProduct[] {
 }
 
 export function HomePageClient({ data }: { data: StorefrontHomeData }) {
-  const artifacts = dedupeById(data.featured).slice(0, 3);
   const pool = dedupeById(data.catalog?.length ? data.catalog : [...data.featured, ...data.recommended]);
 
   return (
     <LenisProvider>
       <div className="lx-page relative min-h-screen overflow-hidden">
         <LoadingScreen />
-        <CustomCursor />
         <ScrollProgress />
         <div className="noise-overlay" />
 
         <div className="relative z-10">
-          <PremiumHero stats={data.stats} artifacts={artifacts} />
+          <PremiumHero stats={data.stats} />
           <div
             aria-hidden
-            className="pointer-events-none relative z-10 -mt-1 h-24 bg-gradient-to-b from-[#05060e] to-[var(--lx-bg)] sm:h-32"
+            className="pointer-events-none relative z-10 -mt-1 h-24 bg-gradient-to-b from-[#0B0B0F] to-[var(--lx-bg)] sm:h-32"
           />
           <CategoryShowcase categories={data.categories} />
           <FeaturedProducts products={data.featured} />

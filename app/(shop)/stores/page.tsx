@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowUpRight, Search, Sparkles, Store, Users } from "lucide-react";
 import { PageHeader, Breadcrumbs, EmptyState } from "@/components/shop/storefront-ui";
@@ -60,9 +61,9 @@ export default async function StoresPage({
               placeholder="Search stores by name…"
               className="w-full bg-transparent text-sm text-[var(--lx-text)] outline-none placeholder:text-[var(--lx-muted)]"
             />
-            <button type="submit" className="h-9 shrink-0 rounded-full bg-[var(--lx-text)] px-4 text-xs font-semibold text-[var(--lx-bg)]">
+            <Button type="submit" className="h-9 shrink-0 rounded-full bg-[var(--lx-text)] px-4 text-xs font-semibold text-[var(--lx-bg)]">
               Search
-            </button>
+            </Button>
           </div>
         </form>
 

@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowUpRight, Search, SearchX, Sparkles } from "lucide-react";
 import { ProductCard } from "@/components/shop/product-card";
@@ -54,13 +55,13 @@ export default async function SearchPage({
               autoComplete="off"
               className="w-full bg-transparent text-sm text-[var(--lx-text)] outline-none placeholder:text-[var(--lx-muted)]/70 sm:text-base [&::-webkit-search-cancel-button]:hidden"
             />
-            <button
+            <Button
               type="submit"
               className="flex h-10 shrink-0 items-center gap-2 rounded-full bg-[var(--lx-text)] px-5 text-sm font-semibold text-[var(--lx-bg)] transition duration-300 hover:-translate-y-0.5 hover:opacity-90 active:scale-95"
             >
               Search
               <ArrowUpRight className="h-4 w-4" aria-hidden />
-            </button>
+            </Button>
           </div>
         </form>
 

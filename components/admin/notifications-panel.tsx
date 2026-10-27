@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
@@ -140,19 +141,19 @@ export function NotificationsPanel({
             <span className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-blue-200">
               <Bell className="h-4 w-4" /> {stats.unread} unread
             </span>
-            <button
+            <Button
               onClick={markAllRead}
               disabled={pending || stats.unread === 0}
               className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold transition hover:bg-white/10 disabled:opacity-50"
             >
               <CheckCheck className="h-4 w-4" /> Mark All Read
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => router.refresh()}
               className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-2.5 text-sm font-bold text-white shadow-xl shadow-blue-600/20"
             >
               <RefreshCcw className="h-4 w-4" /> Refresh
-            </button>
+            </Button>
           </div>
         </div>
       </motion.section>
@@ -177,7 +178,7 @@ export function NotificationsPanel({
         </div>
         <div className="flex flex-wrap gap-2">
           {FILTERS.map((filter) => (
-            <button
+            <Button
               key={filter}
               onClick={() => setSelected(filter)}
               className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
@@ -187,7 +188,7 @@ export function NotificationsPanel({
               }`}
             >
               {filter}
-            </button>
+            </Button>
           ))}
         </div>
       </section>
@@ -248,13 +249,13 @@ export function NotificationsPanel({
                     {item.read ? (
                       <span className="rounded-xl px-3 py-2 text-xs font-semibold text-slate-500">Read</span>
                     ) : (
-                      <button
+                      <Button
                         onClick={() => markRead(item.id)}
                         disabled={pending}
                         className="flex items-center gap-1 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold transition hover:bg-white/10 disabled:opacity-50"
                       >
                         <Check className="h-3.5 w-3.5" /> Mark read
-                      </button>
+                      </Button>
                     )}
                   </motion.div>
                 );

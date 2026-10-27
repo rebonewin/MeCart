@@ -135,7 +135,7 @@ const storeSchema = z.object({
   logoUrl: z.string().url().optional().or(z.literal("")),
   bannerUrl: z.string().url().optional().or(z.literal("")),
   brandPrimaryColor: z.string().regex(/^#[0-9a-fA-F]{6}$/).default("#4f46e5"),
-  brandAccentColor: z.string().regex(/^#[0-9a-fA-F]{6}$/).default("#f0c46c"),
+  brandAccentColor: z.string().regex(/^#[0-9a-fA-F]{6}$/).default("#D4AF37"),
   returnPolicy: z.string().max(6000).optional().or(z.literal("")),
   shippingPolicy: z.string().max(6000).optional().or(z.literal("")),
   seoTitle: z.string().max(180).optional().or(z.literal("")),

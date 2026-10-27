@@ -29,7 +29,7 @@ export default async function SellerCouponsPage() {
             <SellerCard key={coupon.id}>
               <div className="flex items-start justify-between gap-4">
                 <div className="flex gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-[#d8b45a]/25 bg-[#d8b45a]/10 text-[#d8b45a]">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-[#D4AF37]/25 bg-[#D4AF37]/10 text-[#D4AF37]">
                     <Tag className="h-4 w-4" />
                   </span>
                   <div>
@@ -42,7 +42,7 @@ export default async function SellerCouponsPage() {
               <div className="mt-5 grid grid-cols-3 gap-3 border-t border-white/[0.06] pt-4 text-xs">
                 <div>
                   <p className="text-[9px] uppercase tracking-[0.16em] text-slate-600">Discount</p>
-                  <p className="mt-1 font-semibold text-[#f5dfa2]">
+                  <p className="mt-1 font-semibold text-[#E6C768]">
                     {coupon.discount_percent ? `${coupon.discount_percent}%` : coupon.discount_amount ? money(coupon.discount_amount) : "—"}
                   </p>
                 </div>

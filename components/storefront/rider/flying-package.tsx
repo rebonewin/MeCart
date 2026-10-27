@@ -135,7 +135,7 @@ export function PackageFlights() {
       className="pointer-events-none fixed left-0 top-0 z-[180] will-change-transform"
       style={{ opacity: 0, visibility: visible ? "visible" : "hidden" }}
     >
-      <div className="relative h-full w-full overflow-hidden rounded-[22%] border border-[var(--lx-gold)]/60 bg-[#f7d99a] shadow-[0_18px_40px_-16px_rgba(240,196,108,0.7)]">
+      <div className="relative h-full w-full overflow-hidden rounded-[22%] border border-[var(--lx-gold)]/60 bg-[#f7d99a] shadow-[0_18px_40px_-16px_rgba(212,175,55,0.7)]">
         {image ? (
           <Image src={image} alt="" fill sizes="66px" className="object-cover" />
         ) : (

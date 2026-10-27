@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Save } from "lucide-react";
@@ -7,7 +8,7 @@ import { toast } from "sonner";
 import { updateVendorProfile } from "@/lib/actions/vendor";
 import type { VendorRow } from "@/types/database";
 
-const field = "h-10 w-full rounded-xl border border-white/10 bg-[#07090f] px-3 text-xs text-white outline-none placeholder:text-slate-600 focus:border-[#d8b45a]/40";
+const field = "h-10 w-full rounded-xl border border-white/10 bg-[#101116] px-3 text-xs text-white outline-none placeholder:text-slate-600 focus:border-[#D4AF37]/40";
 const label = "mb-1 block text-[10px] uppercase tracking-[0.14em] text-slate-500";
 
 export function VendorSettingsForm({ vendor }: { vendor: VendorRow }) {
@@ -99,9 +100,9 @@ export function VendorSettingsForm({ vendor }: { vendor: VendorRow }) {
         <textarea id="vendor-shipping-policy" value={form.shippingPolicy} onChange={set("shippingPolicy")} rows={4} className={`${field} h-auto py-2.5`} />
       </div>
       <div className="sm:col-span-2">
-        <button type="button" onClick={submit} disabled={pending} className="inline-flex h-10 items-center gap-2 rounded-full bg-[#d8b45a] px-5 text-xs font-semibold text-[#1e1708] disabled:opacity-55">
+        <Button type="button" onClick={submit} disabled={pending} className="inline-flex h-10 items-center gap-2 rounded-full bg-[#D4AF37] px-5 text-xs font-semibold text-[#0B0B0F] disabled:opacity-55">
           {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />} Save vendor profile
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -1,8 +1,10 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 import { CommandPalette } from "@/components/admin/command-palette";
+import { LiquidStage } from "@/components/luxe/webgl/liquid-stage";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/auth-provider";
 import { useEffect, useState } from "react";
@@ -129,21 +131,28 @@ export function AdminShell({ children, username }: { children: React.ReactNode; 
   const active = (href: string) => pathname === href || (href !== "/admin" && pathname.startsWith(`${href}/`));
 
   return (
-    <div className="min-h-screen bg-[#030712] text-slate-100">
+    <div className="lx-dark-scene min-h-screen bg-[var(--lx-bg)] text-slate-100">
       <aside
-        className={`fixed left-0 top-0 z-40 hidden h-screen border-r border-white/10 bg-slate-950/70 backdrop-blur-2xl transition-all duration-300 md:block ${
+        className={`lx-sidebar fixed left-0 top-0 z-40 hidden h-screen border-r border-white/10 backdrop-blur-2xl transition-all duration-300 md:block ${
           collapsed ? "w-20" : "w-72"
         }`}
       >
         <div className="flex h-16 items-center justify-between px-4">
-          {!collapsed && <span className="text-lg font-bold text-white">MeCart Admin</span>}
-          <button
+          {!collapsed && (
+            <span className="flex items-center gap-2 text-lg font-semibold tracking-tight text-white">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--lx-gold)] text-[12px] font-black text-[#0B0B0F]">
+                M
+              </span>
+              <span className="lx-serif">MeCart Admin</span>
+            </span>
+          )}
+          <Button
             onClick={() => setCollapsed((value) => !value)}
             className="rounded-xl border border-white/10 p-2 text-slate-300 transition hover:bg-white/10"
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-          </button>
+          </Button>
         </div>
         <nav className="space-y-6 overflow-y-auto px-3 pb-6">
           {navGroups.map((group) => (
@@ -158,10 +167,11 @@ export function AdminShell({ children, username }: { children: React.ReactNode; 
                       key={item.href}
                       href={item.href}
                       title={item.label}
-                      className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
+                      data-active={isActive}
+                      className={`lx-sidebar-link flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
                         isActive
-                          ? "bg-gradient-to-r from-blue-600/80 to-cyan-500/60 text-white shadow-lg shadow-blue-600/20"
-                          : "text-slate-300 hover:bg-white/10 hover:text-white"
+                          ? "bg-gradient-to-r from-[#D4AF37]/25 to-[#D4AF37]/5 text-[#E6C768] ring-1 ring-[#D4AF37]/25"
+                          : "text-slate-400 hover:bg-white/[0.06] hover:text-white"
                       }`}
                     >
                       <Icon className="h-5 w-5 shrink-0" />
@@ -178,40 +188,47 @@ export function AdminShell({ children, username }: { children: React.ReactNode; 
       <CommandPalette />
 
       <div className={`transition-all duration-300 ${collapsed ? "md:ml-20" : "md:ml-72"}`}>
-        <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-950/60 px-4 py-4 backdrop-blur-2xl sm:px-6">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <header className="relative isolate sticky top-0 z-30 overflow-hidden border-b border-white/10">
+          <div className="absolute inset-0 bg-[#0B0B0F]" aria-hidden />
+          <LiquidStage variant="ambient" intensity={0.42} className="opacity-80" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0F] via-[#0B0B0F]/85 to-[#0B0B0F]/35" aria-hidden />
+          <div className="relative flex flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              {!collapsed && <p className="text-xs uppercase tracking-[0.3em] text-blue-300">MeCart Enterprise Admin</p>}
-              <h1 className="text-xl font-bold text-white">Operations Dashboard</h1>
+              {!collapsed && (
+                <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-[var(--lx-gold)]">
+                  MeCart Enterprise Admin
+                </p>
+              )}
+              <h1 className="text-xl font-semibold tracking-tight text-white">Operations Dashboard</h1>
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <label className="relative hidden md:block">
                 <span className="sr-only">Search admin</span>
                 <input
                   placeholder="Search admin..."
-                  className="h-10 w-72 rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10"
+                  className="lx-field h-10 w-72 border-white/10 bg-white/5 text-sm text-white placeholder:text-slate-500"
                 />
               </label>
-              <button
+              <Button
                 onClick={toggleTheme}
                 className="rounded-2xl border border-white/10 p-2 text-slate-300 transition hover:bg-white/10 hover:text-white"
                 aria-label="Toggle dark mode"
               >
                 {dark ? "🌙" : "☀️"}
-              </button>
-              <button className="rounded-2xl border border-white/10 p-2 text-slate-300 transition hover:bg-white/10 hover:text-white" aria-label="Notifications">
+              </Button>
+              <Button className="rounded-2xl border border-white/10 p-2 text-slate-300 transition hover:bg-white/10 hover:text-white" aria-label="Notifications">
                 <Bell className="h-5 w-5" />
-              </button>
+              </Button>
               <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-white">
                 {username || "Admin"}
               </div>
-              <button
+              <Button
                 onClick={() => void handleSignOut()}
                 className="rounded-2xl border border-white/10 p-2 text-slate-300 transition hover:bg-white/10 hover:text-white"
                 aria-label="Logout"
               >
                 <LogOut className="h-5 w-5" />
-              </button>
+              </Button>
             </div>
           </div>
         </header>

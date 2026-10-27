@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Plus, Save } from "lucide-react";
@@ -7,7 +8,7 @@ import { toast } from "sonner";
 import { createStore, updateStoreProfile } from "@/lib/actions/vendor";
 import type { StoreRow } from "@/types/database";
 
-const field = "h-10 w-full rounded-xl border border-white/10 bg-[#07090f] px-3 text-xs text-white outline-none placeholder:text-slate-600 focus:border-[#d8b45a]/40";
+const field = "h-10 w-full rounded-xl border border-white/10 bg-[#101116] px-3 text-xs text-white outline-none placeholder:text-slate-600 focus:border-[#D4AF37]/40";
 const label = "mb-1 block text-[10px] uppercase tracking-[0.14em] text-slate-500";
 
 export function SellerStoreForm({ store, compact = false }: { store?: StoreRow; compact?: boolean }) {
@@ -27,7 +28,7 @@ export function SellerStoreForm({ store, compact = false }: { store?: StoreRow; 
     logoUrl: store?.logo_url ?? "",
     bannerUrl: store?.banner_url ?? "",
     brandPrimaryColor: store?.brand_primary_color ?? "#4f46e5",
-    brandAccentColor: store?.brand_accent_color ?? "#f0c46c",
+    brandAccentColor: store?.brand_accent_color ?? "#D4AF37",
     returnPolicy: store?.return_policy ?? "",
     shippingPolicy: store?.shipping_policy ?? "",
     seoTitle: store?.seo_title ?? "",
@@ -62,9 +63,9 @@ export function SellerStoreForm({ store, compact = false }: { store?: StoreRow; 
 
   if (!store && !open) {
     return (
-      <button type="button" onClick={() => setOpen(true)} className="inline-flex h-10 items-center gap-2 rounded-full bg-[#d8b45a] px-5 text-xs font-semibold text-[#1e1708] transition hover:bg-[#e7c778]">
+      <Button type="button" onClick={() => setOpen(true)} className="inline-flex h-10 items-center gap-2 rounded-full bg-[#D4AF37] px-5 text-xs font-semibold text-[#0B0B0F] transition hover:bg-[#E6C768]">
         <Plus className="h-3.5 w-3.5" /> New store
-      </button>
+      </Button>
     );
   }
 
@@ -73,7 +74,7 @@ export function SellerStoreForm({ store, compact = false }: { store?: StoreRow; 
       {!store && (
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-white">Create a store</h3>
-          <button type="button" onClick={() => setOpen(false)} className="text-xs text-slate-400 hover:text-white">Cancel</button>
+          <Button type="button" onClick={() => setOpen(false)} className="text-xs text-slate-400 hover:text-white">Cancel</Button>
         </div>
       )}
       <div className="grid gap-4 sm:grid-cols-2">
@@ -159,10 +160,10 @@ export function SellerStoreForm({ store, compact = false }: { store?: StoreRow; 
           <input id="store-seo-description" value={form.seoDescription} onChange={set("seoDescription")} className={field} />
         </div>
       </div>
-      <button type="button" onClick={submit} disabled={pending} className="mt-5 inline-flex h-10 items-center gap-2 rounded-full bg-[#d8b45a] px-5 text-xs font-semibold text-[#1e1708] disabled:opacity-55">
+      <Button type="button" onClick={submit} disabled={pending} className="mt-5 inline-flex h-10 items-center gap-2 rounded-full bg-[#D4AF37] px-5 text-xs font-semibold text-[#0B0B0F] disabled:opacity-55">
         {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
         {store ? "Save store" : "Create store"}
-      </button>
+      </Button>
     </div>
   );
 }

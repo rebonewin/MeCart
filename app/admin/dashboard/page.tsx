@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
@@ -440,7 +441,7 @@ export default async function DashboardPage() {
                     <span className="rounded-full bg-red-400/10 px-3 py-1 text-xs font-bold text-red-300">
                       {item.quantity === 0 ? "Out of stock" : "Priority"}
                     </span>
-                    <button className="rounded-2xl bg-white/10 px-3 py-2 text-xs font-semibold transition hover:bg-white/20">Restock</button>
+                    <Button className="rounded-2xl bg-white/10 px-3 py-2 text-xs font-semibold transition hover:bg-white/20">Restock</Button>
                   </div>
                 </div>
               );

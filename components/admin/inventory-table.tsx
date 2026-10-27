@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -89,21 +90,21 @@ export function InventoryTable({ items }: { items: InventoryTableItem[] }) {
               <td className="p-3">{item.sku || "-"}</td>
               <td className="p-3">
                 <div className="flex items-center gap-1">
-                  <button
+                  <Button
                     onClick={() => handleAdjust(item, -1)}
                     disabled={pending || item.quantity === 0}
                     className="rounded border px-1.5 py-0.5 disabled:opacity-40"
                   >
                     -
-                  </button>
+                  </Button>
                   <span className="w-10 text-center font-medium">{item.quantity}</span>
-                  <button
+                  <Button
                     onClick={() => handleAdjust(item, 1)}
                     disabled={pending}
                     className="rounded border px-1.5 py-0.5 disabled:opacity-40"
                   >
                     +
-                  </button>
+                  </Button>
                 </div>
                 {item.reservedQuantity > 0 && (
                   <p className="mt-1 text-xs text-gray-500">{item.reservedQuantity} reserved</p>

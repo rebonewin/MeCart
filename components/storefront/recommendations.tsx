@@ -65,7 +65,7 @@ function RecommendationCard({
                 {product.name[0]}
               </span>
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#080a16]/90 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#1A1D24]/90 via-transparent to-transparent" />
             <span className="absolute bottom-2 left-3 text-sm font-semibold text-white">
               ${product.finalPrice.toFixed(2)}
             </span>

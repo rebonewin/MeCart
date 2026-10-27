@@ -18,12 +18,12 @@ type ArtifactSpec = {
 };
 
 const ARTIFACTS: ArtifactSpec[] = [
-  { position: [-4.7, 1.7, -2.4], color: "#818cf8", metal: false, type: 0, scale: 1.15 },
-  { position: [4.5, 2.1, -3.9], color: "#f0c46c", metal: true, type: 2, scale: 0.82 },
-  { position: [4.2, -1.8, -2.3], color: "#22d3ee", metal: false, type: 4, scale: 0.95 },
-  { position: [-3.7, -2.3, -1.6], color: "#f4f5f9", metal: true, type: 1, scale: 0.72 },
-  { position: [0.7, 3, -5.6], color: "#a78bfa", metal: false, type: 3, scale: 0.68 },
-  { position: [-1.5, -3, -3.5], color: "#fb7185", metal: false, type: 2, scale: 0.5 },
+  { position: [-4.7, 1.7, -2.4], color: "#D4AF37", metal: false, type: 0, scale: 1.15 },
+  { position: [4.5, 2.1, -3.9], color: "#D4AF37", metal: true, type: 2, scale: 0.82 },
+  { position: [4.2, -1.8, -2.3], color: "#E6C768", metal: false, type: 4, scale: 0.95 },
+  { position: [-3.7, -2.3, -1.6], color: "#F8F6F2", metal: true, type: 1, scale: 0.72 },
+  { position: [0.7, 3, -5.6], color: "#D4AF37", metal: false, type: 3, scale: 0.68 },
+  { position: [-1.5, -3, -3.5], color: "#D98B8B", metal: false, type: 2, scale: 0.5 },
 ];
 
 function Artifact({ position, color, metal, type, scale }: ArtifactSpec) {
@@ -77,7 +77,7 @@ function Core() {
         <sphereGeometry args={[0.32, 32, 32]} />
         <meshBasicMaterial color="#c7d2fe" transparent opacity={0.85} />
       </mesh>
-      <pointLight intensity={30} distance={20} color="#818cf8" />
+      <pointLight intensity={30} distance={20} color="#D4AF37" />
     </group>
   );
 }
@@ -103,7 +103,7 @@ function LightBeams() {
       <mesh position={[6.2, -3.2, -6.6]} rotation={[0, 0, -0.55]}>
         <cylinderGeometry args={[0.03, 0.4, 15, 20, 1, true]} />
         <meshBasicMaterial
-          color="#22d3ee"
+          color="#E6C768"
           transparent
           opacity={0.06}
           blending={THREE.AdditiveBlending}
@@ -165,12 +165,12 @@ export function HeroScene() {
       <ambientLight intensity={0.42} />
       <directionalLight position={[6, 7, 4]} intensity={1.25} color="#dbe7ff" />
       <pointLight position={[-7, -4, -5]} intensity={34} distance={32} color="#6366f1" />
-      <pointLight position={[6, -3, 4]} intensity={22} distance={28} color="#22d3ee" />
+      <pointLight position={[6, -3, 4]} intensity={22} distance={28} color="#E6C768" />
 
       <Environment resolution={64} frames={1}>
         <Lightformer intensity={5} position={[0, 6, -8]} scale={[12, 8, 1]} color="#93a6ff" />
-        <Lightformer intensity={2.6} position={[-7, 2, 1]} rotation-y={Math.PI / 2} scale={[10, 3, 1]} color="#22d3ee" />
-        <Lightformer intensity={2.4} position={[7, -1, 1]} rotation-y={-Math.PI / 2} scale={[10, 3, 1]} color="#f0c46c" />
+        <Lightformer intensity={2.6} position={[-7, 2, 1]} rotation-y={Math.PI / 2} scale={[10, 3, 1]} color="#E6C768" />
+        <Lightformer intensity={2.4} position={[7, -1, 1]} rotation-y={-Math.PI / 2} scale={[10, 3, 1]} color="#D4AF37" />
         <Lightformer intensity={1.1} position={[0, -6, 0]} rotation-x={Math.PI / 2} scale={[12, 12, 1]} color="#111a3d" />
       </Environment>
 

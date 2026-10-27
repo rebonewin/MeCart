@@ -47,7 +47,7 @@ export default async function SellerOrdersPage({
               href={`/seller/orders${tab.value ? `?status=${tab.value}` : ""}`}
               className={`shrink-0 rounded-xl px-3.5 py-2 text-xs font-medium transition ${
                 (params.status ?? "") === tab.value
-                  ? "bg-[#d8b45a] text-[#1e1708]"
+                  ? "bg-[#D4AF37] text-[#0B0B0F]"
                   : "text-slate-400 hover:bg-white/[0.05] hover:text-white"
               }`}
             >
@@ -62,7 +62,7 @@ export default async function SellerOrdersPage({
             name="q"
             defaultValue={params.q ?? ""}
             placeholder="Search order or customer"
-            className="h-10 w-full rounded-2xl border border-white/10 bg-white/[0.03] pl-9 pr-4 text-xs text-white outline-none placeholder:text-slate-600 focus:border-[#d8b45a]/40 lg:w-64"
+            className="h-10 w-full rounded-2xl border border-white/10 bg-white/[0.03] pl-9 pr-4 text-xs text-white outline-none placeholder:text-slate-600 focus:border-[#D4AF37]/40 lg:w-64"
           />
         </form>
       </div>
@@ -108,7 +108,7 @@ export default async function SellerOrdersPage({
                     <td className="px-3 py-4"><SellerBadge tone={sellerStatusTone(allocation.fulfillment_status)}>{allocation.fulfillment_status}</SellerBadge></td>
                     <td className="px-3 py-4 text-xs text-slate-500">{dateLabel(order.created_at)}</td>
                     <td className="px-5 py-4 text-right">
-                      <Link href={`/seller/orders/${order.id}`} className="inline-flex items-center gap-1 text-xs font-medium text-[#f5dfa2] hover:underline">
+                      <Link href={`/seller/orders/${order.id}`} className="inline-flex items-center gap-1 text-xs font-medium text-[#E6C768] hover:underline">
                         Open <Package className="h-3.5 w-3.5" />
                       </Link>
                     </td>

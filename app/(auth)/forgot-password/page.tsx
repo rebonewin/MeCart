@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -11,6 +12,7 @@ import {
   completePasswordReset,
 } from "@/lib/actions/email-otp";
 import { passwordStrength } from "@/lib/auth/password-strength";
+import { LiquidStage } from "@/components/luxe/webgl/liquid-stage";
 
 type Step = "email" | "verify" | "password" | "success";
 
@@ -141,10 +143,12 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-indigo-50 via-white to-emerald-50 px-4 py-16 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
-      <div className="relative mx-auto max-w-md rounded-3xl border border-white/60 bg-white/80 p-6 shadow-2xl backdrop-blur dark:border-gray-800 dark:bg-gray-900/80">
-        <h1 className="text-2xl font-bold">Reset your password</h1>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+    <div className="dark lx-dark-scene relative min-h-screen overflow-hidden bg-[var(--lx-bg)] px-4 py-16 text-[var(--lx-text)]">
+      <LiquidStage variant="hero" intensity={0.7} />
+      <div className="relative mx-auto max-w-md rounded-[1.75rem] border border-white/10 bg-white/[0.055] p-6 shadow-[0_40px_100px_-40px_rgba(0,0,0,0.8)] backdrop-blur-2xl sm:p-8">
+        <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-[var(--lx-gold)]">Account recovery</p>
+        <h1 className="lx-title mt-3 text-3xl">Reset your password</h1>
+        <p className="mt-2 text-sm leading-6 text-[var(--lx-muted)]">
           {step === "email" && "Enter your email to receive a reset code."}
           {step === "verify" && `We sent a code to ${email}.`}
           {step === "password" && "Code verified. Choose a new password."}
@@ -153,8 +157,18 @@ export default function ForgotPasswordPage() {
 
         {step === "email" && (
           <form onSubmit={sendCode} className="mt-6 space-y-4">
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="w-full rounded-2xl border border-gray-200 bg-white/70 px-4 py-3 text-sm dark:border-gray-700 dark:bg-gray-950/80" required />
-            <button disabled={loading} type="submit" className="w-full rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white">{loading ? "Sending..." : "Send reset code"}</button>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="lx-field w-full" autoComplete="email" required />
+            <Button
+              disabled={loading}
+              type="submit"
+              loading={loading}
+              loadingText="Sending…"
+              variant="brand"
+              size="lg"
+              className="w-full"
+            >
+              Send reset code
+            </Button>
           </form>
         )}
 
@@ -162,52 +176,79 @@ export default function ForgotPasswordPage() {
           <form onSubmit={verifyCode} className="mt-6 space-y-4">
             <div className="grid grid-cols-6 gap-2">
               {otpDigits.map((digit, index) => (
-                <input key={index} ref={(node) => { refs.current[index] = node; }} value={digit} onChange={(e) => setDigit(index, e.target.value)} onPaste={handlePaste} maxLength={1} inputMode="numeric" className="h-12 rounded-2xl border border-gray-200 bg-white/70 text-center text-lg font-bold dark:border-gray-700 dark:bg-gray-950/80" />
+                <input key={index} ref={(node) => { refs.current[index] = node; }} value={digit} onChange={(e) => setDigit(index, e.target.value)} onPaste={handlePaste} maxLength={1} inputMode="numeric" autoComplete="one-time-code" aria-label={`Reset code digit ${index + 1}`} className="lx-field h-12 px-0 text-center text-lg font-bold" />
               ))}
             </div>
-            <div className="flex items-center justify-between gap-3 rounded-2xl border border-gray-200 px-3 py-2 text-xs dark:border-gray-700">
-              <span className="text-gray-500 dark:text-gray-400" aria-live="polite">
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 px-3 py-2 text-xs">
+              <span className="text-[var(--lx-muted)]" aria-live="polite">
                 {secondsRemaining > 0
                   ? `Code expires in ${String(Math.floor(secondsRemaining / 60)).padStart(2, "0")}:${String(secondsRemaining % 60).padStart(2, "0")}`
                   : "Your code has expired."}
               </span>
-              <button
+              <Button
                 type="button"
                 onClick={resendCode}
                 disabled={resendInSeconds > 0 || resendCount >= 5 || loading}
-                className="font-semibold text-indigo-600 disabled:text-gray-400 dark:text-indigo-400 dark:disabled:text-gray-500"
+                className="font-semibold text-[var(--lx-gold)] disabled:text-[var(--lx-faint)]"
               >
                 {resendCount >= 5
                   ? "Maximum resends reached"
                   : resendInSeconds > 0
                     ? `Resend in ${resendInSeconds}s`
                     : "Resend code"}
-              </button>
+              </Button>
             </div>
-            {otpError && <p className="rounded-xl bg-rose-50 px-3 py-2 text-sm text-rose-600 dark:bg-rose-950/40 dark:text-rose-400">{otpError}</p>}
+            {otpError && <p className="rounded-xl border border-rose-400/25 bg-rose-500/10 px-3 py-2 text-sm text-rose-200" role="alert">{otpError}</p>}
             <div className="flex gap-3">
-              <button type="submit" disabled={loading || otpValue.length !== 6} className="flex-1 rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white disabled:opacity-40">{loading ? "Verifying..." : "Verify code"}</button>
-              <button type="button" onClick={() => setStep("email")} className="rounded-2xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-200">Back</button>
+              <Button
+                type="submit"
+                disabled={loading || otpValue.length !== 6}
+                loading={loading}
+                loadingText="Verifying…"
+                variant="brand"
+                size="md"
+                className="flex-1"
+              >
+                Verify code
+              </Button>
+              <Button
+                type="button"
+                onClick={() => setStep("email")}
+                variant="outline"
+                size="md"
+              >
+                Back
+              </Button>
             </div>
           </form>
         )}
 
         {step === "password" && (
           <form onSubmit={resetPassword} className="mt-6 space-y-4">
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="New password" className="w-full rounded-2xl border border-gray-200 bg-white/70 px-4 py-3 text-sm dark:border-gray-700 dark:bg-gray-950/80" required minLength={8} />
-            <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="New password" className="lx-field w-full" autoComplete="new-password" required minLength={8} />
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
               <div className={`h-full transition-all ${strength.label === "Weak" ? "bg-rose-500" : strength.label === "Medium" ? "bg-amber-500" : "bg-emerald-500"}`} style={{ width: `${(strength.score / 5) * 100}%` }} />
             </div>
-            <input type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="Confirm new password" className="w-full rounded-2xl border border-gray-200 bg-white/70 px-4 py-3 text-sm dark:border-gray-700 dark:bg-gray-950/80" required minLength={8} />
-            {passwordError && <p className="rounded-xl bg-rose-50 px-3 py-2 text-sm text-rose-600 dark:bg-rose-950/40 dark:text-rose-400">{passwordError}</p>}
-            <button disabled={loading} type="submit" className="w-full rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white">{loading ? "Updating..." : "Update password"}</button>
+            <input type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="Confirm new password" className="lx-field w-full" autoComplete="new-password" required minLength={8} />
+            {passwordError && <p className="rounded-xl border border-rose-400/25 bg-rose-500/10 px-3 py-2 text-sm text-rose-200" role="alert">{passwordError}</p>}
+            <Button
+              disabled={loading}
+              type="submit"
+              loading={loading}
+              loadingText="Updating…"
+              variant="brand"
+              size="lg"
+              className="w-full"
+            >
+              Update password
+            </Button>
           </form>
         )}
 
-        {step === "success" && <p className="mt-6 text-sm text-emerald-600">Redirecting to sign in...</p>}
+        {step === "success" && <p className="mt-6 rounded-xl border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">Redirecting to sign in...</p>}
 
-        <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
-          <Link href="/login" className="text-indigo-600 hover:underline dark:text-indigo-400">Back to sign in</Link>
+        <p className="mt-5 text-center text-sm text-[var(--lx-muted)]">
+          <Link href="/login" className="text-[var(--lx-gold)] hover:underline">Back to sign in</Link>
         </p>
       </div>
     </div>

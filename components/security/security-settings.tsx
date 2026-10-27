@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -73,7 +74,7 @@ function Modal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <button
+      <Button
         aria-label="Close dialog"
         className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm"
         onClick={onClose}
@@ -86,14 +87,14 @@ function Modal({
       >
         <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 dark:border-white/10">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{title}</h2>
-          <button
+          <Button
             type="button"
             onClick={onClose}
             aria-label="Close"
             className="rounded-xl p-2 text-slate-500 transition hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10"
           >
             <X className="h-4 w-4" />
-          </button>
+          </Button>
         </div>
         <div className="max-h-[75vh] overflow-y-auto px-6 py-5">{children}</div>
       </div>
@@ -131,7 +132,7 @@ function RecoveryCodesPanel({
       return;
     }
     printWindow.document.write(
-      `<!doctype html><html><head><title>MeCart recovery codes</title><style>body{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;padding:32px;color:#0f172a}h1{font-size:16px}li{margin:8px 0;font-size:14px}</style></head><body><h1>MeCart two-factor recovery codes — keep this safe</h1><ul>${codes
+      `<!doctype html><html><head><title>MeCart recovery codes</title><style>body{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;padding:32px;color:#0B0B0F}h1{font-size:16px}li{margin:8px 0;font-size:14px}</style></head><body><h1>MeCart two-factor recovery codes — keep this safe</h1><ul>${codes
         .map((code) => `<li>${code}</li>`)
         .join("")}</ul></body></html>`,
     );
@@ -166,35 +167,35 @@ function RecoveryCodesPanel({
         ))}
       </ul>
       <div className="flex flex-wrap gap-2">
-        <button
+        <Button
           type="button"
           onClick={download}
           className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-white/10 dark:text-slate-200 dark:hover:bg-white/5"
         >
           <Download className="h-4 w-4" /> Download
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           onClick={print}
           className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-white/10 dark:text-slate-200 dark:hover:bg-white/5"
         >
           <Printer className="h-4 w-4" /> Print
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           onClick={copy}
           className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-white/10 dark:text-slate-200 dark:hover:bg-white/5"
         >
           <Copy className="h-4 w-4" /> Copy
-        </button>
+        </Button>
       </div>
-      <button
+      <Button
         type="button"
         onClick={onDismiss}
         className="w-full rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-600/20 transition hover:from-indigo-500 hover:to-violet-500"
       >
         {dismissLabel}
-      </button>
+      </Button>
     </div>
   );
 }
@@ -323,12 +324,12 @@ function SetupWizard({
             />
           </label>
           {error && <p className="text-sm text-rose-600 dark:text-rose-300">{error}</p>}
-          <button
+          <Button
             type="submit"
             className="w-full rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-600/20 transition hover:from-indigo-500 hover:to-violet-500"
           >
             Continue
-          </button>
+          </Button>
         </form>
       )}
 
@@ -338,7 +339,7 @@ function SetupWizard({
             Choose how you want to verify sign-ins. You can change this later.
           </p>
 
-          <button
+          <Button
             type="button"
             onClick={() => chooseMethod("totp")}
             disabled={busy}
@@ -355,9 +356,9 @@ function SetupWizard({
                 Google Authenticator, Microsoft Authenticator, Authy, 1Password, Bitwarden — works offline.
               </span>
             </span>
-          </button>
+          </Button>
 
-          <button
+          <Button
             type="button"
             onClick={() => chooseMethod("email")}
             disabled={busy || !canUseEmail}
@@ -374,9 +375,9 @@ function SetupWizard({
                   : "Verify a real email address first"}
               </span>
             </span>
-          </button>
+          </Button>
 
-          <button
+          <Button
             type="button"
             onClick={() => chooseMethod("sms")}
             disabled={busy || !canUseSms}
@@ -395,7 +396,7 @@ function SetupWizard({
                     : `SMS provider not configured (${status.smsMissing.join(", ") || "Twilio"})`}
               </span>
             </span>
-          </button>
+          </Button>
 
           {error && <p className="text-sm text-rose-600 dark:text-rose-300">{error}</p>}
           {busy && (
@@ -440,14 +441,14 @@ function SetupWizard({
           </label>
 
           {error && <p className="text-sm text-rose-600 dark:text-rose-300">{error}</p>}
-          <button
+          <Button
             type="submit"
             disabled={busy || code.length !== 6}
             className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-600/20 transition hover:from-indigo-500 hover:to-violet-500 disabled:opacity-60"
           >
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
             Verify and enable
-          </button>
+          </Button>
         </form>
       )}
 
@@ -471,14 +472,14 @@ function SetupWizard({
             />
           </label>
           {error && <p className="text-sm text-rose-600 dark:text-rose-300">{error}</p>}
-          <button
+          <Button
             type="submit"
             disabled={busy || code.length !== 6}
             className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-600/20 transition hover:from-indigo-500 hover:to-violet-500 disabled:opacity-60"
           >
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
             Verify and enable
-          </button>
+          </Button>
         </form>
       )}
 
@@ -562,7 +563,7 @@ function ConfirmActionDialog({
           />
         </label>
         {error && <p className="text-sm text-rose-600 dark:text-rose-300">{error}</p>}
-        <button
+        <Button
           type="submit"
           disabled={busy || !password || !code}
           className={`flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold text-white shadow-lg transition disabled:opacity-60 ${
@@ -573,7 +574,7 @@ function ConfirmActionDialog({
         >
           {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
           {busy ? loadingLabel : confirmLabel}
-        </button>
+        </Button>
       </form>
     </Modal>
   );
@@ -673,46 +674,46 @@ export function SecuritySettings({ status }: { status: TwoFactorStatusView }) {
 
         <div className="flex flex-wrap gap-3 border-t border-slate-100 px-6 py-5 dark:border-white/10">
           {!status.enabled ? (
-            <button
+            <Button
               type="button"
               onClick={() => setWizard("enable")}
               className="rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-600/20 transition hover:from-indigo-500 hover:to-violet-500"
             >
               Enable two-factor authentication
-            </button>
+            </Button>
           ) : (
             <>
               {status.method === "totp" ? (
-                <button
+                <Button
                   type="button"
                   onClick={() => setWizard("reconfigure")}
                   className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-white/10 dark:text-slate-200 dark:hover:bg-white/5"
                 >
                   <RefreshCw className="mr-2 inline h-4 w-4" />
                   Reconfigure authenticator
-                </button>
+                </Button>
               ) : null}
-              <button
+              <Button
                 type="button"
                 onClick={() => setWizard("change")}
                 className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-white/10 dark:text-slate-200 dark:hover:bg-white/5"
               >
                 Change method
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => setRegenOpen(true)}
                 className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-white/10 dark:text-slate-200 dark:hover:bg-white/5"
               >
                 Regenerate recovery codes
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => setDisableOpen(true)}
                 className="rounded-2xl border border-rose-200 px-4 py-3 text-sm font-medium text-rose-600 transition hover:bg-rose-50 dark:border-rose-400/30 dark:text-rose-300 dark:hover:bg-rose-500/10"
               >
                 Disable 2FA
-              </button>
+              </Button>
             </>
           )}
         </div>
@@ -732,7 +733,7 @@ export function SecuritySettings({ status }: { status: TwoFactorStatusView }) {
             </div>
           </div>
           {status.trustedDevices.length > 0 && (
-            <button
+            <Button
               type="button"
               onClick={() => {
                 void removeAllTrustedDevices().then((result) => {
@@ -747,7 +748,7 @@ export function SecuritySettings({ status }: { status: TwoFactorStatusView }) {
               className="rounded-xl border border-rose-200 px-3 py-2 text-xs font-medium text-rose-600 transition hover:bg-rose-50 dark:border-rose-400/30 dark:text-rose-300 dark:hover:bg-rose-500/10"
             >
               Sign out all devices
-            </button>
+            </Button>
           )}
         </div>
 
@@ -775,7 +776,7 @@ export function SecuritySettings({ status }: { status: TwoFactorStatusView }) {
                   {formatDate(device.lastUsedAt)}
                 </p>
               </div>
-              <button
+              <Button
                 type="button"
                 onClick={() => {
                   void removeTrustedDevice(device.id).then((result) => {
@@ -790,7 +791,7 @@ export function SecuritySettings({ status }: { status: TwoFactorStatusView }) {
                 className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 transition hover:bg-slate-50 dark:border-white/10 dark:text-slate-300 dark:hover:bg-white/5"
               >
                 <Trash2 className="h-3.5 w-3.5" /> Remove
-              </button>
+              </Button>
             </li>
           ))}
         </ul>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -116,14 +117,14 @@ export function VisualSearchPanel({
           <p className="mt-1 text-sm text-white/75">Show MECO a texture, tone or silhouette.</p>
         </div>
         {onClose ? (
-          <button
+          <Button
             type="button"
             onClick={onClose}
             className="flex items-center gap-1 rounded-full border border-white/10 px-2.5 py-1.5 text-[10px] text-white/55 transition hover:border-white/25 hover:text-white"
           >
             <ArrowLeft className="h-3 w-3" aria-hidden />
             Text search
-          </button>
+          </Button>
         ) : null}
       </div>
 
@@ -160,17 +161,17 @@ export function VisualSearchPanel({
         {preview ? (
           <div className="relative aspect-[16/9]">
             <Image src={preview} alt={fileName ? `Uploaded image ${fileName}` : "Uploaded image"} fill unoptimized sizes="(max-width: 768px) 100vw, 720px" className="object-contain" />
-            <button
+            <Button
               type="button"
               onClick={clear}
               aria-label="Remove uploaded image"
-              className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-[#080a16]/80 text-white/70 backdrop-blur transition hover:text-white"
+              className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-[#1A1D24]/80 text-white/70 backdrop-blur transition hover:text-white"
             >
               <X className="h-3.5 w-3.5" aria-hidden />
-            </button>
+            </Button>
           </div>
         ) : (
-          <button
+          <Button
             type="button"
             onClick={() => inputRef.current?.click()}
             className="flex w-full flex-col items-center justify-center gap-2 px-6 py-8 text-center transition hover:bg-white/[0.03]"
@@ -182,7 +183,7 @@ export function VisualSearchPanel({
             <span className="max-w-sm text-xs leading-5 text-white/40">
               JPG, PNG or WebP. MECO reads palette, tone and catalogue affinity on this device.
             </span>
-          </button>
+          </Button>
         )}
       </div>
 
@@ -193,13 +194,13 @@ export function VisualSearchPanel({
           {visualSearchHasRemoteModel() ? " · falls back on-device" : " · no external model required"}
         </p>
         {preview ? (
-          <button
+          <Button
             type="button"
             onClick={() => inputRef.current?.click()}
             className="inline-flex items-center gap-1 text-[10px] text-[var(--lx-cyan)] transition hover:text-white"
           >
             <Upload className="h-3 w-3" aria-hidden /> Another image
-          </button>
+          </Button>
         ) : null}
       </div>
 
@@ -213,9 +214,9 @@ export function VisualSearchPanel({
         {error ? (
           <div className="mt-3 rounded-xl border border-[var(--lx-gold)]/20 bg-[var(--lx-gold)]/[0.07] px-3 py-2.5 text-xs leading-5 text-white/65">
             {error} You can still{" "}
-            <button type="button" onClick={onClose} className="text-[var(--lx-cyan)] hover:underline">
+            <Button type="button" onClick={onClose} className="text-[var(--lx-cyan)] hover:underline">
               search by text
-            </button>
+            </Button>
             .
           </div>
         ) : null}
@@ -282,9 +283,9 @@ export function VisualSearchPanel({
           ) : (
             <div className="mt-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-4 text-center">
               <p className="text-xs text-white/60">Nothing in the edit shares that palette closely enough.</p>
-              <button type="button" onClick={onClose} className="mt-1 text-[10px] text-[var(--lx-cyan)] hover:underline">
+              <Button type="button" onClick={onClose} className="mt-1 text-[10px] text-[var(--lx-cyan)] hover:underline">
                 Try a text search instead
-              </button>
+              </Button>
             </div>
           )}
         </div>

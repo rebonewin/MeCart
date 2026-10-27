@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useRef, useState, useTransition } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -106,7 +107,7 @@ export function MediaLibrary({ items }: { items: MediaItem[] }) {
           className="hidden"
           id="media-upload-input"
         />
-        <button
+        <Button
           type="button"
           disabled={uploading}
           onClick={() => fileRef.current?.click()}
@@ -114,27 +115,27 @@ export function MediaLibrary({ items }: { items: MediaItem[] }) {
         >
           <UploadCloud className="h-4 w-4" />
           {uploading ? "Uploading..." : "Upload files"}
-        </button>
+        </Button>
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <button
+        <Button
           onClick={() => setFilter("all")}
           className={`rounded-full border px-3 py-1 text-xs ${filter === "all" ? "border-indigo-500 text-indigo-600" : "border-gray-300 text-gray-500 dark:border-gray-700"}`}
         >
           All ({items.length})
-        </button>
+        </Button>
         {STORAGE_BUCKETS.map((b) => {
           const count = items.filter((i) => i.bucket === b).length;
           if (!count) return null;
           return (
-            <button
+            <Button
               key={b}
               onClick={() => setFilter(b)}
               className={`rounded-full border px-3 py-1 text-xs ${filter === b ? "border-indigo-500 text-indigo-600" : "border-gray-300 text-gray-500 dark:border-gray-700"}`}
             >
               {b} ({count})
-            </button>
+            </Button>
           );
         })}
       </div>
@@ -176,14 +177,14 @@ export function MediaLibrary({ items }: { items: MediaItem[] }) {
                     <span className="text-[11px] text-gray-400">
                       {new Date(item.created_at).toLocaleDateString()}
                     </span>
-                    <button
+                    <Button
                       onClick={() => remove(item.id, item.name)}
                       disabled={pending}
                       className="rounded p-1 text-gray-400 hover:text-rose-500 disabled:opacity-50"
                       title="Delete"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>

@@ -4,6 +4,7 @@ export { completeIntro, onIntroComplete } from "./intro";
 export {
   usePrefersReducedMotion,
   useIsCoarsePointer,
+  useIsSmallScreen,
   useReveal,
   usePointerSpotlight,
   useRaf,

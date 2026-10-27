@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Loader2, Plus, Power } from "lucide-react";
@@ -7,7 +8,7 @@ import { toast } from "sonner";
 import { createSellerCoupon, toggleSellerCoupon } from "@/lib/actions/seller-operations";
 import { cn } from "@/lib/cn";
 
-const field = "h-10 w-full rounded-xl border border-white/10 bg-[#07090f] px-3 text-xs text-white outline-none placeholder:text-slate-600 focus:border-[#d8b45a]/40";
+const field = "h-10 w-full rounded-xl border border-white/10 bg-[#101116] px-3 text-xs text-white outline-none placeholder:text-slate-600 focus:border-[#D4AF37]/40";
 
 export function SellerCouponForm() {
   const router = useRouter();
@@ -49,17 +50,17 @@ export function SellerCouponForm() {
 
   if (!open) {
     return (
-      <button type="button" onClick={() => setOpen(true)} className="inline-flex h-10 items-center gap-2 rounded-full bg-[#d8b45a] px-5 text-xs font-semibold text-[#1e1708] transition hover:bg-[#e7c778]">
+      <Button type="button" onClick={() => setOpen(true)} className="inline-flex h-10 items-center gap-2 rounded-full bg-[#D4AF37] px-5 text-xs font-semibold text-[#0B0B0F] transition hover:bg-[#E6C768]">
         <Plus className="h-3.5 w-3.5" /> New coupon
-      </button>
+      </Button>
     );
   }
 
   return (
-    <div className="w-full rounded-3xl border border-[#d8b45a]/20 bg-[#d8b45a]/[0.05] p-5">
+    <div className="w-full rounded-3xl border border-[#D4AF37]/20 bg-[#D4AF37]/[0.05] p-5">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-white">Create a coupon</h3>
-        <button type="button" onClick={() => setOpen(false)} className="text-xs text-slate-400 hover:text-white">Cancel</button>
+        <Button type="button" onClick={() => setOpen(false)} className="text-xs text-slate-400 hover:text-white">Cancel</Button>
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <input value={form.code} onChange={set("code")} placeholder="CODE" className={field} />
@@ -69,9 +70,9 @@ export function SellerCouponForm() {
         <input type="number" min="0" value={form.minOrderValue} onChange={set("minOrderValue")} placeholder="Minimum order" className={field} />
         <input type="number" min="1" value={form.usageLimit} onChange={set("usageLimit")} placeholder="Usage limit" className={field} />
         <input type="date" value={form.expiresAt} onChange={set("expiresAt")} className={field} />
-        <button type="button" onClick={submit} disabled={pending} className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[#d8b45a] px-4 text-xs font-semibold text-[#1e1708] disabled:opacity-55">
+        <Button type="button" onClick={submit} disabled={pending} className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[#D4AF37] px-4 text-xs font-semibold text-[#0B0B0F] disabled:opacity-55">
           {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />} Create
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -91,7 +92,7 @@ export function SellerCouponToggle({ couponId, active }: { couponId: string; act
   });
 
   return (
-    <button
+    <Button
       type="button"
       onClick={toggle}
       disabled={pending}
@@ -102,6 +103,6 @@ export function SellerCouponToggle({ couponId, active }: { couponId: string; act
     >
       {pending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Power className="h-3 w-3" />}
       {active ? "Active" : "Paused"}
-    </button>
+    </Button>
   );
 }

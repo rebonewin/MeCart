@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
 import {
   animate,
   motion,
@@ -62,7 +62,11 @@ export function Reveal({
       initial={{ opacity: 0, y, filter: "blur(6px)" }}
       whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
       viewport={{ once, amount }}
-      transition={{ duration: reduced ? 0 : 0.7, delay: reduced ? 0 : delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{
+        duration: reduced ? 0 : 0.7,
+        delay: reduced ? 0 : delay,
+        ease: [0.22, 1, 0.36, 1],
+      }}
     >
       {children}
     </motion.div>
@@ -184,7 +188,10 @@ export function Tilt({
         {glare ? (
           <motion.div
             aria-hidden
-            className={cn("pointer-events-none absolute inset-0 z-10 transition-opacity duration-300", radiusClass)}
+            className={cn(
+              "pointer-events-none absolute inset-0 z-10 transition-opacity duration-300",
+              radiusClass,
+            )}
             style={{ background: glareBg, opacity: active ? 1 : 0 }}
           />
         ) : null}
@@ -194,10 +201,8 @@ export function Tilt({
 }
 
 /* ------------------------------------------------------------------ */
-/* RippleButton — luxury button with click ripple                      */
+/* RippleButton — backwards-compatible wrapper around the Button system */
 /* ------------------------------------------------------------------ */
-
-type Ripple = { id: number; x: number; y: number; size: number };
 
 export function RippleButton({
   children,
@@ -222,83 +227,27 @@ export function RippleButton({
   loading?: boolean;
   ariaLabel?: string;
 }) {
-  const [ripples, setRipples] = useState<Ripple[]>([]);
-  const idRef = useRef(0);
-
-  const spawn = (event: ReactMouseEvent<HTMLElement>) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const size = Math.max(rect.width, rect.height);
-    const id = ++idRef.current;
-    setRipples((current) => [
-      ...current,
-      { id, x: event.clientX - rect.left - size / 2, y: event.clientY - rect.top - size / 2, size },
-    ]);
-  };
-
-  const base =
-    "relative isolate inline-flex items-center justify-center gap-2 overflow-hidden rounded-full font-semibold tracking-tight transition-all duration-300 will-change-transform active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-55";
-  const sizes = {
-    sm: "h-9 px-4 text-sm",
-    md: "h-11 px-6 text-sm",
-    lg: "h-[3.25rem] px-8 text-[0.95rem]",
+  const mapped = {
+    primary: "primary",
+    gold: "premium",
+    glass: "glass",
+    ghost: "ghost",
   } as const;
-  const variants = {
-    primary:
-      "bg-[var(--lx-text)] text-[var(--lx-bg)] shadow-[0_18px_50px_-20px_rgba(0,0,0,0.45)] hover:-translate-y-0.5 hover:shadow-[0_26px_60px_-20px_rgba(0,0,0,0.5)]",
-    gold: "bg-gradient-to-r from-[#f5d08a] via-[#f0c46c] to-[#e0a84e] text-[#241a05] shadow-[0_18px_50px_-18px_rgba(240,196,108,0.6)] hover:-translate-y-0.5 hover:brightness-105",
-    glass:
-      "lx-glass text-[var(--lx-text)] hover:-translate-y-0.5 hover:border-[var(--lx-border-strong)]",
-    ghost:
-      "text-[var(--lx-muted)] hover:bg-[color-mix(in_srgb,var(--lx-text)_6%,transparent)] hover:text-[var(--lx-text)]",
-  } as const;
-  const cls = cn(base, sizes[size], variants[variant], loading && "cursor-wait", className);
-
-  const content = (
-    <>
-      <span className="relative z-10 inline-flex items-center gap-2">
-        {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : null}
-        {children}
-      </span>
-      {ripples.map((ripple) => (
-        <span
-          key={ripple.id}
-          className="lx-ripple"
-          style={{ left: ripple.x, top: ripple.y, width: ripple.size, height: ripple.size }}
-          onAnimationEnd={() => setRipples((current) => current.filter((item) => item.id !== ripple.id))}
-        />
-      ))}
-    </>
-  );
-
-  if (href) {
-    return (
-      <Link
-        href={href}
-        className={cls}
-        onClick={(event) => {
-          spawn(event);
-          onClick?.(event);
-        }}
-      >
-        {content}
-      </Link>
-    );
-  }
 
   return (
-    <button
+    <Button
+      href={href}
+      onClick={onClick}
+      className={className}
+      variant={mapped[variant]}
+      size={size}
       type={type}
-      disabled={disabled || loading}
-      aria-busy={loading || undefined}
+      disabled={disabled}
+      loading={loading}
       aria-label={ariaLabel}
-      className={cls}
-      onClick={(event) => {
-        spawn(event);
-        onClick?.(event);
-      }}
     >
-      {content}
-    </button>
+      {children}
+    </Button>
   );
 }
 
@@ -371,8 +320,13 @@ export function Marquee({
         data-direction={reverse ? "reverse" : undefined}
         style={{ "--lx-marquee-duration": `${duration}s` } as CSSProperties}
       >
-        <div className={cn("flex shrink-0 items-center", innerClassName)}>{children}</div>
-        <div className={cn("flex shrink-0 items-center", innerClassName)} aria-hidden>
+        <div className={cn("flex shrink-0 items-center", innerClassName)}>
+          {children}
+        </div>
+        <div
+          className={cn("flex shrink-0 items-center", innerClassName)}
+          aria-hidden
+        >
           {children}
         </div>
       </div>
@@ -411,7 +365,10 @@ export function SectionHeader({
             align === "center" && "justify-center",
           )}
         >
-          <span className="inline-block h-px w-8 bg-gradient-to-r from-transparent to-[var(--lx-cyan)]" aria-hidden />
+          <span
+            className="inline-block h-px w-8 bg-gradient-to-r from-transparent to-[var(--lx-cyan)]"
+            aria-hidden
+          />
           {eyebrow}
           <span
             className="inline-block h-px w-8 bg-gradient-to-l from-transparent to-[var(--lx-cyan)] sm:hidden"
@@ -422,7 +379,9 @@ export function SectionHeader({
           {title}
         </h2>
         {description ? (
-          <p className="mt-3 text-sm leading-6 text-[var(--lx-muted)] sm:text-base">{description}</p>
+          <p className="mt-3 text-sm leading-6 text-[var(--lx-muted)] sm:text-base">
+            {description}
+          </p>
         ) : null}
       </div>
       {action ? <div className="shrink-0">{action}</div> : null}
@@ -502,9 +461,12 @@ export function PriceTag({
   className?: string;
 }) {
   const sizes = { sm: "text-sm", md: "text-base", lg: "text-2xl" } as const;
-  const discounted = discountPercent > 0 && original !== undefined && original > price;
+  const discounted =
+    discountPercent > 0 && original !== undefined && original > price;
   return (
-    <div className={cn("flex flex-wrap items-baseline gap-x-2 gap-y-1", className)}>
+    <div
+      className={cn("flex flex-wrap items-baseline gap-x-2 gap-y-1", className)}
+    >
       <Counter
         value={price}
         decimals={2}
@@ -512,7 +474,9 @@ export function PriceTag({
         className={cn("font-semibold text-[var(--lx-text)]", sizes[size])}
       />
       {discounted ? (
-        <span className="text-xs text-[var(--lx-muted)]/70 line-through">${original.toFixed(2)}</span>
+        <span className="text-xs text-[var(--lx-muted)]/70 line-through">
+          ${original.toFixed(2)}
+        </span>
       ) : null}
       {discounted && showChip ? (
         <span className="rounded-full bg-[var(--lx-gold)]/15 px-2 py-0.5 text-[10px] font-bold tracking-wide text-[var(--lx-gold)]">

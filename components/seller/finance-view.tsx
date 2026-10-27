@@ -46,7 +46,7 @@ export function SellerFinanceView({
             {finance.ledger.length ? (
               <div className="max-h-[540px] overflow-y-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="sticky top-0 bg-[#0b0e16] text-[9px] uppercase tracking-[0.16em] text-slate-600">
+                  <thead className="sticky top-0 bg-[#1A1D24] text-[9px] uppercase tracking-[0.16em] text-slate-600">
                     <tr>
                       <th className="px-5 py-2.5 font-medium">Type</th>
                       <th className="px-3 py-2.5 font-medium">Description</th>

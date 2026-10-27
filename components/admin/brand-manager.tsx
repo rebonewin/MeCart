@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -64,8 +65,8 @@ export function BrandManager({ initial }: { initial: Item[] }) {
           <input value={editing ? editing.slug : slug} onChange={(e) => (editing ? setEditing({ ...editing, slug: e.target.value }) : setSlug(e.target.value))} placeholder="slug" className="rounded border px-3 py-2 dark:bg-gray-800" />
         </div>
         <div className="mt-3 flex gap-2">
-          <button onClick={submit} disabled={pending} className="rounded-md bg-indigo-600 px-4 py-2 text-sm text-white">Save</button>
-          {editing && <button onClick={() => setEditing(null)} className="rounded-md border px-4 py-2 text-sm">Cancel</button>}
+          <Button onClick={submit} disabled={pending} className="rounded-md bg-indigo-600 px-4 py-2 text-sm text-white">Save</Button>
+          {editing && <Button onClick={() => setEditing(null)} className="rounded-md border px-4 py-2 text-sm">Cancel</Button>}
         </div>
       </div>
 
@@ -78,8 +79,8 @@ export function BrandManager({ initial }: { initial: Item[] }) {
                 <td className="p-3">{i.name}</td>
                 <td className="p-3">{i.slug}</td>
                 <td className="p-3 flex gap-2">
-                  <button onClick={() => setEditing(i)} className="text-indigo-600 hover:underline">Edit</button>
-                  <button onClick={() => remove(i.id)} className="text-rose-600 hover:underline">Delete</button>
+                  <Button onClick={() => setEditing(i)} className="text-indigo-600 hover:underline">Edit</Button>
+                  <Button onClick={() => remove(i.id)} className="text-rose-600 hover:underline">Delete</Button>
                 </td>
               </tr>
             ))}

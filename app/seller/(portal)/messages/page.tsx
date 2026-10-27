@@ -39,13 +39,13 @@ export default async function SellerMessagesPage({
               {conversations.map((conversation) => {
                 const active = selected?.id === conversation.id;
                 return (
-                  <Link key={conversation.id} href={`/seller/messages?c=${conversation.id}`} className={`block px-4 py-3.5 transition ${active ? "bg-[#d8b45a]/[0.08]" : "hover:bg-white/[0.03]"}`}>
+                  <Link key={conversation.id} href={`/seller/messages?c=${conversation.id}`} className={`block px-4 py-3.5 transition ${active ? "bg-[#D4AF37]/[0.08]" : "hover:bg-white/[0.03]"}`}>
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-white">{conversation.subject}</p>
                         <p className="mt-0.5 truncate text-[11px] text-slate-500">{conversation.customerName} · {conversation.last_message_preview || "No preview"}</p>
                       </div>
-                      {conversation.unread > 0 && <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#d8b45a] px-1 text-[9px] font-bold text-[#1e1708]">{conversation.unread}</span>}
+                      {conversation.unread > 0 && <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#D4AF37] px-1 text-[9px] font-bold text-[#0B0B0F]">{conversation.unread}</span>}
                     </div>
                     <div className="mt-2 flex items-center justify-between">
                       <SellerBadge tone={sellerStatusTone(conversation.status)}>{conversation.status}</SellerBadge>

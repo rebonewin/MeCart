@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -102,30 +103,30 @@ export function ReviewsTable({ reviews }: { reviews: AdminReview[] }) {
                 <td className="p-3">
                   <div className="flex flex-wrap gap-2">
                     {review.status !== "APPROVED" && (
-                      <button
+                      <Button
                         onClick={() => handleStatus(review, "APPROVED")}
                         disabled={pending}
                         className="rounded border border-emerald-300 px-2 py-1 text-xs text-emerald-700 disabled:opacity-50 dark:border-emerald-800 dark:text-emerald-400"
                       >
                         Approve
-                      </button>
+                      </Button>
                     )}
                     {review.status !== "REJECTED" && (
-                      <button
+                      <Button
                         onClick={() => handleStatus(review, "REJECTED")}
                         disabled={pending}
                         className="rounded border border-amber-300 px-2 py-1 text-xs text-amber-700 disabled:opacity-50 dark:border-amber-800 dark:text-amber-400"
                       >
                         Reject
-                      </button>
+                      </Button>
                     )}
-                    <button
+                    <Button
                       onClick={() => setDeleteTarget(review.id)}
                       disabled={pending}
                       className="rounded border border-rose-300 px-2 py-1 text-xs text-rose-700 disabled:opacity-50 dark:border-rose-800 dark:text-rose-400"
                     >
                       Delete
-                    </button>
+                    </Button>
                   </div>
                 </td>
               </tr>

@@ -50,14 +50,14 @@ export default async function VendorPage({ params }: { params: Promise<{ slug: s
             {vendor.banner_url ? (
               <Image src={vendor.banner_url} alt="" fill priority className="object-cover" sizes="100vw" />
             ) : (
-              <div className="h-full w-full bg-[radial-gradient(circle_at_15%_15%,rgba(216,180,90,0.25),transparent_55%),linear-gradient(135deg,#12151f,#07090f)]" />
+              <div className="h-full w-full bg-[radial-gradient(circle_at_15%_15%,rgba(216,180,90,0.25),transparent_55%),linear-gradient(135deg,#12151f,#101116)]" />
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#07090f] via-[#07090f]/25 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#101116] via-[#101116]/25 to-transparent" />
           </div>
           <div className="px-5 pb-8 sm:px-8 lg:px-10">
             <div className="-mt-12 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
               <div className="flex items-end gap-4">
-                <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-[1.35rem] border-2 border-[#07090f] bg-[#0b0e16] text-2xl font-bold text-[var(--lx-gold)] shadow-2xl">
+                <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-[1.35rem] border-2 border-[#101116] bg-[#1A1D24] text-2xl font-bold text-[var(--lx-gold)] shadow-2xl">
                   {vendor.logo_url ? (
                     <Image src={vendor.logo_url} alt={`${vendor.display_name} logo`} width={96} height={96} className="h-full w-full object-cover" />
                   ) : vendor.display_name.charAt(0)}

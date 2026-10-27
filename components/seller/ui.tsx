@@ -18,7 +18,7 @@ export function SellerPageHeader({
     <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
       <div>
         {eyebrow && (
-          <p className="font-mono text-[10px] uppercase tracking-[0.26em] text-[#d8b45a]">{eyebrow}</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.26em] text-[#D4AF37]">{eyebrow}</p>
         )}
         <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-3xl">{title}</h2>
         {description && <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">{description}</p>}
@@ -68,7 +68,7 @@ export function SellerStat({
           <p
             className={cn(
               "mt-2 text-2xl font-semibold tabular-nums tracking-tight",
-              tone === "gold" && "text-[#f5dfa2]",
+              tone === "gold" && "text-[#E6C768]",
               tone === "green" && "text-emerald-300",
               tone === "rose" && "text-rose-300",
               tone === "default" && "text-white",
@@ -79,7 +79,7 @@ export function SellerStat({
           {hint && <p className="mt-1 text-xs text-slate-500">{hint}</p>}
         </div>
         {Icon && (
-          <span className="flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-[#d8b45a]">
+          <span className="flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-[#D4AF37]">
             <Icon className="h-4 w-4" />
           </span>
         )}
@@ -102,7 +102,7 @@ export function SellerBadge({
         tone === "success" && "border-emerald-400/25 bg-emerald-400/10 text-emerald-300",
         tone === "warning" && "border-amber-400/25 bg-amber-400/10 text-amber-300",
         tone === "danger" && "border-rose-400/25 bg-rose-400/10 text-rose-300",
-        tone === "gold" && "border-[#d8b45a]/30 bg-[#d8b45a]/10 text-[#f5dfa2]",
+        tone === "gold" && "border-[#D4AF37]/30 bg-[#D4AF37]/10 text-[#E6C768]",
         tone === "info" && "border-sky-400/25 bg-sky-400/10 text-sky-300",
         tone === "neutral" && "border-white/10 bg-white/[0.04] text-slate-300",
       )}
@@ -129,8 +129,8 @@ export function SellerButton({
       className={cn(
         "inline-flex h-10 items-center justify-center gap-2 rounded-full px-5 text-xs font-semibold transition",
         variant === "primary"
-          ? "bg-[#d8b45a] text-[#1e1708] hover:bg-[#e7c778]"
-          : "border border-white/10 text-slate-200 hover:border-[#d8b45a]/40 hover:text-white",
+          ? "bg-[#D4AF37] text-[#0B0B0F] hover:bg-[#E6C768]"
+          : "border border-white/10 text-slate-200 hover:border-[#D4AF37]/40 hover:text-white",
         className,
       )}
     >
@@ -151,7 +151,7 @@ export function SellerEmpty({
 }) {
   return (
     <div className="rounded-3xl border border-dashed border-white/10 bg-white/[0.02] px-6 py-14 text-center">
-      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-[#d8b45a]/25 bg-[#d8b45a]/10 text-[#d8b45a]">
+      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-[#D4AF37]/25 bg-[#D4AF37]/10 text-[#D4AF37]">
         <StoreIcon />
       </div>
       <h3 className="mt-4 text-base font-semibold text-white">{title}</h3>

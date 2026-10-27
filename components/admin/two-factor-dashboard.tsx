@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -180,7 +181,7 @@ export function TwoFactorDashboard({ data }: { data: AdminTwoFactorData }) {
                   <td className="px-5 py-3">
                     <div className="flex justify-end gap-2">
                       {row.status === "locked" && (
-                        <button
+                        <Button
                           type="button"
                           onClick={() => void runAction(row, "unlock")}
                           disabled={busyId === row.userId}
@@ -192,10 +193,10 @@ export function TwoFactorDashboard({ data }: { data: AdminTwoFactorData }) {
                             <LockOpen className="h-3 w-3" />
                           )}
                           Unlock
-                        </button>
+                        </Button>
                       )}
                       {row.enabled && (
-                        <button
+                        <Button
                           type="button"
                           onClick={() => void runAction(row, "reset")}
                           disabled={busyId === row.userId}
@@ -207,7 +208,7 @@ export function TwoFactorDashboard({ data }: { data: AdminTwoFactorData }) {
                             <RotateCcw className="h-3 w-3" />
                           )}
                           Reset 2FA
-                        </button>
+                        </Button>
                       )}
                     </div>
                   </td>

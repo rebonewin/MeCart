@@ -36,10 +36,10 @@ export default async function SellerDashboardPage() {
         description="A live view of revenue, fulfilment and the signals that need your attention today."
         actions={
           <>
-            <Link href="/seller/products/new" className="inline-flex h-10 items-center gap-2 rounded-full bg-[#d8b45a] px-5 text-xs font-semibold text-[#1e1708] transition hover:bg-[#e7c778]">
+            <Link href="/seller/products/new" className="inline-flex h-10 items-center gap-2 rounded-full bg-[#D4AF37] px-5 text-xs font-semibold text-[#0B0B0F] transition hover:bg-[#E6C768]">
               <ShoppingBag className="h-3.5 w-3.5" /> New product
             </Link>
-            <Link href="/seller/orders" className="inline-flex h-10 items-center gap-2 rounded-full border border-white/10 px-5 text-xs font-semibold text-slate-200 transition hover:border-[#d8b45a]/40 hover:text-white">
+            <Link href="/seller/orders" className="inline-flex h-10 items-center gap-2 rounded-full border border-white/10 px-5 text-xs font-semibold text-slate-200 transition hover:border-[#D4AF37]/40 hover:text-white">
               Open orders <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
           </>
@@ -51,7 +51,7 @@ export default async function SellerDashboardPage() {
           title="Create your first store"
           description="A store gives customers a branded home for your products. You can own more than one."
           action={
-            <Link href="/seller/stores" className="inline-flex h-10 items-center gap-2 rounded-full bg-[#d8b45a] px-5 text-xs font-semibold text-[#1e1708]">
+            <Link href="/seller/stores" className="inline-flex h-10 items-center gap-2 rounded-full bg-[#D4AF37] px-5 text-xs font-semibold text-[#0B0B0F]">
               Set up a store <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
           }
@@ -78,10 +78,10 @@ export default async function SellerDashboardPage() {
             {dashboard.revenueSeries.map((point) => (
               <div key={point.label} className="group relative flex h-full flex-1 items-end">
                 <div
-                  className="w-full rounded-t-md bg-gradient-to-t from-[#8f6b1e]/50 to-[#e7c778] transition group-hover:from-[#b98d36] group-hover:to-[#f5dfa2]"
+                  className="w-full rounded-t-md bg-gradient-to-t from-[#8f6b1e]/50 to-[#E6C768] transition group-hover:from-[#b98d36] group-hover:to-[#E6C768]"
                   style={{ height: `${Math.max(4, Math.round((point.revenue / peak) * 100))}%` }}
                 />
-                <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-lg border border-white/10 bg-[#0b0e16] px-2.5 py-1.5 text-[10px] text-white shadow-xl group-hover:block">
+                <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-lg border border-white/10 bg-[#1A1D24] px-2.5 py-1.5 text-[10px] text-white shadow-xl group-hover:block">
                   {point.label}: {money(point.revenue)}
                 </div>
               </div>
@@ -99,7 +99,7 @@ export default async function SellerDashboardPage() {
               <p className="text-[10px] uppercase tracking-[0.22em] text-slate-500">Attention queue</p>
               <h3 className="mt-1 text-lg font-semibold text-white">What needs you</h3>
             </div>
-            <span className="flex h-9 w-9 items-center justify-center rounded-2xl border border-[#d8b45a]/25 bg-[#d8b45a]/10 text-[#d8b45a]">
+            <span className="flex h-9 w-9 items-center justify-center rounded-2xl border border-[#D4AF37]/25 bg-[#D4AF37]/10 text-[#D4AF37]">
               <Star className="h-4 w-4" />
             </span>
           </div>
@@ -113,11 +113,11 @@ export default async function SellerDashboardPage() {
             ].map((item) => {
               const Icon = item.icon;
               return (
-                <Link key={item.label} href={item.href} className="flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 transition hover:border-[#d8b45a]/25 hover:bg-white/[0.04]">
+                <Link key={item.label} href={item.href} className="flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 transition hover:border-[#D4AF37]/25 hover:bg-white/[0.04]">
                   <span className="flex items-center gap-3 text-sm text-slate-300">
                     <Icon className="h-4 w-4 text-slate-500" /> {item.label}
                   </span>
-                  <span className={item.value > 0 ? "text-sm font-semibold text-[#f5dfa2]" : "text-sm text-slate-600"}>{item.value}</span>
+                  <span className={item.value > 0 ? "text-sm font-semibold text-[#E6C768]" : "text-sm text-slate-600"}>{item.value}</span>
                 </Link>
               );
             })}
@@ -132,7 +132,7 @@ export default async function SellerDashboardPage() {
               <p className="text-[10px] uppercase tracking-[0.22em] text-slate-500">Recent orders</p>
               <h3 className="mt-1 text-lg font-semibold text-white">Latest allocations</h3>
             </div>
-            <Link href="/seller/orders" className="text-xs text-slate-400 transition hover:text-[#f5dfa2]">View all</Link>
+            <Link href="/seller/orders" className="text-xs text-slate-400 transition hover:text-[#E6C768]">View all</Link>
           </div>
           {dashboard.recentOrders.length === 0 ? (
             <div className="px-6 py-12 text-center text-sm text-slate-500">No orders yet.</div>
@@ -152,7 +152,7 @@ export default async function SellerDashboardPage() {
                   {dashboard.recentOrders.map(({ allocation, order }) => (
                     <tr key={allocation.id} className="border-b border-white/[0.04] last:border-0">
                       <td className="px-5 py-3.5 sm:px-6">
-                        <Link href={`/seller/orders/${order.id}`} className="font-medium text-white transition hover:text-[#f5dfa2]">{order.order_number}</Link>
+                        <Link href={`/seller/orders/${order.id}`} className="font-medium text-white transition hover:text-[#E6C768]">{order.order_number}</Link>
                       </td>
                       <td className="px-3 py-3.5 text-slate-400">{order.customer_name}</td>
                       <td className="px-3 py-3.5 tabular-nums text-slate-200">{money(allocation.subtotal)}</td>
@@ -180,7 +180,7 @@ export default async function SellerDashboardPage() {
                       <p className="mt-0.5 text-[11px] text-slate-500">{product.units} units</p>
                     </div>
                   </div>
-                  <span className="shrink-0 text-xs tabular-nums text-[#f5dfa2]">{money(product.revenue)}</span>
+                  <span className="shrink-0 text-xs tabular-nums text-[#E6C768]">{money(product.revenue)}</span>
                 </div>
               </div>
             )) : <p className="text-sm text-slate-500">Sales data appears here once orders arrive.</p>}

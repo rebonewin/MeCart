@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
@@ -225,13 +226,13 @@ function ProductsContent({ products, brands }: { products: Product[]; brands: st
           Refine the edit
         </p>
         {activeFilters.length ? (
-          <button
+          <Button
             type="button"
             onClick={resetAll}
             className="inline-flex items-center gap-1.5 text-[11px] text-[var(--lx-gold)] transition hover:text-[var(--lx-text)]"
           >
             <RotateCcw className="h-3 w-3" aria-hidden /> Reset
-          </button>
+          </Button>
         ) : null}
       </div>
 
@@ -402,19 +403,19 @@ function ProductsContent({ products, brands }: { products: Product[]; brands: st
             { value: "4", label: "4★ & up" },
             { value: "3", label: "3★ & up" },
           ].map((option) => (
-            <button
+            <Button
               key={option.value || "any"}
               type="button"
               onClick={() => update(setRating, option.value)}
               className={cn("lx-chip", rating === option.value && "lx-chip-active")}
             >
               {option.label}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
 
-      <button
+      <Button
         type="button"
         onClick={() => update(setInStock, !inStock)}
         aria-pressed={inStock}
@@ -425,13 +426,13 @@ function ProductsContent({ products, brands }: { products: Product[]; brands: st
           className={cn(
             "flex h-5 w-5 items-center justify-center rounded-md border transition",
             inStock
-              ? "border-[var(--lx-gold)] bg-[var(--lx-gold)] text-[#241a05]"
+              ? "border-[var(--lx-gold)] bg-[var(--lx-gold)] text-[#0B0B0F]"
               : "border-[var(--lx-border-strong)]",
           )}
         >
           {inStock ? <Check className="h-3 w-3" aria-hidden /> : null}
         </span>
-      </button>
+      </Button>
     </div>
   );
 
@@ -492,21 +493,21 @@ function ProductsContent({ products, brands }: { products: Product[]; brands: st
               </label>
 
               <div className="flex items-center gap-2">
-                <button
+                <Button
                   type="button"
                   onClick={() => setDrawer(true)}
-                  className="lx-field flex h-11 items-center gap-2 whitespace-nowrap px-4 text-xs lg:hidden"
+                  className="lx-field !w-auto flex h-11 shrink-0 items-center gap-2 whitespace-nowrap px-4 text-xs lg:hidden"
                   aria-expanded={drawer}
                   aria-controls="mobile-filters"
                 >
                   <SlidersHorizontal className="h-4 w-4" aria-hidden />
                   Filters
                   {activeFilters.length ? (
-                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--lx-gold)] px-1 text-[10px] font-bold text-[#241a05]">
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--lx-gold)] px-1 text-[10px] font-bold text-[#0B0B0F]">
                       {activeFilters.length}
                     </span>
                   ) : null}
-                </button>
+                </Button>
 
                 <div className="relative min-w-0 flex-1 sm:w-52 sm:flex-none">
                   <label htmlFor="sort" className="sr-only">
@@ -519,7 +520,7 @@ function ProductsContent({ products, brands }: { products: Product[]; brands: st
                       setSort(event.target.value);
                       setPage(1);
                     }}
-                    className="lx-field h-11 appearance-none pr-9 text-xs"
+                    className="lx-field h-11 w-full min-w-0 appearance-none pr-9 text-xs"
                   >
                     {SORTS.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -541,7 +542,7 @@ function ProductsContent({ products, brands }: { products: Product[]; brands: st
                   Filtered by
                 </span>
                 {activeFilters.map((filter) => (
-                  <button
+                  <Button
                     key={filter.key}
                     type="button"
                     onClick={() => {
@@ -552,15 +553,15 @@ function ProductsContent({ products, brands }: { products: Product[]; brands: st
                   >
                     {filter.label}
                     <X className="h-3 w-3" aria-hidden />
-                  </button>
+                  </Button>
                 ))}
-                <button
+                <Button
                   type="button"
                   onClick={resetAll}
                   className="text-[11px] text-[var(--lx-muted)] underline-offset-4 transition hover:text-[var(--lx-text)] hover:underline"
                 >
                   Clear all
-                </button>
+                </Button>
               </div>
             ) : null}
 
@@ -598,13 +599,13 @@ function ProductsContent({ products, brands }: { products: Product[]; brands: st
                   title="The edit is empty — for now."
                   description="Try removing a filter, widening the price range, or searching a different maison."
                 >
-                  <button
+                  <Button
                     type="button"
                     onClick={resetAll}
                     className="inline-flex h-11 items-center gap-2 rounded-full bg-[var(--lx-text)] px-6 text-sm font-semibold text-[var(--lx-bg)] transition hover:-translate-y-0.5"
                   >
                     <RotateCcw className="h-4 w-4" aria-hidden /> Reset filters
-                  </button>
+                  </Button>
                   <Link
                     href="/categories"
                     className="lx-glass inline-flex h-11 items-center gap-2 rounded-full px-6 text-sm font-medium text-[var(--lx-text)]"
@@ -617,14 +618,14 @@ function ProductsContent({ products, brands }: { products: Product[]; brands: st
 
             {totalPages > 1 ? (
               <nav aria-label="Pagination" className="mt-12 flex flex-wrap items-center justify-center gap-2">
-                <button
+                <Button
                   type="button"
                   onClick={() => setPage((value) => Math.max(1, value - 1))}
                   disabled={currentPage <= 1}
                   className="lx-chip disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Prev
-                </button>
+                </Button>
                 {Array.from({ length: totalPages }).map((_, index) => {
                   const number = index + 1;
                   if (
@@ -636,7 +637,7 @@ function ProductsContent({ products, brands }: { products: Product[]; brands: st
                     return null;
                   }
                   return (
-                    <button
+                    <Button
                       key={number}
                       type="button"
                       onClick={() => setPage(number)}
@@ -644,22 +645,22 @@ function ProductsContent({ products, brands }: { products: Product[]; brands: st
                       className={cn(
                         "flex h-9 min-w-9 items-center justify-center rounded-full border px-3 text-xs transition",
                         number === currentPage
-                          ? "border-[var(--lx-gold)] bg-[var(--lx-gold)] font-semibold text-[#241a05]"
+                          ? "border-[var(--lx-gold)] bg-[var(--lx-gold)] font-semibold text-[#0B0B0F]"
                           : "border-[var(--lx-border)] text-[var(--lx-muted)] hover:border-[var(--lx-border-strong)] hover:text-[var(--lx-text)]",
                       )}
                     >
                       {number}
-                    </button>
+                    </Button>
                   );
                 })}
-                <button
+                <Button
                   type="button"
                   onClick={() => setPage((value) => Math.min(totalPages, value + 1))}
                   disabled={currentPage >= totalPages}
                   className="lx-chip disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Next
-                </button>
+                </Button>
               </nav>
             ) : null}
           </div>
@@ -678,7 +679,7 @@ function ProductsContent({ products, brands }: { products: Product[]; brands: st
             aria-modal="true"
             aria-label="Filter products"
           >
-            <button
+            <Button
               type="button"
               aria-label="Close filters"
               onClick={() => setDrawer(false)}
@@ -694,24 +695,24 @@ function ProductsContent({ products, brands }: { products: Product[]; brands: st
             >
               <div className="flex items-center justify-between border-b border-[var(--lx-border)] px-5 py-4">
                 <p className="text-sm font-semibold text-[var(--lx-text)]">Filters</p>
-                <button
+                <Button
                   type="button"
                   onClick={() => setDrawer(false)}
                   aria-label="Close filters"
                   className="lx-icon-button"
                 >
                   <X className="h-4 w-4" aria-hidden />
-                </button>
+                </Button>
               </div>
               <div className="flex-1 overflow-y-auto p-5">{filterPanel}</div>
               <div className="border-t border-[var(--lx-border)] p-4">
-                <button
+                <Button
                   type="button"
                   onClick={() => setDrawer(false)}
                   className="flex h-12 w-full items-center justify-center rounded-full bg-[var(--lx-text)] text-sm font-semibold text-[var(--lx-bg)] transition hover:-translate-y-0.5"
                 >
                   Show {filtered.length} {filtered.length === 1 ? "piece" : "pieces"}
-                </button>
+                </Button>
               </div>
             </motion.div>
           </motion.div>

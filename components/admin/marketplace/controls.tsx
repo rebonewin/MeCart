@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Check, Loader2, Save, X } from "lucide-react";
@@ -47,22 +48,22 @@ export function VendorReviewControls({ vendorId, status }: { vendorId: string; s
       <textarea value={notes} onChange={(event) => setNotes(event.target.value)} rows={3} placeholder="Review notes (shared with the seller for under-review/rejection decisions)…" className="w-full resize-none rounded-xl border border-white/10 bg-slate-950/70 px-3 py-2.5 text-xs leading-5 text-white outline-none placeholder:text-slate-600 focus:border-blue-400/50" />
       <div className="flex flex-wrap gap-2">
         {status !== "APPROVED" && (
-          <button type="button" onClick={() => decide("APPROVED", "Vendor approved.")} disabled={pending} className={primary}>
+          <Button type="button" onClick={() => decide("APPROVED", "Vendor approved.")} disabled={pending} className={primary}>
             {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />} Approve vendor
-          </button>
+          </Button>
         )}
         {status === "PENDING" && (
-          <button type="button" onClick={() => decide("UNDER_REVIEW", "Vendor moved under review.")} disabled={pending} className={secondary}>Start review</button>
+          <Button type="button" onClick={() => decide("UNDER_REVIEW", "Vendor moved under review.")} disabled={pending} className={secondary}>Start review</Button>
         )}
         {status !== "REJECTED" && (
-          <button type="button" onClick={() => decide("REJECTED", "Vendor application rejected.")} disabled={pending} className="inline-flex h-9 items-center gap-1.5 rounded-full border border-rose-400/25 px-4 text-[11px] font-medium text-rose-300 hover:bg-rose-400/10 disabled:opacity-50">
+          <Button type="button" onClick={() => decide("REJECTED", "Vendor application rejected.")} disabled={pending} className="inline-flex h-9 items-center gap-1.5 rounded-full border border-rose-400/25 px-4 text-[11px] font-medium text-rose-300 hover:bg-rose-400/10 disabled:opacity-50">
             <X className="h-3.5 w-3.5" /> Reject
-          </button>
+          </Button>
         )}
         {status === "APPROVED" && (
-          <button type="button" onClick={() => decide("SUSPENDED", "Vendor suspended.")} disabled={pending} className="inline-flex h-9 items-center gap-1.5 rounded-full border border-amber-400/25 px-4 text-[11px] font-medium text-amber-300 hover:bg-amber-400/10 disabled:opacity-50">
+          <Button type="button" onClick={() => decide("SUSPENDED", "Vendor suspended.")} disabled={pending} className="inline-flex h-9 items-center gap-1.5 rounded-full border border-amber-400/25 px-4 text-[11px] font-medium text-amber-300 hover:bg-amber-400/10 disabled:opacity-50">
             Suspend
-          </button>
+          </Button>
         )}
       </div>
     </div>
@@ -79,10 +80,10 @@ export function ProductModerationControls({ productId, approval }: { productId: 
       <div className="flex min-w-[240px] flex-col gap-2">
         <input value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Reason for rejection" className={input} />
         <div className="flex gap-2">
-          <button type="button" onClick={() => run(() => moderateVendorProduct(productId, "REJECTED", notes), "Product rejected.")} disabled={pending || !notes.trim()} className="inline-flex h-8 items-center gap-1 rounded-full border border-rose-400/25 px-3 text-[10px] font-medium text-rose-300 disabled:opacity-40">
+          <Button type="button" onClick={() => run(() => moderateVendorProduct(productId, "REJECTED", notes), "Product rejected.")} disabled={pending || !notes.trim()} className="inline-flex h-8 items-center gap-1 rounded-full border border-rose-400/25 px-3 text-[10px] font-medium text-rose-300 disabled:opacity-40">
             {pending ? <Loader2 className="h-3 w-3 animate-spin" /> : <X className="h-3 w-3" />} Reject
-          </button>
-          <button type="button" onClick={() => setRejecting(false)} className="text-[10px] text-slate-500 hover:text-white">Cancel</button>
+          </Button>
+          <Button type="button" onClick={() => setRejecting(false)} className="text-[10px] text-slate-500 hover:text-white">Cancel</Button>
         </div>
       </div>
     );
@@ -91,14 +92,14 @@ export function ProductModerationControls({ productId, approval }: { productId: 
   return (
     <div className="flex justify-end gap-2">
       {approval !== "APPROVED" && (
-        <button type="button" onClick={() => run(() => moderateVendorProduct(productId, "APPROVED"), "Product approved and published.")} disabled={pending} className="inline-flex h-8 items-center gap-1 rounded-full bg-emerald-500/15 px-3 text-[10px] font-medium text-emerald-300 ring-1 ring-emerald-400/25 disabled:opacity-50">
+        <Button type="button" onClick={() => run(() => moderateVendorProduct(productId, "APPROVED"), "Product approved and published.")} disabled={pending} className="inline-flex h-8 items-center gap-1 rounded-full bg-emerald-500/15 px-3 text-[10px] font-medium text-emerald-300 ring-1 ring-emerald-400/25 disabled:opacity-50">
           {pending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />} Approve
-        </button>
+        </Button>
       )}
       {approval !== "REJECTED" && (
-        <button type="button" onClick={() => setRejecting(true)} disabled={pending} className="inline-flex h-8 items-center gap-1 rounded-full border border-rose-400/20 px-3 text-[10px] font-medium text-rose-300 disabled:opacity-50">
+        <Button type="button" onClick={() => setRejecting(true)} disabled={pending} className="inline-flex h-8 items-center gap-1 rounded-full border border-rose-400/20 px-3 text-[10px] font-medium text-rose-300 disabled:opacity-50">
           <X className="h-3 w-3" /> Reject
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -137,14 +138,14 @@ export function PayoutActions({ payoutId, status }: { payoutId: string; status: 
   return (
     <div className="flex flex-wrap items-center justify-end gap-2">
       <input value={reference} onChange={(event) => setReference(event.target.value)} placeholder="Reference" className="h-8 w-28 rounded-lg border border-white/10 bg-slate-950/70 px-2 text-[10px] text-white outline-none" />
-      {status === "PENDING" && <button type="button" onClick={() => update("APPROVED", "Payout approved.")} disabled={pending} className={secondary}>Approve</button>}
-      {status === "APPROVED" && <button type="button" onClick={() => update("PROCESSING", "Payout processing.")} disabled={pending} className={secondary}>Processing</button>}
+      {status === "PENDING" && <Button type="button" onClick={() => update("APPROVED", "Payout approved.")} disabled={pending} className={secondary}>Approve</Button>}
+      {status === "APPROVED" && <Button type="button" onClick={() => update("PROCESSING", "Payout processing.")} disabled={pending} className={secondary}>Processing</Button>}
       {["APPROVED", "PROCESSING"].includes(status) && (
-        <button type="button" onClick={() => update("PAID", "Payout marked paid.")} disabled={pending} className={primary}>
+        <Button type="button" onClick={() => update("PAID", "Payout marked paid.")} disabled={pending} className={primary}>
           {pending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />} Mark paid
-        </button>
+        </Button>
       )}
-      <button type="button" onClick={() => update("CANCELLED", "Payout cancelled.")} disabled={pending} className="inline-flex h-8 items-center rounded-full border border-rose-400/20 px-3 text-[10px] text-rose-300 disabled:opacity-50">Reject</button>
+      <Button type="button" onClick={() => update("CANCELLED", "Payout cancelled.")} disabled={pending} className="inline-flex h-8 items-center rounded-full border border-rose-400/20 px-3 text-[10px] text-rose-300 disabled:opacity-50">Reject</Button>
     </div>
   );
 }
@@ -161,15 +162,15 @@ export function ReturnActions({ returnId, status, refundAmount }: { returnId: st
       <input type="number" min="0" value={refund} onChange={(event) => setRefund(event.target.value)} placeholder="Refund" className="h-8 w-24 rounded-lg border border-white/10 bg-slate-950/70 px-2 text-[10px] text-white outline-none" />
       {status === "REQUESTED" && (
         <>
-          <button type="button" onClick={() => update("REJECTED", "Return rejected.")} disabled={pending} className="inline-flex h-8 items-center rounded-full border border-rose-400/20 px-3 text-[10px] text-rose-300 disabled:opacity-50">Reject</button>
-          <button type="button" onClick={() => update("APPROVED", "Return approved.")} disabled={pending} className={secondary}>Approve</button>
+          <Button type="button" onClick={() => update("REJECTED", "Return rejected.")} disabled={pending} className="inline-flex h-8 items-center rounded-full border border-rose-400/20 px-3 text-[10px] text-rose-300 disabled:opacity-50">Reject</Button>
+          <Button type="button" onClick={() => update("APPROVED", "Return approved.")} disabled={pending} className={secondary}>Approve</Button>
         </>
       )}
-      {status === "APPROVED" && <button type="button" onClick={() => update("RECEIVED", "Return marked received.")} disabled={pending} className={secondary}>Received</button>}
+      {status === "APPROVED" && <Button type="button" onClick={() => update("RECEIVED", "Return marked received.")} disabled={pending} className={secondary}>Received</Button>}
       {["APPROVED", "RECEIVED"].includes(status) && (
-        <button type="button" onClick={() => update("REFUNDED", "Return refunded.")} disabled={pending} className={primary}>
+        <Button type="button" onClick={() => update("REFUNDED", "Return refunded.")} disabled={pending} className={primary}>
           {pending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />} Refund
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -181,9 +182,9 @@ export function CommissionForm({ vendorId, rate }: { vendorId: string; rate: num
   return (
     <div className="flex items-center gap-2">
       <input type="number" min="0" max="50" step="0.1" value={value} onChange={(event) => setValue(event.target.value)} className="h-9 w-24 rounded-xl border border-white/10 bg-slate-950/70 px-2 text-xs text-white outline-none" aria-label="Commission rate" />
-      <button type="button" onClick={() => run(() => setVendorCommission(vendorId, Number(value)), "Commission updated.")} disabled={pending || Number(value) === rate} className="inline-flex h-9 items-center gap-1 rounded-full bg-blue-500/15 px-3 text-[10px] font-medium text-blue-200 ring-1 ring-blue-400/25 disabled:opacity-40">
+      <Button type="button" onClick={() => run(() => setVendorCommission(vendorId, Number(value)), "Commission updated.")} disabled={pending || Number(value) === rate} className="inline-flex h-9 items-center gap-1 rounded-full bg-blue-500/15 px-3 text-[10px] font-medium text-blue-200 ring-1 ring-blue-400/25 disabled:opacity-40">
         {pending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />} Save
-      </button>
+      </Button>
     </div>
   );
 }
@@ -215,9 +216,9 @@ export function OwnershipEditor({
 
   if (!open) {
     return (
-      <button type="button" onClick={() => setOpen(true)} className="inline-flex h-8 items-center rounded-full border border-white/10 px-3 text-[10px] font-medium text-slate-300 hover:border-blue-400/30 hover:text-white">
+      <Button type="button" onClick={() => setOpen(true)} className="inline-flex h-8 items-center rounded-full border border-white/10 px-3 text-[10px] font-medium text-slate-300 hover:border-blue-400/30 hover:text-white">
         Manage ownership
-      </button>
+      </Button>
     );
   }
 
@@ -245,7 +246,7 @@ export function OwnershipEditor({
         <input value={sku} onChange={(event) => setSku(event.target.value)} placeholder="Vendor SKU" className={input} disabled={!selectedVendor} />
       </div>
       <div className="flex gap-2">
-        <button
+        <Button
           type="button"
           onClick={() => run(() => assignProductOwnership(productId, {
             vendorId: selectedVendor || null,
@@ -257,8 +258,8 @@ export function OwnershipEditor({
           className={primary}
         >
           {pending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />} Save
-        </button>
-        <button type="button" onClick={() => setOpen(false)} className="text-[10px] text-slate-500 hover:text-white">Cancel</button>
+        </Button>
+        <Button type="button" onClick={() => setOpen(false)} className="text-[10px] text-slate-500 hover:text-white">Cancel</Button>
       </div>
     </div>
   );

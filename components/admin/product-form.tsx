@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -213,7 +214,7 @@ export function ProductForm({
           {images.map((url, i) => (
             <div key={url + i} className="relative aspect-square">
               <Image src={url} alt="" fill sizes="120px" className="rounded object-cover" />
-              <button type="button" onClick={() => setImages((prev) => prev.filter((_, idx) => idx !== i))} className="absolute right-1 top-1 rounded bg-black/60 px-1.5 text-xs text-white">✕</button>
+              <Button type="button" onClick={() => setImages((prev) => prev.filter((_, idx) => idx !== i))} className="absolute right-1 top-1 rounded bg-black/60 px-1.5 text-xs text-white">✕</Button>
             </div>
           ))}
         </div>
@@ -221,12 +222,12 @@ export function ProductForm({
       </div>
 
       <div className="flex gap-3">
-        <button type="submit" className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">
+        <Button type="submit" className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">
           {mode === "create" ? "Create Product" : "Update Product"}
-        </button>
-        <button type="button" onClick={() => router.push("/admin/products")} className="rounded-md border px-4 py-2 text-sm">
+        </Button>
+        <Button type="button" onClick={() => router.push("/admin/products")} className="rounded-md border px-4 py-2 text-sm">
           Cancel
-        </button>
+        </Button>
       </div>
     </form>
   );

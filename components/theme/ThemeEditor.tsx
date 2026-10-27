@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useCallback, useMemo, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Download, Eye, History, Monitor, Palette, Redo2, RotateCcw, Save, Smartphone, Square, Tablet, Undo2, Upload, WandSparkles } from "lucide-react";
@@ -139,21 +140,21 @@ export function ThemeEditor({ initial, initialVersions = [], initialTab = "color
             <p className="mt-2 text-sm text-slate-300">Build, preview, and publish enterprise themes without touching backend logic.</p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <button onClick={undo} disabled={!history.length} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold transition hover:bg-white/10 disabled:opacity-50">
+            <Button onClick={undo} disabled={!history.length} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold transition hover:bg-white/10 disabled:opacity-50">
               <Undo2 className="mr-2 inline h-4 w-4" /> Undo
-            </button>
-            <button onClick={redo} disabled={!future.length} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold transition hover:bg-white/10 disabled:opacity-50">
+            </Button>
+            <Button onClick={redo} disabled={!future.length} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold transition hover:bg-white/10 disabled:opacity-50">
               <Redo2 className="mr-2 inline h-4 w-4" /> Redo
-            </button>
-            <button onClick={reset} disabled={pending} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold transition hover:bg-white/10 disabled:opacity-50">
+            </Button>
+            <Button onClick={reset} disabled={pending} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold transition hover:bg-white/10 disabled:opacity-50">
               <RotateCcw className="mr-2 inline h-4 w-4" /> Reset
-            </button>
-            <button onClick={saveNow} disabled={pending} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold transition hover:bg-white/10 disabled:opacity-50">
+            </Button>
+            <Button onClick={saveNow} disabled={pending} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold transition hover:bg-white/10 disabled:opacity-50">
               <Save className="mr-2 inline h-4 w-4" /> Save Draft
-            </button>
-            <button onClick={publish} disabled={pending} className="rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-2.5 text-sm font-bold text-white shadow-xl shadow-blue-600/20 disabled:opacity-50">
+            </Button>
+            <Button onClick={publish} disabled={pending} className="rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-2.5 text-sm font-bold text-white shadow-xl shadow-blue-600/20 disabled:opacity-50">
               Publish
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -162,22 +163,22 @@ export function ThemeEditor({ initial, initialVersions = [], initialTab = "color
         {tabs.map((tab) => {
           const Icon = tab.icon;
           return (
-            <button
+            <Button
               key={tab.id}
               onClick={() => setActive(tab.id)}
               className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${active === tab.id ? "bg-blue-600 text-white" : "border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"}`}
             >
               <Icon className="h-4 w-4" />
               {tab.label}
-            </button>
+            </Button>
           );
         })}
-        <button onClick={() => setViewport("desktop")} className={`rounded-full border px-3 py-2 ${viewport === "desktop" ? "border-blue-400 text-blue-300" : "border-white/10 text-slate-400"}`}><Monitor className="h-4 w-4" /></button>
-        <button onClick={() => setViewport("tablet")} className={`rounded-full border px-3 py-2 ${viewport === "tablet" ? "border-blue-400 text-blue-300" : "border-white/10 text-slate-400"}`}><Tablet className="h-4 w-4" /></button>
-        <button onClick={() => setViewport("mobile")} className={`rounded-full border px-3 py-2 ${viewport === "mobile" ? "border-blue-400 text-blue-300" : "border-white/10 text-slate-400"}`}><Smartphone className="h-4 w-4" /></button>
-        <button onClick={exportTheme} className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold transition hover:bg-white/10">
+        <Button onClick={() => setViewport("desktop")} className={`rounded-full border px-3 py-2 ${viewport === "desktop" ? "border-blue-400 text-blue-300" : "border-white/10 text-slate-400"}`}><Monitor className="h-4 w-4" /></Button>
+        <Button onClick={() => setViewport("tablet")} className={`rounded-full border px-3 py-2 ${viewport === "tablet" ? "border-blue-400 text-blue-300" : "border-white/10 text-slate-400"}`}><Tablet className="h-4 w-4" /></Button>
+        <Button onClick={() => setViewport("mobile")} className={`rounded-full border px-3 py-2 ${viewport === "mobile" ? "border-blue-400 text-blue-300" : "border-white/10 text-slate-400"}`}><Smartphone className="h-4 w-4" /></Button>
+        <Button onClick={exportTheme} className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold transition hover:bg-white/10">
           <Download className="mr-2 inline h-4 w-4" /> Export
-        </button>
+        </Button>
         <label className="cursor-pointer rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold transition hover:bg-white/10">
           <Upload className="mr-2 inline h-4 w-4" /> Import
           <input ref={importRef} type="file" accept="application/json" className="hidden" onChange={(event) => {
@@ -270,7 +271,7 @@ export function ThemeEditor({ initial, initialVersions = [], initialTab = "color
               <h2 className="mb-4 text-lg font-bold text-white">Preset Themes</h2>
               <div className="space-y-2">
                 {Object.keys(presetThemes).map((name) => (
-                  <button
+                  <Button
                     key={name}
                     onClick={() => { setSelectedPreset(name); pushHistory(presetThemes[name]); }}
                     className={`w-full rounded-2xl border px-4 py-3 text-left transition ${selectedPreset === name ? "border-blue-400/60 bg-blue-500/10" : "border-white/10 bg-white/[0.04] hover:bg-white/[0.08]"}`}
@@ -279,7 +280,7 @@ export function ThemeEditor({ initial, initialVersions = [], initialTab = "color
                       <span className="font-semibold text-white">{name}</span>
                       <WandSparkles className="h-4 w-4 text-blue-300" />
                     </div>
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -291,14 +292,14 @@ export function ThemeEditor({ initial, initialVersions = [], initialTab = "color
               {savedVersions.length === 0 && <p className="text-sm text-slate-400">No published versions yet.</p>}
               <div className="space-y-3">
                 {savedVersions.map((version) => (
-                  <button
+                  <Button
                     key={version.id}
                     onClick={() => pushHistory(version.tokens)}
                     className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-left transition hover:bg-white/[0.08]"
                   >
                     <p className="font-semibold text-white">{version.name}</p>
                     <p className="text-xs text-slate-400">{new Date(version.createdAt).toLocaleString()}</p>
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -350,9 +351,9 @@ export function ThemeEditor({ initial, initialVersions = [], initialTab = "color
                     >
                       <h2 style={{ fontFamily: vars["--theme-heading-font"], fontSize: "2.25rem", fontWeight: 900, lineHeight: 1.1 }}>Future Shopping Experience</h2>
                       <p className="mt-3" style={{ color: "rgba(255,255,255,0.85)" }}>Premium products and modern design in one beautiful storefront.</p>
-                      <button className="mt-5 rounded-full bg-white px-6 py-3 text-sm font-bold" style={{ borderRadius: vars["--theme-radius"], color: "#0f172a", fontFamily: vars["--theme-button-font"] }}>
+                      <Button className="mt-5 rounded-full bg-white px-6 py-3 text-sm font-bold" style={{ borderRadius: vars["--theme-radius"], color: "#0B0B0F", fontFamily: vars["--theme-button-font"] }}>
                         Shop Now
-                      </button>
+                      </Button>
                     </section>
 
                     <section

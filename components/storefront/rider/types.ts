@@ -9,12 +9,16 @@
 
 export type RiderPhase =
   | "idle"
+  | "walk"
+  | "fly"
+  | "wave"
   | "launch"
   | "catch"
   | "load"
   | "drive"
   | "deliver"
   | "celebrate"
+  | "checkout"
   | "return";
 
 /** 0 = empty · 1 = light (1–5) · 2 = heavy (6–10) · 3 = overloaded (10+). */

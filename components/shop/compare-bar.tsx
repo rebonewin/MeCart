@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -254,7 +255,7 @@ function CompareModal({ open, onClose }: { open: boolean; onClose: () => void })
           aria-modal="true"
           aria-label="Compare products"
         >
-          <button
+          <Button
             type="button"
             aria-label="Close comparison"
             onClick={onClose}
@@ -281,15 +282,15 @@ function CompareModal({ open, onClose }: { open: boolean; onClose: () => void })
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <button
+                <Button
                   type="button"
                   onClick={compare.clear}
                   className="flex h-9 items-center gap-2 rounded-full border border-white/10 px-4 text-xs text-[var(--lx-muted)] transition hover:border-white/25 hover:text-white"
                 >
                   <Trash2 className="h-3.5 w-3.5" aria-hidden />
                   Clear
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   onClick={onClose}
                   aria-label="Close"
@@ -297,7 +298,7 @@ function CompareModal({ open, onClose }: { open: boolean; onClose: () => void })
                   className="lx-glass flex h-9 w-9 items-center justify-center rounded-full text-white/80 transition hover:text-white"
                 >
                   <X className="h-4 w-4" aria-hidden />
-                </button>
+                </Button>
               </div>
             </header>
 
@@ -316,7 +317,7 @@ function CompareModal({ open, onClose }: { open: boolean; onClose: () => void })
                 >
                   <div
                     role="columnheader"
-                    className="sticky left-0 z-20 flex items-end bg-[#0b0d1c]/95 p-4 pb-5"
+                    className="sticky left-0 z-20 flex items-end bg-[#101116] p-4 pb-5"
                   >
                     <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-[var(--lx-muted)]">
                       The edit
@@ -345,14 +346,14 @@ function CompareModal({ open, onClose }: { open: boolean; onClose: () => void })
                               {item.name[0]}
                             </span>
                           )}
-                          <button
+                          <Button
                             type="button"
                             onClick={() => compare.remove(item.id)}
                             aria-label={`Remove ${item.name}`}
                             className="lx-glass absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full text-white/80 transition hover:text-white"
                           >
                             <X className="h-3 w-3" aria-hidden />
-                          </button>
+                          </Button>
                           <div className="absolute inset-x-2 bottom-2 flex flex-wrap gap-1">
                             {isBestValue ? (
                               <span className="inline-flex items-center gap-1 rounded-full bg-[var(--lx-emerald)]/90 px-2 py-0.5 text-[8px] font-semibold uppercase tracking-[0.12em] text-[#052014]">
@@ -400,8 +401,8 @@ function CompareModal({ open, onClose }: { open: boolean; onClose: () => void })
                           role="rowheader"
                           aria-label={`${row.label}${differs ? " differs" : ""}`}
                           className={cn(
-                            "sticky left-0 z-10 flex items-center gap-2 border-t border-white/5 bg-[#0b0d1c]/95 p-4 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--lx-muted)]",
-                            differs && "bg-[#17150d]/95 text-[var(--lx-gold)]",
+                            "sticky left-0 z-10 flex items-center gap-2 border-t border-white/5 bg-[#101116] p-4 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--lx-muted)]",
+                            differs && "bg-[#17150d] text-[var(--lx-gold)]",
                           )}
                         >
                           {differs ? (
@@ -429,7 +430,7 @@ function CompareModal({ open, onClose }: { open: boolean; onClose: () => void })
                 <div className="contents" role="row">
                   <div
                     role="cell"
-                    className="sticky left-0 z-10 border-t border-white/10 bg-[#0b0d1c]/95 p-4"
+                    className="sticky left-0 z-10 border-t border-white/10 bg-[#101116] p-4"
                   />
                   {compare.items.map((item) => (
                     <div
@@ -470,14 +471,14 @@ function CompareModal({ open, onClose }: { open: boolean; onClose: () => void })
                 <Sparkles className="h-3 w-3 text-[var(--lx-cyan)]" aria-hidden />
                 Prices, stock and availability are confirmed live at checkout.
               </p>
-              <button
+              <Button
                 type="button"
                 onClick={onClose}
                 className="inline-flex items-center gap-1 text-xs text-[var(--lx-cyan)] transition hover:text-white"
               >
                 Keep browsing
                 <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-              </button>
+              </Button>
             </div>
           </motion.div>
         </motion.div>
@@ -529,14 +530,14 @@ export function CompareBar() {
               Compare
               <ArrowRight className="h-3.5 w-3.5" aria-hidden />
             </RippleButton>
-            <button
+            <Button
               type="button"
               onClick={compare.clear}
               aria-label="Clear compare selection"
               className="flex h-8 w-8 items-center justify-center rounded-full text-[var(--lx-muted)] transition hover:bg-white/10 hover:text-white"
             >
               <Trash2 className="h-3.5 w-3.5" aria-hidden />
-            </button>
+            </Button>
           </motion.div>
         ) : null}
       </AnimatePresence>

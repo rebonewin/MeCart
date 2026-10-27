@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -137,7 +138,7 @@ function StepIndicator({ step }: { step: number }) {
                     complete
                       ? "border-[var(--lx-emerald)] bg-[var(--lx-emerald)] text-white"
                       : active
-                        ? "border-[var(--lx-gold)] bg-[var(--lx-gold)] text-[#241a05]"
+                        ? "border-[var(--lx-gold)] bg-[var(--lx-gold)] text-[#0B0B0F]"
                         : "border-[var(--lx-border-strong)] text-[var(--lx-muted)]",
                   )}
                   aria-hidden
@@ -706,7 +707,7 @@ export default function CheckoutPage() {
                                   className={cn(
                                     "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border",
                                     selected
-                                      ? "border-[var(--lx-gold)] bg-[var(--lx-gold)] text-[#241a05]"
+                                      ? "border-[var(--lx-gold)] bg-[var(--lx-gold)] text-[#0B0B0F]"
                                       : "border-[var(--lx-border-strong)]",
                                   )}
                                   aria-hidden
@@ -756,7 +757,7 @@ export default function CheckoutPage() {
                                   aria-invalid={Boolean(errors.upiId)}
                                   {...form.register("upiId")}
                                 />
-                                <button
+                                <Button
                                   type="button"
                                   onClick={() => {
                                     if (form.getValues("upiId")) setUpiVerified(true);
@@ -765,7 +766,7 @@ export default function CheckoutPage() {
                                   className="lx-glass inline-flex h-12 items-center justify-center rounded-xl px-5 text-xs font-medium text-[var(--lx-text)] transition hover:border-[var(--lx-gold)]/40"
                                 >
                                   Verify
-                                </button>
+                                </Button>
                               </div>
                             </Field>
                             {upiVerified ? (
@@ -791,10 +792,10 @@ export default function CheckoutPage() {
                           >
                             <div
                               aria-hidden
-                              className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#141830] via-[#0a0c1a] to-[#05060e] p-5 text-white shadow-[0_30px_60px_-36px_rgba(0,0,0,0.9)] sm:p-6"
+                              className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#141830] via-[#0a0c1a] to-[#0B0B0F] p-5 text-white shadow-[0_30px_60px_-36px_rgba(0,0,0,0.9)] sm:p-6"
                             >
-                              <div className="absolute -right-10 -top-12 h-40 w-40 rounded-full bg-[radial-gradient(circle_at_center,rgba(240,196,108,0.3),transparent_68%)] blur-2xl" />
-                              <div className="absolute -bottom-16 left-10 h-40 w-40 rounded-full bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.35),transparent_68%)] blur-2xl" />
+                              <div className="absolute -right-10 -top-12 h-40 w-40 rounded-full bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.3),transparent_68%)] blur-2xl" />
+                              <div className="absolute -bottom-16 left-10 h-40 w-40 rounded-full bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.35),transparent_68%)] blur-2xl" />
                               <div className="relative flex items-start justify-between">
                                 <span className="text-[13px] font-semibold tracking-[0.28em] text-white/90">
                                   MECART
@@ -934,7 +935,7 @@ export default function CheckoutPage() {
                       </AnimatePresence>
 
                       <div className="flex flex-col-reverse gap-3 pt-1 sm:flex-row sm:items-center sm:justify-between">
-                        <button
+                        <Button
                           type="button"
                           onClick={() => {
                             setStep(1);
@@ -943,7 +944,7 @@ export default function CheckoutPage() {
                           className="inline-flex h-11 items-center justify-center gap-2 rounded-full px-5 text-sm text-[var(--lx-muted)] transition hover:bg-[var(--lx-surface-2)] hover:text-[var(--lx-text)]"
                         >
                           <ArrowLeft className="h-4 w-4" aria-hidden /> Back to delivery
-                        </button>
+                        </Button>
                         <RippleButton type="button" variant="primary" size="lg" onClick={() => void goToReview()}>
                           Review order
                           <ArrowRight className="h-4 w-4" aria-hidden />
@@ -986,7 +987,7 @@ export default function CheckoutPage() {
                             <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[var(--lx-muted)]">
                               Delivery to
                             </p>
-                            <button
+                            <Button
                               type="button"
                               onClick={() => {
                                 setStep(1);
@@ -995,7 +996,7 @@ export default function CheckoutPage() {
                               className="text-[10px] text-[var(--lx-gold)] transition hover:text-[var(--lx-text)]"
                             >
                               Edit
-                            </button>
+                            </Button>
                           </div>
                           <p className="mt-2 text-sm font-medium text-[var(--lx-text)]">{customerName}</p>
                           <p className="mt-1 text-xs leading-5 text-[var(--lx-muted)]">
@@ -1013,7 +1014,7 @@ export default function CheckoutPage() {
                             <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[var(--lx-muted)]">
                               Payment
                             </p>
-                            <button
+                            <Button
                               type="button"
                               onClick={() => {
                                 setStep(2);
@@ -1022,7 +1023,7 @@ export default function CheckoutPage() {
                               className="text-[10px] text-[var(--lx-gold)] transition hover:text-[var(--lx-text)]"
                             >
                               Edit
-                            </button>
+                            </Button>
                           </div>
                           <p className="mt-2 text-sm font-medium text-[var(--lx-text)]">{methodLabel}</p>
                           <p className="mt-1 text-xs leading-5 text-[var(--lx-muted)]">
@@ -1084,7 +1085,7 @@ export default function CheckoutPage() {
                       </div>
 
                       <div className="flex flex-col-reverse gap-3 pt-1 sm:flex-row sm:items-center sm:justify-between">
-                        <button
+                        <Button
                           type="button"
                           onClick={() => {
                             setStep(2);
@@ -1093,7 +1094,7 @@ export default function CheckoutPage() {
                           className="inline-flex h-11 items-center justify-center gap-2 rounded-full px-5 text-sm text-[var(--lx-muted)] transition hover:bg-[var(--lx-surface-2)] hover:text-[var(--lx-text)]"
                         >
                           <ArrowLeft className="h-4 w-4" aria-hidden /> Back to payment
-                        </button>
+                        </Button>
                         <RippleButton type="submit" variant="primary" size="lg" loading={processing}>
                           Place order · ${total.toFixed(2)}
                           <LockKeyhole className="h-4 w-4" aria-hidden />

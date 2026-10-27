@@ -56,8 +56,8 @@ export function RevenueTrendChart({ data }: { data: RevenuePoint[] }) {
         <AreaChart data={data}>
           <defs>
             <linearGradient id="insightsRevenue" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#818cf8" stopOpacity={0.45} />
-              <stop offset="95%" stopColor="#22d3ee" stopOpacity={0.03} />
+              <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.45} />
+              <stop offset="95%" stopColor="#E6C768" stopOpacity={0.03} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
@@ -65,7 +65,7 @@ export function RevenueTrendChart({ data }: { data: RevenuePoint[] }) {
           <YAxis stroke="#94a3b8" tickLine={false} axisLine={false} />
           <Tooltip
             contentStyle={{
-              background: "rgba(15,23,42,0.92)",
+              background: "rgba(11,11,15,0.92)",
               border: "1px solid rgba(255,255,255,0.12)",
               borderRadius: "16px",
               color: "#fff",

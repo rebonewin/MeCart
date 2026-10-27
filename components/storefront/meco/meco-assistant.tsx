@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -91,7 +92,7 @@ function AssistantProductCard({
             </span>
           )}
           {product.stock <= 0 ? (
-            <span className="absolute left-2 top-2 rounded-full bg-[#080a16]/80 px-2 py-0.5 text-[8px] uppercase tracking-[0.14em] text-white/70">
+            <span className="absolute left-2 top-2 rounded-full bg-[#1A1D24]/80 px-2 py-0.5 text-[8px] uppercase tracking-[0.14em] text-white/70">
               Waitlist
             </span>
           ) : null}
@@ -108,7 +109,7 @@ function AssistantProductCard({
           </p>
         </div>
       </Link>
-      <button
+      <Button
         type="button"
         onClick={() => onAdd(product)}
         disabled={adding || product.stock <= 0}
@@ -117,7 +118,7 @@ function AssistantProductCard({
       >
         {adding ? <Loader2 className="h-3 w-3 animate-spin" aria-hidden /> : <ShoppingBag className="h-3 w-3" aria-hidden />}
         {product.stock <= 0 ? "Waitlist" : "Add to bag"}
-      </button>
+      </Button>
     </div>
   );
 }
@@ -420,30 +421,30 @@ export function MecoAssistant() {
 
   return (
     <>
-      <button
+      <Button
         ref={triggerRef}
         type="button"
         onClick={openAssistant}
         aria-haspopup="dialog"
         aria-expanded={open}
-        className="group fixed bottom-4 right-4 z-[110] flex h-14 items-center gap-2 rounded-full border border-white/15 bg-[#0b0f18]/95 py-1.5 pl-2 pr-4 text-white shadow-[0_18px_60px_rgba(0,0,0,0.45)] backdrop-blur-xl transition hover:border-[var(--lx-gold)]/50 hover:shadow-[0_20px_70px_rgba(240,196,108,0.16)] sm:bottom-6 sm:right-6"
+        className="group fixed bottom-4 right-4 z-[110] flex h-14 items-center gap-2 rounded-full border border-white/15 bg-[#101116] py-1.5 pl-2 pr-4 text-white shadow-[0_18px_60px_rgba(0,0,0,0.45)] backdrop-blur-xl transition hover:border-[var(--lx-gold)]/50 hover:shadow-[0_20px_70px_rgba(212,175,55,0.16)] sm:bottom-6 sm:right-6"
       >
         <span className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-[var(--lx-iris)]/30 to-[var(--lx-cyan)]/20">
           <RiderModel phase="idle" tier={1} waving headlight={false} reduced={reduced} className="h-8 w-10" />
-          <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-[#0b0f18] bg-[var(--lx-emerald)]" />
+          <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-[#0B0B0F] bg-[var(--lx-emerald)]" />
         </span>
         <span className="text-left">
-          <span className="block font-mono text-[8px] uppercase tracking-[0.24em] text-[var(--lx-cyan)]">
+          <span className="block font-mono text-[8px] uppercase tracking-[0.24em] text-[var(--lx-champagne-warm)]">
             AI concierge
           </span>
           <span className="block text-xs font-semibold tracking-wide">Ask MECO</span>
         </span>
-      </button>
+      </Button>
 
       <AnimatePresence>
         {open ? (
           <motion.div
-            className="fixed inset-0 z-[120] bg-[#04050d]/40 backdrop-blur-[2px] sm:bg-transparent sm:backdrop-blur-0"
+            className="fixed inset-0 z-[120] bg-[#0B0B0F]/40 backdrop-blur-[2px] sm:bg-transparent sm:backdrop-blur-0"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -493,14 +494,14 @@ export function MecoAssistant() {
                     )}
                   </p>
                 </div>
-                <button
+                <Button
                   type="button"
                   onClick={close}
                   aria-label="Close MECO"
                   className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-white/60 transition hover:border-white/25 hover:text-white"
                 >
                   <X className="h-4 w-4" aria-hidden />
-                </button>
+                </Button>
               </div>
 
               <div
@@ -556,7 +557,7 @@ export function MecoAssistant() {
                         <PackageSearch className="h-3.5 w-3.5" aria-hidden />
                         Order lookup
                       </p>
-                      <button
+                      <Button
                         type="button"
                         onClick={() => {
                           setLookupOpen(false);
@@ -567,7 +568,7 @@ export function MecoAssistant() {
                         aria-label="Close order lookup"
                       >
                         <X className="h-3.5 w-3.5" aria-hidden />
-                      </button>
+                      </Button>
                     </div>
                     <form
                       className="mt-2 flex gap-1.5"
@@ -587,13 +588,13 @@ export function MecoAssistant() {
                         autoComplete="off"
                         className="min-w-0 flex-1 rounded-xl border border-white/10 bg-white/[0.04] px-2.5 py-2 font-mono text-[10px] uppercase tracking-wide text-white placeholder:text-white/25 focus:border-[var(--lx-cyan)]/50 focus:outline-none"
                       />
-                      <button
+                      <Button
                         type="submit"
                         disabled={lookupStatus === "loading" || !lookupValue.trim()}
                         className="flex h-8 items-center justify-center rounded-xl bg-[var(--lx-cyan)] px-3 text-[10px] font-semibold text-[#071018] transition hover:bg-[var(--lx-cyan)]/90 disabled:opacity-50"
                       >
                         {lookupStatus === "loading" ? <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden /> : "Find"}
-                      </button>
+                      </Button>
                     </form>
 
                     {lookupResult?.ok ? (
@@ -646,14 +647,14 @@ export function MecoAssistant() {
               {suggestions.length ? (
                 <div className="flex gap-1.5 overflow-x-auto border-t border-white/[0.06] px-3 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   {suggestions.map((suggestion) => (
-                    <button
+                    <Button
                       key={suggestion}
                       type="button"
                       onClick={() => submit(suggestion)}
                       className="shrink-0 rounded-full border border-white/10 px-2.5 py-1 text-[10px] text-white/60 transition hover:border-[var(--lx-gold)]/40 hover:text-[var(--lx-gold)]"
                     >
                       {suggestion}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               ) : null}
@@ -678,7 +679,7 @@ export function MecoAssistant() {
                   className="min-w-0 flex-1 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-[12px] text-white placeholder:text-white/30 focus:border-[var(--lx-cyan)]/50 focus:outline-none"
                 />
                 {voice.supported ? (
-                  <button
+                  <Button
                     type="button"
                     onClick={() => {
                       if (voice.listening) voice.stop();
@@ -694,16 +695,16 @@ export function MecoAssistant() {
                     )}
                   >
                     <Mic className={cn("h-4 w-4", voice.listening && "animate-pulse")} aria-hidden />
-                  </button>
+                  </Button>
                 ) : null}
-                <button
+                <Button
                   type="submit"
                   disabled={!input.trim() || typing}
                   aria-label="Send message to MECO"
                   className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--lx-gold)] text-[#17120a] transition hover:bg-[var(--lx-gold-soft)] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <Send className="h-4 w-4" aria-hidden />
-                </button>
+                </Button>
               </form>
 
               <p className="flex items-center justify-center gap-1.5 border-t border-white/[0.05] bg-black/20 py-1.5 text-[8px] text-white/25">

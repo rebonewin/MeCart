@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -240,7 +241,7 @@ export function TwoFactorChallenge({ view }: { view: TwoFactorChallengeView }) {
 
   if (availableMethods.length === 0) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#030712] px-4 text-white">
+      <div className="flex min-h-screen items-center justify-center bg-[#0B0B0F] px-4 text-white">
         <div className="w-full max-w-md rounded-[2rem] border border-white/10 bg-white/10 p-8 text-center backdrop-blur-2xl">
           <ShieldCheck className="mx-auto h-10 w-10 text-amber-300" />
           <h1 className="mt-4 text-2xl font-bold">No verification methods available</h1>
@@ -260,15 +261,15 @@ export function TwoFactorChallenge({ view }: { view: TwoFactorChallengeView }) {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#030712] px-4 py-10 text-white">
+    <div className="lx-dark-scene relative flex min-h-screen items-center justify-center overflow-hidden bg-[var(--lx-bg)] px-4 py-10 text-[var(--lx-text)]">
       <div className="pointer-events-none absolute inset-0">
         <motion.div
-          className="absolute -left-24 top-16 h-80 w-80 rounded-full bg-indigo-500/25 blur-3xl"
+          className="absolute -left-24 top-16 h-80 w-80 rounded-full bg-[var(--lx-champagne)]/12 blur-3xl"
           animate={{ x: [0, 36, 0], y: [0, 22, 0] }}
           transition={{ duration: 13, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute -right-20 bottom-12 h-96 w-96 rounded-full bg-cyan-400/20 blur-3xl"
+          className="absolute -right-20 bottom-12 h-96 w-96 rounded-full bg-[var(--lx-champagne-warm)]/10 blur-3xl"
           animate={{ x: [0, -34, 0], y: [0, -20, 0] }}
           transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
         />
@@ -283,7 +284,7 @@ export function TwoFactorChallenge({ view }: { view: TwoFactorChallengeView }) {
         <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
         <div className="relative">
           <div className="text-center">
-            <p className="text-xs uppercase tracking-[0.35em] text-indigo-300">MeCart Security</p>
+            <p className="text-xs uppercase tracking-[0.35em] text-[var(--lx-gold-soft)]">MeCart Security</p>
             <h1 className="mt-3 text-3xl font-black tracking-tight">Confirm it&apos;s you</h1>
             <p className="mt-3 text-sm text-slate-300">
               Password verified. Complete the second step to finish signing in.
@@ -293,7 +294,7 @@ export function TwoFactorChallenge({ view }: { view: TwoFactorChallengeView }) {
           {availableMethods.length > 1 && (
             <div className="mt-6 grid grid-cols-2 gap-2" role="tablist" aria-label="Verification methods">
               {availableMethods.map((option) => (
-                <button
+                <Button
                   key={option}
                   type="button"
                   role="tab"
@@ -301,13 +302,13 @@ export function TwoFactorChallenge({ view }: { view: TwoFactorChallengeView }) {
                   onClick={() => switchMethod(option)}
                   className={`flex items-center justify-center gap-2 rounded-2xl border px-3 py-2.5 text-xs font-semibold transition ${
                     method === option
-                      ? "border-indigo-400/60 bg-indigo-500/20 text-white"
+                      ? "border-[var(--lx-gold)]/60 bg-[var(--lx-gold)]/15 text-[var(--lx-text)]"
                       : "border-white/10 bg-slate-950/40 text-slate-300 hover:bg-white/5"
                   }`}
                 >
                   {METHOD_ICONS[option]}
                   {METHOD_LABELS[option]}
-                </button>
+                </Button>
               ))}
             </div>
           )}
@@ -356,7 +357,7 @@ export function TwoFactorChallenge({ view }: { view: TwoFactorChallengeView }) {
                       maxLength={1}
                       autoFocus={index === 0}
                       disabled={locked || expired}
-                      className="h-12 rounded-xl border border-white/10 bg-slate-950/60 text-center text-lg font-semibold text-white outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/15 disabled:opacity-60"
+                      className="h-12 rounded-xl border border-white/10 bg-white/[0.045] text-center text-lg font-semibold text-[var(--lx-text)] outline-none transition focus:border-[var(--lx-gold)] focus:bg-white/[0.07] disabled:opacity-60"
                     />
                   ))}
                 </div>
@@ -372,15 +373,17 @@ export function TwoFactorChallenge({ view }: { view: TwoFactorChallengeView }) {
                 </p>
 
                 {requiresSend ? (
-                  <button
+                  <Button
                     type="button"
                     onClick={requestCode}
                     disabled={sending || locked || expired}
-                    className="flex h-11 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-cyan-500 text-sm font-bold text-white shadow-xl shadow-indigo-600/25 transition disabled:cursor-not-allowed disabled:opacity-60"
+                    variant="brand"
+                    size="md"
+                    className="w-full rounded-full disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                     {method === "email" ? "Send email code" : "Send SMS code"}
-                  </button>
+                  </Button>
                 ) : (
                   <>
                     <div className="grid grid-cols-6 gap-2">
@@ -404,11 +407,11 @@ export function TwoFactorChallenge({ view }: { view: TwoFactorChallengeView }) {
                           maxLength={1}
                           autoFocus={index === 0}
                           disabled={locked || expired}
-                          className="h-12 rounded-xl border border-white/10 bg-slate-950/60 text-center text-lg font-semibold text-white outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/15 disabled:opacity-60"
+                          className="h-12 rounded-xl border border-white/10 bg-white/[0.045] text-center text-lg font-semibold text-[var(--lx-text)] outline-none transition focus:border-[var(--lx-gold)] focus:bg-white/[0.07] disabled:opacity-60"
                         />
                       ))}
                     </div>
-                    <button
+                    <Button
                       type="button"
                       onClick={requestCode}
                       disabled={sending || cooldown > 0 || remainingSends <= 0 || locked || expired}
@@ -421,7 +424,7 @@ export function TwoFactorChallenge({ view }: { view: TwoFactorChallengeView }) {
                           : remainingSends > 0
                             ? `Resend code (${remainingSends} left)`
                             : "No resends left"}
-                    </button>
+                    </Button>
                   </>
                 )}
               </div>
@@ -439,17 +442,19 @@ export function TwoFactorChallenge({ view }: { view: TwoFactorChallengeView }) {
                   aria-label="Recovery code"
                   autoFocus
                   disabled={locked || expired}
-                  className="h-12 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 text-center font-mono text-lg tracking-[0.2em] text-white outline-none transition placeholder:text-slate-600 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/15 disabled:opacity-60"
+                  className="h-12 w-full rounded-2xl border border-white/10 bg-white/[0.045] px-4 text-center font-mono text-lg tracking-[0.2em] text-[var(--lx-text)] outline-none transition placeholder:text-white/25 focus:border-[var(--lx-gold)] focus:bg-white/[0.07] disabled:opacity-60"
                 />
-                <button
+                <Button
                   type="button"
                   onClick={() => void submit("recovery")}
                   disabled={verifying || locked || expired}
-                  className="flex h-11 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-cyan-500 text-sm font-bold text-white shadow-xl shadow-indigo-600/25 transition disabled:cursor-not-allowed disabled:opacity-60"
+                  variant="brand"
+                  size="md"
+                  className="w-full rounded-full disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {verifying ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                   Verify recovery code
-                </button>
+                </Button>
               </div>
             )}
 
@@ -458,7 +463,7 @@ export function TwoFactorChallenge({ view }: { view: TwoFactorChallengeView }) {
                 type="checkbox"
                 checked={rememberDevice}
                 onChange={(event) => setRememberDevice(event.target.checked)}
-                className="h-4 w-4 accent-indigo-500"
+                className="h-4 w-4 accent-[var(--lx-gold)]"
               />
               Trust this device for 30 days
             </label>

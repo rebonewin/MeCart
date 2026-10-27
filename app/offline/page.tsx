@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function OfflinePage() {
   return (
-    <div className="lx-dark-scene min-h-screen bg-[#05060e] px-4 py-12 text-white sm:px-6">
+    <div className="lx-dark-scene min-h-screen bg-[#0B0B0F] px-4 py-12 text-white sm:px-6">
       <div className="mx-auto max-w-lg">
         <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-[var(--lx-cyan)]">
           MeCart · offline atelier

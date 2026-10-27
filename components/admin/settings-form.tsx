@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -223,14 +224,14 @@ export function SettingsForm({ rows }: { rows: SettingsRowProp[] }) {
                   {row.description ?? `Settings stored under "${row.key}".`}
                 </p>
               </div>
-              <button
+              <Button
                 type="button"
                 disabled={pending}
                 onClick={() => saveGroup(row, fields)}
                 className="rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-600/25 transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Save
-              </button>
+              </Button>
             </div>
             <div className="divide-y divide-white/5">
               {fields.map((field) => (

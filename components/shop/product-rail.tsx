@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 import { ProductCard } from "@/components/shop/product-card";
@@ -71,7 +72,7 @@ export function ProductRail({
           <div className="flex items-center gap-3">
             {action}
             <div className="hidden items-center gap-1.5 sm:flex">
-              <button
+              <Button
                 type="button"
                 onClick={() => scroll(-1)}
                 disabled={!canPrev}
@@ -80,8 +81,8 @@ export function ProductRail({
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--lx-border)] text-[var(--lx-muted)] transition hover:border-[var(--lx-gold)]/50 hover:text-[var(--lx-gold)] disabled:cursor-not-allowed disabled:opacity-35"
               >
                 <ArrowLeft className="h-4 w-4" aria-hidden />
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => scroll(1)}
                 disabled={!canNext}
@@ -90,7 +91,7 @@ export function ProductRail({
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--lx-border)] text-[var(--lx-muted)] transition hover:border-[var(--lx-gold)]/50 hover:text-[var(--lx-gold)] disabled:cursor-not-allowed disabled:opacity-35"
               >
                 <ArrowRight className="h-4 w-4" aria-hidden />
-              </button>
+              </Button>
             </div>
           </div>
         }

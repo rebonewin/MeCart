@@ -31,7 +31,7 @@ export default async function SellerShippingPage() {
               <SellerCard key={profile.id} className="overflow-hidden p-0">
                 <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/[0.07] px-5 py-4">
                   <div className="flex items-start gap-3">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-2xl border border-[#d8b45a]/20 bg-[#d8b45a]/10 text-[#d8b45a]">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-2xl border border-[#D4AF37]/20 bg-[#D4AF37]/10 text-[#D4AF37]">
                       <Truck className="h-4 w-4" />
                     </span>
                     <div>
@@ -56,7 +56,7 @@ export default async function SellerShippingPage() {
                         </div>
                         <div className="flex items-center gap-3">
                           {rate.free_over ? <span className="text-[10px] text-slate-500">Free over {money(rate.free_over)}</span> : null}
-                          <span className="text-xs tabular-nums text-[#f5dfa2]">{money(rate.rate)}</span>
+                          <span className="text-xs tabular-nums text-[#E6C768]">{money(rate.rate)}</span>
                           <SellerBadge tone={rate.is_active ? "success" : "neutral"}>{rate.is_active ? "Active" : "Off"}</SellerBadge>
                         </div>
                       </div>

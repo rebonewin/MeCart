@@ -9,11 +9,11 @@ export const dynamic = "force-dynamic";
 
 const TONES = [
   "from-[#6366f1]/50 via-[#6366f1]/10 to-transparent",
-  "from-[#22d3ee]/45 via-[#22d3ee]/10 to-transparent",
-  "from-[#f0c46c]/45 via-[#f0c46c]/10 to-transparent",
-  "from-[#a78bfa]/45 via-[#a78bfa]/10 to-transparent",
+  "from-[#E6C768]/45 via-[#E6C768]/10 to-transparent",
+  "from-[#D4AF37]/45 via-[#D4AF37]/10 to-transparent",
+  "from-[#D4AF37]/45 via-[#D4AF37]/10 to-transparent",
   "from-[#34d399]/40 via-[#34d399]/10 to-transparent",
-  "from-[#fb7185]/40 via-[#fb7185]/10 to-transparent",
+  "from-[#D98B8B]/40 via-[#D98B8B]/10 to-transparent",
 ] as const;
 
 export default async function CategoriesPage() {
@@ -78,7 +78,7 @@ export default async function CategoriesPage() {
                         />
                       ) : null}
                       <div className={cnLocal("absolute inset-0 bg-gradient-to-br", TONES[index % TONES.length])} />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#05060e] via-[#05060e]/45 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0F] via-[#0B0B0F]/45 to-transparent" />
 
                       <div className="relative z-10 flex items-start justify-between gap-4">
                         <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/45">

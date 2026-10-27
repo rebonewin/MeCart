@@ -1,8 +1,11 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { LiquidStage } from "@/components/luxe/webgl/liquid-stage";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useEffect, useRef, useState } from "react";
+import { Lock } from "lucide-react";
 import { toast } from "sonner";
 
 import { completeRegistration, requestRegistrationOtp, verifyOtpCode } from "@/lib/actions/email-otp";
@@ -63,7 +66,7 @@ function OtpInput({
           autoComplete={index === 0 ? "one-time-code" : "off"}
           disabled={disabled}
           aria-label={`Digit ${index + 1}`}
-          className="h-14 w-full rounded-2xl border border-white/60 bg-white/90 text-center text-xl font-bold text-gray-900 shadow-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+          className="h-14 w-full rounded-2xl border border-white/10 bg-white/[0.045] text-center text-xl font-bold text-[var(--lx-text)] outline-none transition focus:border-[var(--lx-gold)] focus:bg-white/[0.07] disabled:opacity-50"
         />
       ))}
     </div>
@@ -87,25 +90,26 @@ function CountDownTimer({
   const disabled = resendInSeconds > 0 || maxed;
 
   return (
-    <div className="flex items-center justify-between gap-3 rounded-xl bg-indigo-50/70 px-4 py-2 text-sm dark:bg-indigo-950/30">
-      <span className="text-gray-600 dark:text-gray-400" aria-live="polite">
+    <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2 text-sm">
+      <span className="text-[var(--lx-muted)]" aria-live="polite">
         {remaining > 0
           ? `Code expires in ${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
           : "Your code has expired — request a new one."}
       </span>
-      <button
+      <Button
         type="button"
+        variant="ghost"
         onClick={onResend}
         disabled={disabled}
         aria-disabled={disabled}
-        className="font-medium text-indigo-600 hover:underline disabled:text-gray-400 disabled:no-underline dark:text-indigo-400 dark:disabled:text-gray-500"
+        className="font-medium text-[var(--lx-gold)] hover:text-[var(--lx-champagne-warm)] disabled:text-white/35 disabled:no-underline"
       >
         {maxed
           ? "Maximum resends reached"
           : resendInSeconds > 0
             ? `Resend in ${resendInSeconds}s`
             : "Resend code"}
-      </button>
+      </Button>
     </div>
   );
 }
@@ -273,32 +277,30 @@ export function RegisterForm({ resumeEmail }: { resumeEmail: string }) {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-indigo-50 via-white to-emerald-50 px-4 py-16 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
-      <div className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-indigo-300/40 blur-3xl" />
-      <div className="pointer-events-none absolute -top-24 right-8 h-72 w-72 rounded-full bg-emerald-300/40 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-24 right-8 h-72 w-72 rounded-full bg-amber-300/30 blur-3xl" />
+    <div className="dark lx-dark-scene relative min-h-screen overflow-hidden bg-[var(--lx-bg)] px-4 py-16 text-[var(--lx-text)]">
+      <LiquidStage variant="hero" intensity={0.7} />
 
       <div className="relative mx-auto max-w-md">
         <div className="mb-6 text-center">
-          <span className="rounded-full border border-white/60 bg-white/60 px-3 py-1 text-xs font-semibold tracking-wide text-indigo-700 backdrop-blur dark:border-gray-700 dark:bg-gray-900/70 dark:text-indigo-300">
+          <span className="rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--lx-gold)] backdrop-blur">
             MeCart Email Verification
           </span>
           <div className="mt-4 flex items-center justify-center gap-2">
             {(["details", "verify", "password", "success"] as Step[]).map((item, index) => (
               <div
                 key={item}
-                className={`h-2 w-8 rounded-full transition ${["details", "verify", "password", "success"].indexOf(step) >= index ? "bg-indigo-600" : "bg-gray-300 dark:bg-gray-700"}`}
+                className={`h-1.5 w-8 rounded-full transition ${["details", "verify", "password", "success"].indexOf(step) >= index ? "bg-[var(--lx-gold)]" : "bg-white/15"}`}
                 aria-hidden="true"
               />
             ))}
           </div>
         </div>
 
-        <div className="rounded-3xl border border-white/60 bg-white/80 p-6 shadow-2xl backdrop-blur dark:border-gray-800 dark:bg-gray-900/80">
+        <div className="lx-glass rounded-[1.75rem] bg-white/[0.055] p-6 shadow-[0_40px_100px_-40px_rgba(0,0,0,0.8)] backdrop-blur-2xl sm:p-8">
           <div className="mb-6 flex items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-emerald-600">Create account</h1>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <h1 className="lx-title text-3xl text-[var(--lx-text)]">Create account</h1>
+              <p className="mt-2 text-sm leading-6 text-[var(--lx-muted)]">
                 {step === "details" && "Enter your name and email to receive a 6-digit code."}
                 {step === "verify" && `We sent a code to ${email}.`}
                 {step === "password" && "Your email is verified. Create your password."}
@@ -310,35 +312,41 @@ export function RegisterForm({ resumeEmail }: { resumeEmail: string }) {
           {step === "details" && (
             <form onSubmit={startVerification} className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm font-medium dark:text-gray-300" htmlFor="register-name">Full name</label>
+                <label className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.14em] text-[var(--lx-muted)]" htmlFor="register-name">Full name</label>
                 <input
                   id="register-name"
                   value={name}
                   onChange={(event) => setName(event.target.value)}
                   placeholder="Full name"
-                  className="w-full rounded-2xl border border-gray-200 bg-white/70 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-950/80"
+                  className="lx-field w-full"
+                  autoComplete="name"
                   required
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium dark:text-gray-300" htmlFor="register-email">Email address</label>
+                <label className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.14em] text-[var(--lx-muted)]" htmlFor="register-email">Email address</label>
                 <input
                   id="register-email"
                   type="email"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   placeholder="Email"
-                  className="w-full rounded-2xl border border-gray-200 bg-white/70 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-950/80"
+                  className="lx-field w-full"
+                  autoComplete="email"
                   required
                 />
               </div>
-              <button
+              <Button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-2xl bg-gradient-to-r from-indigo-600 to-emerald-500 px-4 py-3 text-sm font-semibold text-white shadow-lg transition hover:from-indigo-700 hover:to-emerald-600 disabled:cursor-not-allowed disabled:opacity-60"
+                loading={loading}
+                loadingText="Sending code…"
+                variant="brand"
+                size="lg"
+                className="w-full rounded-2xl"
               >
-                {loading ? "Sending code..." : "Continue"}
-              </button>
+                Continue
+              </Button>
             </form>
           )}
 
@@ -351,17 +359,31 @@ export function RegisterForm({ resumeEmail }: { resumeEmail: string }) {
                 resendCount={resendCount}
                 onResend={resendOtp}
               />
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-[var(--lx-muted)]">
                 Enter all 6 code digits. You can resend after the timer.
               </p>
-              {otpError && <p className="rounded-xl bg-rose-50 px-3 py-2 text-sm text-rose-600 dark:bg-rose-950/40 dark:text-rose-400">{otpError}</p>}
+              {otpError && <p className="lx-error rounded-xl border border-rose-400/25 bg-rose-500/10 px-3 py-2 text-sm text-rose-200" role="alert">{otpError}</p>}
               <div className="flex items-center gap-3">
-                <button type="submit" disabled={loading || otpValue.length !== 6} className="flex-1 rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:opacity-40">
-                  {loading ? "Verifying..." : "Verify code"}
-                </button>
-                <button type="button" onClick={() => setStep("details")} className="rounded-2xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 transition dark:border-gray-700 dark:text-gray-200">
+                <Button
+                  type="submit"
+                  disabled={loading || otpValue.length !== 6}
+                  loading={loading}
+                  loadingText="Verifying…"
+                  variant="brand"
+                  size="md"
+                  className="flex-1 rounded-2xl"
+                >
+                  Verify code
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => setStep("details")}
+                  variant="outline"
+                  size="md"
+                  className="rounded-2xl"
+                >
                   Back
-                </button>
+                </Button>
               </div>
             </form>
           )}
@@ -369,43 +391,59 @@ export function RegisterForm({ resumeEmail }: { resumeEmail: string }) {
           {step === "password" && (
             <form onSubmit={createPassword} className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm font-medium dark:text-gray-300" htmlFor="password">Password</label>
+                <label className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.14em] text-[var(--lx-muted)]" htmlFor="password">
+                  <Lock className="h-3.5 w-3.5" aria-hidden /> Password
+                </label>
                 <input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   placeholder="Password"
-                  className="w-full rounded-2xl border border-gray-200 bg-white/70 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-950/80"
+                  className="lx-field h-12 w-full bg-white/[0.045]"
+                  autoComplete="new-password"
                   required
                 />
                 <div className="mt-3">
-                  <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
                     <div
                       className={`h-full transition-all duration-300 ${strength.label === "Weak" ? "bg-rose-500" : strength.label === "Medium" ? "bg-amber-500" : "bg-emerald-500"}`}
                       style={{ width: `${(strength.score / 5) * 100}%` }}
                     />
                   </div>
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Strength: {strength.label}</p>
+                  <p className="mt-1 text-xs text-[var(--lx-muted)]">
+                    Strength: {strength.label}
+                  </p>
                   <PasswordChecks checks={strength.checks} />
                 </div>
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium dark:text-gray-300" htmlFor="confirm">Confirm password</label>
+                <label className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.14em] text-[var(--lx-muted)]" htmlFor="confirm">
+                  <Lock className="h-3.5 w-3.5" aria-hidden /> Confirm password
+                </label>
                 <input
                   id="confirm"
                   type="password"
                   value={confirm}
                   onChange={(event) => setConfirm(event.target.value)}
                   placeholder="Confirm password"
-                  className="w-full rounded-2xl border border-gray-200 bg-white/70 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-950/80"
+                  className="lx-field h-12 w-full bg-white/[0.045]"
+                  autoComplete="new-password"
                   required
                 />
               </div>
-              {passwordError && <p className="rounded-xl bg-rose-50 px-3 py-2 text-sm text-rose-600 dark:bg-rose-950/40 dark:text-rose-400">{passwordError}</p>}
-              <button type="submit" disabled={loading} className="w-full rounded-2xl bg-gradient-to-r from-indigo-600 to-emerald-500 px-4 py-3 text-sm font-semibold text-white shadow-lg transition hover:from-indigo-700 hover:to-emerald-600 disabled:cursor-not-allowed disabled:opacity-60">
-                {loading ? "Creating account..." : "Create account"}
-              </button>
+              {passwordError && <p className="lx-error rounded-xl border border-rose-400/25 bg-rose-500/10 px-3 py-2 text-sm text-rose-200" role="alert">{passwordError}</p>}
+              <Button
+                type="submit"
+                disabled={loading}
+                loading={loading}
+                loadingText="Creating account…"
+                variant="brand"
+                size="lg"
+                className="w-full rounded-2xl"
+              >
+                Create account
+              </Button>
             </form>
           )}
 
@@ -413,14 +451,14 @@ export function RegisterForm({ resumeEmail }: { resumeEmail: string }) {
             <div className="text-center">
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-3xl dark:bg-emerald-900/40">✓</div>
               <h2 className="mt-4 text-xl font-bold text-gray-900 dark:text-gray-100">Account created</h2>
-              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Redirecting you home...</p>
+              <p className="mt-2 text-sm text-[var(--lx-muted)]">Redirecting you home...</p>
             </div>
           )}
         </div>
 
-        <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
+        <p className="mt-4 text-center text-sm text-[var(--lx-muted)]">
           Already have an account?{" "}
-          <Link href="/login" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+          <Link href="/login" className="font-medium text-[var(--lx-gold-soft)] hover:underline">
             Sign in
           </Link>
         </p>

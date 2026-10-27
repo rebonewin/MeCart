@@ -11,7 +11,7 @@ export function TotpQr({ value, size = 200 }: { value: string; size?: number }) 
         level="M"
         marginSize={1}
         bgColor="#ffffff"
-        fgColor="#0f172a"
+        fgColor="#0B0B0F"
         title="Scan this QR code with your authenticator app"
       />
     </div>

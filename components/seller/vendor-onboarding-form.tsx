@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Check, Loader2, ShieldCheck, Store, Sparkles } from "lucide-react";
@@ -7,7 +8,7 @@ import { toast } from "sonner";
 import { createVendorApplication } from "@/lib/actions/vendor";
 
 const inputClass =
-  "h-11 w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-[#d8b45a]/50 focus:ring-4 focus:ring-[#d8b45a]/10";
+  "h-11 w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-[#D4AF37]/50 focus:ring-4 focus:ring-[#D4AF37]/10";
 const labelClass = "mb-1.5 block text-xs font-medium text-slate-300";
 
 export function VendorOnboardingForm({ defaultEmail }: { defaultEmail: string }) {
@@ -53,12 +54,12 @@ export function VendorOnboardingForm({ defaultEmail }: { defaultEmail: string })
 
   return (
     <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:gap-12">
-      <aside className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#0b0e16] p-7 sm:p-10">
+      <aside className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#1A1D24] p-7 sm:p-10">
         <div
           aria-hidden
           className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[radial-gradient(circle_at_center,rgba(216,180,90,0.22),transparent_68%)] blur-2xl"
         />
-        <span className="relative inline-flex items-center gap-2 rounded-full border border-[#d8b45a]/25 bg-[#d8b45a]/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#f5dfa2]">
+        <span className="relative inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/25 bg-[#D4AF37]/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#E6C768]">
           <Sparkles className="h-3.5 w-3.5" /> MeCart Marketplace
         </span>
         <h2 className="relative mt-7 text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl">
@@ -76,7 +77,7 @@ export function VendorOnboardingForm({ defaultEmail }: { defaultEmail: string })
             ["Human review", "Our marketplace team reviews sellers and catalogue items before launch."],
           ].map(([title, body]) => (
             <div key={title} className="flex gap-3">
-              <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#d8b45a]/25 bg-[#d8b45a]/10 text-[#d8b45a]">
+              <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#D4AF37]/25 bg-[#D4AF37]/10 text-[#D4AF37]">
                 <Check className="h-3.5 w-3.5" />
               </span>
               <div>
@@ -92,10 +93,10 @@ export function VendorOnboardingForm({ defaultEmail }: { defaultEmail: string })
         </div>
       </aside>
 
-      <div className="rounded-[2rem] border border-white/10 bg-[#0b0e16] p-6 sm:p-8">
+      <div className="rounded-[2rem] border border-white/10 bg-[#1A1D24] p-6 sm:p-8">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.24em] text-[#d8b45a]">Seller application</p>
+            <p className="text-[10px] uppercase tracking-[0.24em] text-[#D4AF37]">Seller application</p>
             <h1 className="mt-2 text-xl font-semibold text-white">
               {step === 1 ? "Tell us about your business" : step === 2 ? "Name your first store" : "Review and submit"}
             </h1>
@@ -104,7 +105,7 @@ export function VendorOnboardingForm({ defaultEmail }: { defaultEmail: string })
             {[1, 2, 3].map((value) => (
               <span
                 key={value}
-                className={`h-1.5 w-8 rounded-full ${value <= step ? "bg-[#d8b45a]" : "bg-white/10"}`}
+                className={`h-1.5 w-8 rounded-full ${value <= step ? "bg-[#D4AF37]" : "bg-white/10"}`}
               />
             ))}
           </div>
@@ -163,9 +164,9 @@ export function VendorOnboardingForm({ defaultEmail }: { defaultEmail: string })
               <label className={labelClass} htmlFor="taxId">Tax / business registration number (optional)</label>
               <input id="taxId" className={inputClass} value={form.taxId} onChange={set("taxId")} placeholder="Only visible to marketplace reviewers" />
             </div>
-            <button type="button" onClick={() => setStep(2)} className="mt-2 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#d8b45a] px-6 text-sm font-semibold text-[#1e1708] transition hover:bg-[#e7c778]">
+            <Button type="button" onClick={() => setStep(2)} className="mt-2 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#D4AF37] px-6 text-sm font-semibold text-[#0B0B0F] transition hover:bg-[#E6C768]">
               Continue to store setup <ArrowRight className="h-4 w-4" />
-            </button>
+            </Button>
           </div>
         )}
 
@@ -196,12 +197,12 @@ export function VendorOnboardingForm({ defaultEmail }: { defaultEmail: string })
               <textarea id="shippingPolicy" className={`${inputClass} h-24 py-3`} value={form.shippingPolicy} onChange={set("shippingPolicy")} />
             </div>
             <div className="flex gap-3">
-              <button type="button" onClick={() => setStep(1)} className="inline-flex h-11 flex-1 items-center justify-center rounded-full border border-white/10 text-sm text-slate-300 transition hover:text-white">
+              <Button type="button" onClick={() => setStep(1)} className="inline-flex h-11 flex-1 items-center justify-center rounded-full border border-white/10 text-sm text-slate-300 transition hover:text-white">
                 Back
-              </button>
-              <button type="button" onClick={() => setStep(3)} className="inline-flex h-11 flex-[1.5] items-center justify-center gap-2 rounded-full bg-[#d8b45a] px-6 text-sm font-semibold text-[#1e1708] transition hover:bg-[#e7c778]">
+              </Button>
+              <Button type="button" onClick={() => setStep(3)} className="inline-flex h-11 flex-[1.5] items-center justify-center gap-2 rounded-full bg-[#D4AF37] px-6 text-sm font-semibold text-[#0B0B0F] transition hover:bg-[#E6C768]">
                 Review application <ArrowRight className="h-4 w-4" />
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -228,18 +229,18 @@ export function VendorOnboardingForm({ defaultEmail }: { defaultEmail: string })
               within two business days.
             </p>
             <div className="mt-5 flex gap-3">
-              <button type="button" onClick={() => setStep(2)} className="inline-flex h-11 flex-1 items-center justify-center rounded-full border border-white/10 text-sm text-slate-300 transition hover:text-white">
+              <Button type="button" onClick={() => setStep(2)} className="inline-flex h-11 flex-1 items-center justify-center rounded-full border border-white/10 text-sm text-slate-300 transition hover:text-white">
                 Back
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={submit}
                 disabled={pending}
-                className="inline-flex h-11 flex-[1.5] items-center justify-center gap-2 rounded-full bg-[#d8b45a] px-6 text-sm font-semibold text-[#1e1708] transition hover:bg-[#e7c778] disabled:opacity-60"
+                className="inline-flex h-11 flex-[1.5] items-center justify-center gap-2 rounded-full bg-[#D4AF37] px-6 text-sm font-semibold text-[#0B0B0F] transition hover:bg-[#E6C768] disabled:opacity-60"
               >
                 {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
                 {pending ? "Submitting…" : "Submit application"}
-              </button>
+              </Button>
             </div>
           </div>
         )}

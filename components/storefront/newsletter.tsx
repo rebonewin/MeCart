@@ -24,8 +24,8 @@ export function Newsletter() {
     <section id="newsletter" className="relative mx-auto w-full max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
       <Reveal>
         <div className="lx-card relative overflow-hidden rounded-[2.25rem] p-8 sm:p-12 lg:p-16">
-          <div className="lx-blob lx-drift-a left-[-12%] top-[-40%] h-[28rem] w-[28rem] bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.4),transparent_65%)]" />
-          <div className="lx-blob lx-drift-c right-[-10%] bottom-[-50%] h-[30rem] w-[30rem] bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.3),transparent_65%)]" />
+          <div className="lx-blob lx-drift-a left-[-12%] top-[-40%] h-[28rem] w-[28rem] bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.4),transparent_65%)]" />
+          <div className="lx-blob lx-drift-c right-[-10%] bottom-[-50%] h-[30rem] w-[30rem] bg-[radial-gradient(circle_at_center,rgba(230,199,104,0.3),transparent_65%)]" />
 
           <div className="relative grid gap-10 lg:grid-cols-2 lg:items-center">
             <div>

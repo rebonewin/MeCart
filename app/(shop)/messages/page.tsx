@@ -90,7 +90,7 @@ export default async function CustomerMessagesPage({
                           <p className="truncate text-sm font-medium text-[var(--lx-text)]">{conversation.subject}</p>
                           <p className="mt-0.5 truncate text-[11px] text-[var(--lx-muted)]">{nameFor(conversation)} · {conversation.last_message_preview || "No preview"}</p>
                         </div>
-                        {unread > 0 && <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--lx-gold)] px-1 text-[9px] font-bold text-[#1e1708]">{unread}</span>}
+                        {unread > 0 && <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--lx-gold)] px-1 text-[9px] font-bold text-[#0B0B0F]">{unread}</span>}
                       </div>
                       <p className="mt-2 text-[9px] text-[var(--lx-faint)]">{dateTimeLabel(conversation.last_message_at)}</p>
                     </Link>

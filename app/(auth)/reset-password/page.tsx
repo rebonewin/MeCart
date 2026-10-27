@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -90,19 +91,23 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-indigo-50 via-white to-emerald-50 px-4 py-16 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
-      <div className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-indigo-300/40 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-emerald-300/40 blur-3xl" />
+    <div className="lx-dark-scene relative flex min-h-screen items-center justify-center overflow-hidden bg-[var(--lx-bg)] px-4 py-16 text-[var(--lx-text)]">
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-[var(--lx-champagne)]/12 blur-3xl" />
+        <div className="absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-[var(--lx-champagne-warm)]/10 blur-3xl" />
+      </div>
       <div className="relative mx-auto max-w-md">
-        <div className="rounded-3xl border border-white/60 bg-white/80 p-6 shadow-2xl backdrop-blur dark:border-gray-800 dark:bg-gray-900/80">
+        <div className="relative rounded-[2rem] border border-white/10 bg-white/[0.05] p-8 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.9)] backdrop-blur-2xl">
+          <div aria-hidden className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--lx-champagne)]/60 to-transparent" />
           {linkState === "checking" && (
-            <p className="text-sm text-gray-500 dark:text-gray-400">Verifying your reset link...</p>
+            <p className="text-sm text-[var(--lx-muted)]">Verifying your reset link...</p>
           )}
 
           {linkState === "ready" && (
             <>
-              <h1 className="text-2xl font-bold">Choose a new password</h1>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-xs uppercase tracking-[0.35em] text-[var(--lx-gold-soft)]">MeCart Security</p>
+              <h1 className="mt-2 text-2xl font-bold">Choose a new password</h1>
+              <p className="mt-1 text-sm text-[var(--lx-muted)]">
                 Pick a password with at least 8 characters.
               </p>
               <form onSubmit={submit} className="mt-6 space-y-4">
@@ -111,7 +116,7 @@ export default function ResetPasswordPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="New password"
-                  className="w-full rounded border px-3 py-2 dark:bg-gray-800"
+                  className="lx-field h-12 w-full"
                   required
                   minLength={8}
                 />
@@ -120,30 +125,36 @@ export default function ResetPasswordPage() {
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                   placeholder="Confirm new password"
-                  className="w-full rounded border px-3 py-2 dark:bg-gray-800"
+                  className="lx-field h-12 w-full"
                   required
                   minLength={8}
                 />
-                {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
-                <button
+                {error && <p className="text-sm text-rose-200" role="alert">{error}</p>}
+                <Button
                   disabled={loading}
                   type="submit"
-                  className="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
+                  loading={loading}
+                  loadingText="Updating…"
+                  variant="brand"
+                  size="lg"
+                  magnetic
+                  className="w-full rounded-full"
                 >
-                  {loading ? "Updating..." : "Update password"}
-                </button>
+                  Update password
+                </Button>
               </form>
             </>
           )}
 
           {linkState === "blocked" && (
             <>
-              <h1 className="text-2xl font-bold">Two-factor protection applied</h1>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{blockedMessage}</p>
+              <p className="text-xs uppercase tracking-[0.35em] text-[var(--lx-gold-soft)]">MeCart Security</p>
+              <h1 className="mt-2 text-2xl font-bold">Two-factor protection applied</h1>
+              <p className="mt-1 text-sm text-[var(--lx-muted)]">{blockedMessage}</p>
               <p className="mt-4 text-sm">
                 <Link
                   href="/login"
-                  className="text-indigo-600 hover:underline dark:text-indigo-400"
+                  className="font-medium text-[var(--lx-gold-soft)] hover:underline"
                 >
                   Go to sign in
                 </Link>
@@ -153,15 +164,16 @@ export default function ResetPasswordPage() {
 
           {linkState === "invalid" && (
             <>
-              <h1 className="text-2xl font-bold">Link invalid or expired</h1>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-xs uppercase tracking-[0.35em] text-[var(--lx-gold-soft)]">MeCart Security</p>
+              <h1 className="mt-2 text-2xl font-bold">Link invalid or expired</h1>
+              <p className="mt-1 text-sm text-[var(--lx-muted)]">
                 Password reset links can only be used once, in the same browser they were requested
                 from, and expire after a short time.
               </p>
               <p className="mt-4 text-sm">
                 <Link
                   href="/forgot-password"
-                  className="text-indigo-600 hover:underline dark:text-indigo-400"
+                  className="font-medium text-[var(--lx-gold-soft)] hover:underline"
                 >
                   Request a new reset link
                 </Link>

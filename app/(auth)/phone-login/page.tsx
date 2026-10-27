@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -278,11 +279,11 @@ export default function PhoneLoginPage() {
   const resendDisabled = loading || resendIn > 0 || resendCount >= maxResends;
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-950 px-4 py-16">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_0%,rgba(99,102,241,0.22),transparent),radial-gradient(40%_40%_at_85%_90%,rgba(16,185,129,0.14),transparent)]" />
+    <div className="lx-dark-scene relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-950 px-4 py-16">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_0%,rgba(212,175,55,0.22),transparent),radial-gradient(40%_40%_at_85%_90%,rgba(230,199,104,0.10),transparent)]" />
 
       <div className="relative w-full max-w-md rounded-3xl border border-white/10 bg-white/[0.04] p-8 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.9)] backdrop-blur-2xl">
-        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-indigo-300/80">MeCart Access</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-[var(--lx-gold-soft)]">MeCart Access</p>
         <h1 className="mt-2 text-2xl font-bold text-white">
           {step === "phone" && "Continue with Mobile"}
           {step === "verify" && "Enter verification code"}
@@ -313,46 +314,55 @@ export default function PhoneLoginPage() {
           >
             <div className="relative">
               <label className="mb-1 block text-sm font-medium text-slate-200">Country</label>
-              <button
+              <Button
                 type="button"
                 onClick={() => setCountryOpen((open) => !open)}
                 aria-expanded={countryOpen}
-                className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-slate-900/70 px-3 py-3 text-sm text-white transition hover:border-indigo-400/40"
+                className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-slate-900/70 px-3 py-3 text-sm text-white transition hover:border-[var(--lx-gold)]/40"
               >
                 <span className="flex items-center gap-2">
                   <span aria-hidden>{country.flag}</span>
                   <span>{country.name}</span>
                 </span>
                 <span className="text-slate-400">{country.dial}</span>
-              </button>
+              </Button>
 
               {countryOpen && (
-                <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-white/10 bg-slate-900/95 shadow-2xl backdrop-blur">
+                <div
+                  className="lx-menu absolute z-20 mt-2 w-full overflow-hidden"
+                  role="listbox"
+                  aria-label="Country codes"
+                >
                   <input
                     autoFocus
                     value={countrySearch}
                     onChange={(event) => setCountrySearch(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Escape") setCountryOpen(false);
+                    }}
                     placeholder="Search country or dial code"
                     className="w-full border-b border-white/10 bg-transparent px-3 py-2.5 text-sm text-white outline-none placeholder:text-slate-500"
                   />
                   <ul className="max-h-56 overflow-y-auto">
                     {filteredCountries.map((item) => (
                       <li key={item.code}>
-                        <button
+                        <Button
                           type="button"
+                          role="option"
+                          aria-selected={item.code === country.code}
                           onClick={() => {
                             setCountry(item);
                             setCountryOpen(false);
                             setCountrySearch("");
                           }}
-                          className="flex w-full items-center justify-between px-3 py-2 text-left text-sm text-slate-200 transition hover:bg-white/5"
+                          className="lx-menu-item flex w-full justify-between"
                         >
                           <span className="flex items-center gap-2">
                             <span aria-hidden>{item.flag}</span>
                             {item.name}
                           </span>
                           <span className="text-slate-500">{item.dial}</span>
-                        </button>
+                        </Button>
                       </li>
                     ))}
                     {filteredCountries.length === 0 && (
@@ -367,7 +377,7 @@ export default function PhoneLoginPage() {
               <label htmlFor="mobile-number" className="mb-1 block text-sm font-medium text-slate-200">
                 Mobile number
               </label>
-              <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-slate-900/70 px-3 focus-within:border-indigo-400/60">
+              <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-slate-900/70 px-3 focus-within:border-[var(--lx-gold)]/60">
                 <span className="text-sm text-slate-400">{country.dial}</span>
                 <input
                   id="mobile-number"
@@ -385,13 +395,18 @@ export default function PhoneLoginPage() {
               </p>
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition hover:brightness-110 disabled:opacity-50"
+              loading={loading}
+              loadingText="Sending…"
+              variant="brand"
+              size="lg"
+              magnetic
+              className="w-full"
             >
-              {loading ? "Sending…" : "Send OTP"}
-            </button>
+              Send OTP
+            </Button>
           </form>
         )}
 
@@ -418,7 +433,7 @@ export default function PhoneLoginPage() {
                   inputMode="numeric"
                   autoComplete={index === 0 ? "one-time-code" : "off"}
                   aria-label={`Digit ${index + 1}`}
-                  className="h-13 w-full rounded-xl border border-white/10 bg-slate-900/70 py-3 text-center text-lg font-bold text-white outline-none transition focus:border-indigo-400/70 focus:ring-2 focus:ring-indigo-500/30"
+                  className="h-13 w-full rounded-xl border border-white/10 bg-slate-900/70 py-3 text-center text-lg font-bold text-white outline-none transition focus:border-[var(--lx-gold)]/70 focus:ring-2 focus:ring-[var(--lx-ring)]"
                 />
               ))}
             </div>
@@ -437,14 +452,16 @@ export default function PhoneLoginPage() {
             )}
 
             <div className="flex gap-3">
-              <button
+              <Button
                 type="submit"
                 disabled={loading || otpValue.length !== 6}
-                className="flex-1 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 disabled:opacity-40"
+                variant="brand"
+                size="md"
+                className="flex-1 rounded-full"
               >
                 {loading ? "Verifying…" : "Verify"}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => void sendOtp("resend")}
                 disabled={resendDisabled}
@@ -452,7 +469,7 @@ export default function PhoneLoginPage() {
                 className="rounded-xl border border-white/10 px-4 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/5 disabled:opacity-40"
               >
                 {resendIn > 0 ? `Resend ${resendIn}s` : "Resend"}
-              </button>
+              </Button>
             </div>
           </form>
         )}
@@ -465,16 +482,16 @@ export default function PhoneLoginPage() {
               placeholder="Full name"
               required
               minLength={2}
-              className="w-full rounded-xl border border-white/10 bg-slate-900/70 px-3 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-indigo-400/60"
+              className="w-full rounded-xl border border-white/10 bg-slate-900/70 px-3 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-[var(--lx-gold)]/55"
             />
             <input
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="Email (optional)"
-              className="w-full rounded-xl border border-white/10 bg-slate-900/70 px-3 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-indigo-400/60"
+              className="w-full rounded-xl border border-white/10 bg-slate-900/70 px-3 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-[var(--lx-gold)]/55"
             />
-            <label className="flex cursor-pointer items-center justify-between rounded-xl border border-dashed border-white/15 bg-slate-900/40 px-3 py-3 text-sm text-slate-300 transition hover:border-indigo-400/40">
+            <label className="flex cursor-pointer items-center justify-between rounded-xl border border-dashed border-white/15 bg-slate-900/40 px-3 py-3 text-sm text-slate-300 transition hover:border-[var(--lx-gold)]/35">
               <span>{avatarFile ? avatarFile.name : "Upload avatar (optional)"}</span>
               <span className="text-xs text-slate-500">PNG / JPG</span>
               <input
@@ -484,13 +501,15 @@ export default function PhoneLoginPage() {
                 onChange={(event) => setAvatarFile(event.target.files?.[0] ?? null)}
               />
             </label>
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 disabled:opacity-50"
+              variant="brand"
+              size="md"
+              className="w-full rounded-full"
             >
               {loading ? "Creating account…" : "Finish"}
-            </button>
+            </Button>
           </form>
         )}
 
@@ -502,7 +521,7 @@ export default function PhoneLoginPage() {
         )}
 
         <p className="mt-6 text-center text-sm text-slate-400">
-          <Link href="/login" className="text-indigo-300 transition hover:text-indigo-200">
+          <Link href="/login" className="text-[var(--lx-gold-soft)] transition hover:text-[var(--lx-champagne)]">
             ← Back to login
           </Link>
         </p>

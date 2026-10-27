@@ -20,8 +20,18 @@ const SPARKS = [
  *
  * It reads rider state from context and exposes two hover affordances:
  * hovering the mascot makes it wave; hovering the cart lights its headlight.
+ * `compact` shrinks the artwork for intimate placements (the navbar bag
+ * capsule) without touching the shared model.
  */
-export function RiderMascot({ cartHovered = false, className }: { cartHovered?: boolean; className?: string }) {
+export function RiderMascot({
+  cartHovered = false,
+  className,
+  compact = false,
+}: {
+  cartHovered?: boolean;
+  className?: string;
+  compact?: boolean;
+}) {
   const { phase, tier, reduce, pulse, cartCount, welcomeActive } = useRider();
   const [hovered, setHovered] = useState(false);
   const celebrating = !reduce && (phase === "deliver" || phase === "celebrate");
@@ -49,7 +59,11 @@ export function RiderMascot({ cartHovered = false, className }: { cartHovered?: 
         waving={hovered && !reduce}
         headlight={cartHovered}
         reduced={reduce}
-        className="h-8 w-11 sm:h-11 sm:w-16"
+        className={
+          compact
+            ? "h-7 w-9 sm:h-8 sm:w-12"
+            : "h-8 w-11 sm:h-11 sm:w-16"
+        }
       />
 
       {celebrating ? (

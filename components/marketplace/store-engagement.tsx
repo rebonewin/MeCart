@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -74,7 +75,7 @@ export function StoreEngagement({
   return (
     <>
       <div className="flex flex-wrap items-center gap-2">
-        <button
+        <Button
           type="button"
           onClick={follow}
           disabled={pending}
@@ -88,15 +89,15 @@ export function StoreEngagement({
           {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Heart className={cn("h-4 w-4", following && "fill-current")} />}
           {following ? "Following" : "Follow"}
           <span className="text-xs font-normal opacity-70">{followers.toLocaleString("en-US")}</span>
-        </button>
+        </Button>
         {isAuthenticated ? (
-          <button
+          <Button
             type="button"
             onClick={() => setOpen(true)}
             className="lx-glass inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-medium text-[var(--lx-text)]"
           >
             <MessageCircle className="h-4 w-4" /> Message store
-          </button>
+          </Button>
         ) : (
           <Link href={loginHref} className="lx-glass inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-medium text-[var(--lx-text)]">
             <MessageCircle className="h-4 w-4" /> Message store
@@ -113,9 +114,9 @@ export function StoreEngagement({
                 <h3 className="mt-2 text-xl font-semibold text-[var(--lx-text)]">Contact {storeName}</h3>
                 <p className="mt-1 text-xs leading-5 text-[var(--lx-muted)]">Your message goes directly to the seller. Replies appear in your MeCart messages.</p>
               </div>
-              <button type="button" onClick={() => setOpen(false)} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--lx-border)] text-[var(--lx-muted)] hover:text-[var(--lx-text)]" aria-label="Close">
+              <Button type="button" onClick={() => setOpen(false)} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--lx-border)] text-[var(--lx-muted)] hover:text-[var(--lx-text)]" aria-label="Close">
                 <X className="h-4 w-4" />
-              </button>
+              </Button>
             </div>
             <div className="mt-5 space-y-3">
               <input
@@ -133,10 +134,10 @@ export function StoreEngagement({
               />
             </div>
             <div className="mt-4 flex items-center justify-end gap-2">
-              <button type="button" onClick={() => setOpen(false)} className="h-10 rounded-full px-4 text-sm text-[var(--lx-muted)] hover:text-[var(--lx-text)]">Cancel</button>
-              <button type="button" onClick={send} disabled={pending || !form.body.trim()} className="inline-flex h-10 items-center gap-2 rounded-full bg-[var(--lx-text)] px-5 text-sm font-semibold text-[var(--lx-bg)] disabled:opacity-45">
+              <Button type="button" onClick={() => setOpen(false)} className="h-10 rounded-full px-4 text-sm text-[var(--lx-muted)] hover:text-[var(--lx-text)]">Cancel</Button>
+              <Button type="button" onClick={send} disabled={pending || !form.body.trim()} className="inline-flex h-10 items-center gap-2 rounded-full bg-[var(--lx-text)] px-5 text-sm font-semibold text-[var(--lx-bg)] disabled:opacity-45">
                 {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} Send message
-              </button>
+              </Button>
             </div>
           </div>
         </div>

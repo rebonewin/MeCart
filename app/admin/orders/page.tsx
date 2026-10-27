@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { updateOrderStatusAction, updatePaymentStatusAction } from "@/lib/actions/orders";
 import { listAllOrders } from "@/lib/repositories/orders";
 
@@ -49,7 +50,7 @@ export default async function AdminOrdersPage() {
                       <option>CANCELLED</option>
                       <option>RETURNED</option>
                     </select>
-                    <button className="rounded border px-2 py-1 text-xs">Save</button>
+                    <Button className="rounded border px-2 py-1 text-xs">Save</Button>
                   </form>
                 </td>
                 <td className="p-3">
@@ -61,7 +62,7 @@ export default async function AdminOrdersPage() {
                       <option>FAILED</option>
                       <option>REFUNDED</option>
                     </select>
-                    <button className="rounded border px-2 py-1 text-xs">Save</button>
+                    <Button className="rounded border px-2 py-1 text-xs">Save</Button>
                   </form>
                 </td>
                 <td className="p-3 flex gap-2">

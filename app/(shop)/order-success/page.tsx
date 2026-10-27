@@ -12,6 +12,8 @@ import {
   Truck,
 } from "lucide-react";
 import { DeliveryTakeover } from "@/components/storefront/rider/delivery-takeover";
+import { RiderModel } from "@/components/storefront/rider/rider-model";
+import { LiquidStage } from "@/components/luxe/webgl/liquid-stage";
 import { Breadcrumbs } from "@/components/shop/storefront-ui";
 import { RippleButton } from "@/components/luxe/primitives";
 
@@ -61,33 +63,53 @@ export default async function OrderSuccessPage({
           className="mb-10"
         />
 
-        <div className="mx-auto max-w-3xl text-center">
-          <div className="relative mx-auto flex h-20 w-20 items-center justify-center">
-            <span className="lx-conic-ring absolute inset-0 rounded-full opacity-70" />
-            <span className="absolute inset-[3px] rounded-full bg-[var(--lx-bg)]" />
-            <span className="relative z-10 flex h-14 w-14 items-center justify-center rounded-full border border-[var(--lx-emerald)]/35 bg-[var(--lx-emerald)]/10 text-[var(--lx-emerald)]">
-              <Check className="h-6 w-6" aria-hidden />
-            </span>
-          </div>
-          <p className="lx-eyebrow mt-7 justify-center">Payment successful</p>
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight text-[var(--lx-text)] sm:text-5xl">
-            Your order is in the <span className="lx-serif text-[var(--lx-gold)]">atelier.</span>
-          </h1>
-          <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-[var(--lx-muted)] sm:text-base">
-            Thank you for choosing MeCart. A receipt is on its way to your email, and the atelier is
-            already preparing your order by hand.
-          </p>
+        <div className="lx-dark-scene relative isolate mx-auto max-w-4xl overflow-hidden rounded-[2rem] border border-white/10 shadow-[0_60px_140px_-70px_rgba(0,0,0,0.9)]">
+          <LiquidStage variant="panel" intensity={0.75} />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_80%_at_50%_0%,transparent_20%,rgba(11,11,15,0.55)_100%)]" />
 
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-            {reference ? (
-              <span className="lx-chip lx-chip-active font-mono text-[10px] uppercase tracking-[0.16em]">
-                Order {reference}
+          <div className="relative px-5 py-12 text-center sm:px-10 sm:py-14">
+            <div className="relative mx-auto flex h-20 w-20 items-center justify-center">
+              <span className="lx-conic-ring absolute inset-0 rounded-full opacity-70" />
+              <span className="absolute inset-[3px] rounded-full bg-[#0B0B0F]" />
+              <span className="lx-success relative z-10 flex h-14 w-14 items-center justify-center rounded-full border border-[var(--lx-emerald)]/40 bg-[var(--lx-emerald)]/12 text-[var(--lx-emerald)]">
+                <Check className="h-6 w-6" aria-hidden />
               </span>
-            ) : null}
-            <span className="lx-chip font-mono text-[10px] uppercase tracking-[0.16em]">
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--lx-emerald)]" />
-              {status || "Confirmed"}
-            </span>
+            </div>
+            <p className="lx-eyebrow mt-7 justify-center text-[var(--lx-gold)]">Payment successful</p>
+            <h1 className="lx-title mt-4 text-white">
+              Your order is in the <span className="lx-serif text-[var(--lx-gold)]">atelier.</span>
+            </h1>
+            <p className="lx-prose mx-auto mt-4 max-w-xl text-sm text-white/65 sm:text-base">
+              Thank you for choosing MeCart. A receipt is on its way to your email, and the atelier is
+              already preparing your order by hand.
+            </p>
+
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+              {reference ? (
+                <span className="rounded-full border border-[var(--lx-gold)]/40 bg-[var(--lx-gold)]/12 px-4 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--lx-gold)]">
+                  Order {reference}
+                </span>
+              ) : null}
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-4 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-white/75">
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--lx-emerald)]" />
+                {status || "Confirmed"}
+              </span>
+            </div>
+
+            <div className="relative mx-auto mt-4 w-full max-w-md">
+              <div className="meco-aura" aria-hidden />
+              <RiderModel
+                phase="checkout"
+                tier={2}
+                waving
+                headlight={false}
+                reduced={false}
+                className="relative mx-auto h-32 w-48 sm:h-40 sm:w-60"
+              />
+              <p className="mt-1 font-mono text-[8px] uppercase tracking-[0.3em] text-white/40">
+                MECO · delivery companion
+              </p>
+            </div>
           </div>
         </div>
 

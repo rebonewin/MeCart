@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useState, useTransition } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -136,22 +137,22 @@ export function ProductsManager({
           <option value="DRAFT">Draft</option>
           <option value="HIDDEN">Hidden</option>
         </select>
-        <button type="submit" className="rounded-md border px-3 py-2 text-sm">Filter</button>
+        <Button type="submit" className="rounded-md border px-3 py-2 text-sm">Filter</Button>
       </form>
 
       <div className="flex flex-wrap gap-2 text-sm">
-        <button onClick={handleBulkDelete} disabled={selected.length === 0 || pending} className="rounded border px-3 py-1.5 disabled:opacity-50">
+        <Button onClick={handleBulkDelete} disabled={selected.length === 0 || pending} className="rounded border px-3 py-1.5 disabled:opacity-50">
           Bulk Delete
-        </button>
-        <button onClick={() => handleBulkStatus("ACTIVE")} disabled={selected.length === 0 || pending} className="rounded border px-3 py-1.5 disabled:opacity-50">
+        </Button>
+        <Button onClick={() => handleBulkStatus("ACTIVE")} disabled={selected.length === 0 || pending} className="rounded border px-3 py-1.5 disabled:opacity-50">
           Mark Active
-        </button>
-        <button onClick={() => handleBulkStatus("DRAFT")} disabled={selected.length === 0 || pending} className="rounded border px-3 py-1.5 disabled:opacity-50">
+        </Button>
+        <Button onClick={() => handleBulkStatus("DRAFT")} disabled={selected.length === 0 || pending} className="rounded border px-3 py-1.5 disabled:opacity-50">
           Mark Draft
-        </button>
-        <button onClick={() => handleBulkStatus("HIDDEN")} disabled={selected.length === 0 || pending} className="rounded border px-3 py-1.5 disabled:opacity-50">
+        </Button>
+        <Button onClick={() => handleBulkStatus("HIDDEN")} disabled={selected.length === 0 || pending} className="rounded border px-3 py-1.5 disabled:opacity-50">
           Mark Hidden
-        </button>
+        </Button>
         <span className="text-gray-500">{selected.length} selected</span>
       </div>
 
@@ -189,9 +190,9 @@ export function ProductsManager({
                 <td className="p-3">${p.finalPrice.toFixed(2)}</td>
                 <td className="p-3">
                   <div className="flex items-center gap-1">
-                    <button onClick={() => handleStock(p.id, -1)} className="rounded border px-1.5">-</button>
+                    <Button onClick={() => handleStock(p.id, -1)} className="rounded border px-1.5">-</Button>
                     <span className="w-8 text-center">{p.stock}</span>
-                    <button onClick={() => handleStock(p.id, 1)} className="rounded border px-1.5">+</button>
+                    <Button onClick={() => handleStock(p.id, 1)} className="rounded border px-1.5">+</Button>
                   </div>
                 </td>
                 <td className="p-3">
@@ -202,7 +203,7 @@ export function ProductsManager({
                 <td className="p-3">
                   <div className="flex gap-2">
                     <Link href={`/admin/products/${p.id}/edit`} className="text-indigo-600 hover:underline">Edit</Link>
-                    <button onClick={() => handleDelete(p.id)} className="text-rose-600 hover:underline">Delete</button>
+                    <Button onClick={() => handleDelete(p.id)} className="text-rose-600 hover:underline">Delete</Button>
                   </div>
                 </td>
               </tr>

@@ -24,11 +24,21 @@ export type RiderModelProps = {
 };
 
 const SUSPENSION: Record<CartTier, number> = { 0: 0, 1: 0.6, 2: 1.4, 3: 2.1 };
-const ORANGE = "#f97316";
-const ORANGE_LIGHT = "#fb923c";
-const ORANGE_DARK = "#c2410c";
-const INK = "#0b0f18";
+/* Maison palette: champagne livery over obsidian, with warm gold highlights. */
+const ORANGE = "#d4af37";
+const ORANGE_LIGHT = "#e6c768";
+const ORANGE_DARK = "#8c6d1b";
+const INK = "#0B0B0F";
 const FONT = "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif";
+
+const CONFETTI = [
+  { x: 78, y: 34, dx: -24, dy: -22, delay: 0, color: "#d4af37" },
+  { x: 84, y: 30, dx: -8, dy: -30, delay: 0.08, color: "#e6c768" },
+  { x: 90, y: 34, dx: 12, dy: -26, delay: 0.04, color: "#f8f6f2" },
+  { x: 96, y: 38, dx: 26, dy: -16, delay: 0.14, color: "#d4af37" },
+  { x: 74, y: 40, dx: -30, dy: -6, delay: 0.2, color: "#e6c768" },
+  { x: 100, y: 42, dx: 30, dy: 2, delay: 0.1, color: "#f8f6f2" },
+] as const;
 
 type WheelProps = {
   cx: number;
@@ -43,7 +53,7 @@ function Wheel({ cx, cy, duration, reduced, uid }: WheelProps) {
   return (
     <g>
       <circle cx={cx} cy={cy} r={17} fill={`url(#${uid}-tire)`} stroke="#2b3446" strokeWidth="1.4" />
-      <circle cx={cx} cy={cy} r={14.4} fill="none" stroke="#1a2130" strokeWidth="1" />
+      <circle cx={cx} cy={cy} r={14.4} fill="none" stroke="#20232B" strokeWidth="1" />
       <circle
         cx={cx}
         cy={cy}
@@ -60,7 +70,7 @@ function Wheel({ cx, cy, duration, reduced, uid }: WheelProps) {
         transition={{ duration, repeat: Infinity, ease: "linear" }}
         style={{ transformBox: "fill-box", transformOrigin: "center" }}
       >
-        <circle cx={cx} cy={cy} r={10} fill="#0f1520" stroke="#94a3b8" strokeWidth="1.1" />
+        <circle cx={cx} cy={cy} r={10} fill="#14161C" stroke="#94a3b8" strokeWidth="1.1" />
         {[0, 60, 120, 180, 240, 300].map((angle) => (
           <line
             key={angle}
@@ -91,9 +101,13 @@ export function RiderModel({ phase, tier, waving, headlight, reduced, className 
   const rawId = useId();
   const uid = rawId.replace(/[^a-zA-Z0-9]/g, "");
 
-  const driving = phase === "drive" || phase === "deliver" || phase === "celebrate";
-  const catching = phase === "catch" || phase === "load";
-  const wheelDuration = driving ? 0.28 : 1.9;
+  const celebrating = phase === "celebrate" || phase === "checkout";
+  const flying = phase === "fly";
+  const walking = phase === "walk" || phase === "return";
+  const driving = phase === "drive" || phase === "deliver" || celebrating || flying;
+  const wavingNow = waving || phase === "wave";
+  const catching = phase === "catch" || phase === "load" || phase === "deliver";
+  const wheelDuration = driving ? (celebrating ? 0.2 : 0.28) : walking ? 1.15 : 1.9;
   const suspension = SUSPENSION[tier];
   const lit = headlight || driving;
   const hasParcel = tier >= 1;
@@ -110,7 +124,7 @@ export function RiderModel({ phase, tier, waving, headlight, reduced, className 
     >
       <defs>
         <linearGradient id={`${uid}-suit`} x1="0" y1="0" x2="0.85" y2="1">
-          <stop offset="0%" stopColor="#ffbe86" />
+          <stop offset="0%" stopColor="#f3e2ae" />
           <stop offset="42%" stopColor={ORANGE} />
           <stop offset="100%" stopColor={ORANGE_DARK} />
         </linearGradient>
@@ -120,13 +134,13 @@ export function RiderModel({ phase, tier, waving, headlight, reduced, className 
         </linearGradient>
         <linearGradient id={`${uid}-helmet`} x1="0" y1="0" x2="0.7" y2="1">
           <stop offset="0%" stopColor="#526078" />
-          <stop offset="32%" stopColor="#1e293b" />
-          <stop offset="100%" stopColor="#05070c" />
+          <stop offset="32%" stopColor="#262A33" />
+          <stop offset="100%" stopColor="#0B0B0F" />
         </linearGradient>
         <linearGradient id={`${uid}-visor`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#0f172a" />
-          <stop offset="55%" stopColor="#24324a" />
-          <stop offset="100%" stopColor="#020617" />
+          <stop offset="0%" stopColor="#0B0B0F" />
+          <stop offset="55%" stopColor="#2B303A" />
+          <stop offset="100%" stopColor="#0B0B0F" />
         </linearGradient>
         <linearGradient id={`${uid}-skin`} x1="0" y1="0" x2="0.7" y2="1">
           <stop offset="0%" stopColor="#f8d7b6" />
@@ -141,7 +155,7 @@ export function RiderModel({ phase, tier, waving, headlight, reduced, className 
         </linearGradient>
         <linearGradient id={`${uid}-tire`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#252c3b" />
-          <stop offset="60%" stopColor="#10141d" />
+          <stop offset="60%" stopColor="#15171D" />
           <stop offset="100%" stopColor="#05070b" />
         </linearGradient>
         <linearGradient id={`${uid}-box`} x1="0" y1="0" x2="0.8" y2="1">
@@ -150,9 +164,9 @@ export function RiderModel({ phase, tier, waving, headlight, reduced, className 
           <stop offset="100%" stopColor={INK} />
         </linearGradient>
         <linearGradient id={`${uid}-lid`} x1="0" y1="0" x2="0.8" y2="1">
-          <stop offset="0%" stopColor="#ffbe86" />
+          <stop offset="0%" stopColor="#f3e2ae" />
           <stop offset="55%" stopColor={ORANGE} />
-          <stop offset="100%" stopColor="#b45309" />
+          <stop offset="100%" stopColor={ORANGE_DARK} />
         </linearGradient>
         <linearGradient id={`${uid}-paint`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#3a465c" />
@@ -196,10 +210,54 @@ export function RiderModel({ phase, tier, waving, headlight, reduced, className 
         style={{ transformBox: "fill-box", transformOrigin: "center" }}
       />
 
+      {/* hover wake — MECO lifts into its flight mode with a champagne thruster */}
+      {flying && !reduced ? (
+        <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <motion.ellipse
+            cx="80"
+            cy="108"
+            rx="46"
+            ry="7"
+            fill={ORANGE}
+            animate={{ opacity: [0.1, 0.28, 0.1], scaleX: [0.9, 1.08, 0.9] }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+            style={{ transformBox: "fill-box", transformOrigin: "center" }}
+          />
+          {[0, 1, 2].map((index) => (
+            <motion.ellipse
+              key={`jet-${index}`}
+              cx={64 + index * 17}
+              cy="101"
+              rx="2.4"
+              ry="6"
+              fill={index === 1 ? "#f8f6f2" : ORANGE_LIGHT}
+              animate={{ opacity: [0, 0.8, 0], scaleY: [0.4, 1.4, 0.4], y: [0, 8, 16] }}
+              transition={{ duration: 0.7, repeat: Infinity, delay: index * 0.12, ease: "easeOut" }}
+            />
+          ))}
+        </motion.g>
+      ) : null}
+
       <motion.g
         initial={false}
-        animate={reduced ? undefined : driving ? { y: [0, -1.1, 0] } : { y: [0, -2.4, 0] }}
-        transition={{ duration: driving ? 0.35 : 4.2, repeat: Infinity, ease: "easeInOut" }}
+        animate={
+          reduced
+            ? undefined
+            : flying
+              ? { y: [0, -6.5, 0], rotate: [-1.6, 1.6, -1.6] }
+              : celebrating
+                ? { y: [0, -4.2, 0] }
+                : walking
+                  ? { y: [0, -1.6, 0] }
+                  : driving
+                    ? { y: [0, -1.1, 0] }
+                    : { y: [0, -2.4, 0] }
+        }
+        transition={{
+          duration: flying ? 2.4 : celebrating ? 0.55 : walking ? 0.9 : driving ? 0.35 : 4.2,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
       >
         <motion.g
           initial={false}
@@ -299,8 +357,8 @@ export function RiderModel({ phase, tier, waving, headlight, reduced, className 
               transition={{ type: "spring", stiffness: 210, damping: 16 }}
               style={{ transformBox: "fill-box", transformOrigin: "left center" }}
             >
-              <rect x="13" y="38" width="42" height="8" rx="4" fill={`url(#${uid}-lid)`} stroke="#9a3412" strokeWidth="0.8" />
-              <path d="M 16 40 H 52" stroke="#ffedd5" strokeWidth="0.7" opacity="0.5" />
+              <rect x="13" y="38" width="42" height="8" rx="4" fill={`url(#${uid}-lid)`} stroke="#6a5214" strokeWidth="0.8" />
+              <path d="M 16 40 H 52" stroke="#f8f6f2" strokeWidth="0.7" opacity="0.5" />
               <rect x="30" y="38" width="8" height="8" fill={INK} opacity="0.18" />
             </motion.g>
           </motion.g>
@@ -311,8 +369,8 @@ export function RiderModel({ phase, tier, waving, headlight, reduced, className 
           <path d="M 50 79 L 44 91" stroke="#334155" strokeWidth="1.6" />
 
           {/* far leg — depth layer */}
-          <path d="M 66 76 Q 73 84 80 85" stroke="#b45309" strokeWidth="7" strokeLinecap="round" fill="none" opacity="0.85" />
-          <path d="M 80 85 Q 88 88 94 86" stroke="#0f1520" strokeWidth="5.5" strokeLinecap="round" fill="none" opacity="0.9" />
+          <path d="M 66 76 Q 73 84 80 85" stroke="#8c6d1b" strokeWidth="7" strokeLinecap="round" fill="none" opacity="0.85" />
+          <path d="M 80 85 Q 88 88 94 86" stroke="#14161C" strokeWidth="5.5" strokeLinecap="round" fill="none" opacity="0.9" />
 
           {/* sculpted deck */}
           <path d="M 24 86 L 114 86 Q 119 90 113 94 L 29 94 Q 21 92 24 86 Z" fill={`url(#${uid}-paint)`} stroke={INK} strokeWidth="0.8" />
@@ -345,7 +403,7 @@ export function RiderModel({ phase, tier, waving, headlight, reduced, className 
           {/* scooter badge + charge bolt */}
           <circle cx="116" cy="76" r="3" fill={INK} stroke={`url(#${uid}-chrome)`} strokeWidth="0.5" />
           <path d="M 114.8 74.6 L 116.2 74.6 L 115.4 76.2 L 117 76.2 L 114.6 79 L 115.2 77.2 L 114 77.2 Z" fill={ORANGE_LIGHT} />
-          <circle cx="112" cy="88" r="1.1" fill="#22d3ee" opacity="0.9" />
+          <circle cx="112" cy="88" r="1.1" fill="#E6C768" opacity="0.9" />
 
           {/* front wheel */}
           <Wheel cx={126} cy={94} duration={wheelDuration} reduced={reduced} uid={uid} />
@@ -358,7 +416,7 @@ export function RiderModel({ phase, tier, waving, headlight, reduced, className 
 
           {/* steering column */}
           <path d="M 122 92 L 129 54" stroke={`url(#${uid}-chrome)`} strokeWidth="4" strokeLinecap="round" />
-          <path d="M 124.5 80 L 127 66" stroke="#1a2130" strokeWidth="4.4" strokeLinecap="round" />
+          <path d="M 124.5 80 L 127 66" stroke="#20232B" strokeWidth="4.4" strokeLinecap="round" />
 
           {/* handlebar + grips */}
           <path d="M 126 50 H 146" stroke="#1f2533" strokeWidth="4.6" strokeLinecap="round" />
@@ -375,7 +433,7 @@ export function RiderModel({ phase, tier, waving, headlight, reduced, className 
           <ellipse cx="146" cy="33" rx="3" ry="2.2" fill="#93c5fd" opacity="0.5" />
           <circle cx="144.8" cy="32" r="0.6" fill="#fff" opacity="0.8" />
           <path d="M 133 48 L 135 40" stroke="#475569" strokeWidth="1.1" strokeLinecap="round" opacity="0.8" />
-          <ellipse cx="136.5" cy="38" rx="2.6" ry="2" fill="#11151f" stroke="#64748b" strokeWidth="0.5" opacity="0.85" />
+          <ellipse cx="136.5" cy="38" rx="2.6" ry="2" fill="#171920" stroke="#64748b" strokeWidth="0.5" opacity="0.85" />
 
           {/* LED headlight assembly + beam */}
           <motion.g
@@ -416,11 +474,11 @@ export function RiderModel({ phase, tier, waving, headlight, reduced, className 
           {/* collar + neck */}
           <path d="M 83 44 Q 87 41 90 44 L 88 49 Q 85 47 83 48 Z" fill={INK} />
           <path d="M 83.5 45.5 Q 87 43 89.5 46" stroke={ORANGE} strokeWidth="0.7" fill="none" />
-          <rect x="86" y="40" width="7" height="6" rx="2.5" fill="#1a2130" />
+          <rect x="86" y="40" width="7" height="6" rx="2.5" fill="#20232B" />
 
           {/* near leg: orange thigh, black shin, modern sneaker */}
           <path d="M 69 77 Q 77 84 86 85" stroke={ORANGE} strokeWidth="9.5" strokeLinecap="round" fill="none" />
-          <path d="M 86 85 Q 95 88 100 85" stroke="#1a2130" strokeWidth="7.5" strokeLinecap="round" fill="none" />
+          <path d="M 86 85 Q 95 88 100 85" stroke="#20232B" strokeWidth="7.5" strokeLinecap="round" fill="none" />
           <rect x="82" y="81" width="7" height="7" rx="2" fill={INK} transform="rotate(24 85.5 84.5)" />
           <path d="M 98 82 Q 104 79 110 82 L 114 86 Q 107 89 99 87 Z" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="0.6" />
           <path d="M 99 87 Q 107 89 114 86 L 114 88 Q 107 91 99 89 Z" fill={ORANGE} />
@@ -445,7 +503,7 @@ export function RiderModel({ phase, tier, waving, headlight, reduced, className 
             style={{ transformBox: "fill-box", transformOrigin: "bottom center" }}
           >
             {/* neck + under-helmet layer */}
-            <path d="M 84 35 Q 83.4 41.2 86.4 45.2 L 92.6 46 L 94.2 38.2 Z" fill="#11151f" />
+            <path d="M 84 35 Q 83.4 41.2 86.4 45.2 L 92.6 46 L 94.2 38.2 Z" fill="#171920" />
             <path d="M 88 37.2 L 93.8 38 L 93 44.4 Q 89.6 44.2 87.6 41.8 Z" fill={`url(#${uid}-skin)`} opacity="0.9" />
 
             {/* face */}
@@ -466,10 +524,10 @@ export function RiderModel({ phase, tier, waving, headlight, reduced, className 
             <path d="M 85.2 23.2 C 87 16.8 93.4 13.8 99 16.8" stroke="#ffe4c7" strokeWidth="0.55" fill="none" strokeLinecap="round" opacity="0.7" />
             <ellipse cx="90.4" cy="20.6" rx="6.4" ry="3" fill="#fff" opacity="0.13" transform="rotate(-24 90.4 20.6)" />
             <circle cx="97.8" cy="17.8" r="1" fill="#fff" opacity="0.5" />
-            <path d="M 86.6 23.4 L 88.4 21.8 M 88.8 25.4 L 90.6 23.8" stroke="#11151f" strokeWidth="0.8" strokeLinecap="round" opacity="0.65" />
+            <path d="M 86.6 23.4 L 88.4 21.8 M 88.8 25.4 L 90.6 23.8" stroke="#171920" strokeWidth="0.8" strokeLinecap="round" opacity="0.65" />
 
             {/* helmet badge */}
-            <circle cx="86.2" cy="28.4" r="2.6" fill="#0b0f18" stroke={`url(#${uid}-chrome)`} strokeWidth="0.45" />
+            <circle cx="86.2" cy="28.4" r="2.6" fill="#0B0B0F" stroke={`url(#${uid}-chrome)`} strokeWidth="0.45" />
             <circle cx="86.2" cy="28.4" r="2" fill="none" stroke={ORANGE} strokeWidth="0.4" opacity="0.8" />
             <text
               x="86.2"
@@ -519,11 +577,11 @@ export function RiderModel({ phase, tier, waving, headlight, reduced, className 
             <ellipse cx="101.4" cy="35.1" rx="1.15" ry="0.62" fill={ORANGE} opacity="0.16" />
             <motion.g
               initial={false}
-              animate={reduced ? undefined : waving ? { scale: [1, 1.08, 1] } : { scaleY: [1, 1.05, 1] }}
-              transition={{ duration: waving ? 0.6 : 3.1, repeat: Infinity, ease: "easeInOut" }}
+              animate={reduced ? undefined : wavingNow ? { scale: [1, 1.08, 1] } : { scaleY: [1, 1.05, 1] }}
+              transition={{ duration: wavingNow ? 0.6 : 3.1, repeat: Infinity, ease: "easeInOut" }}
               style={{ transformBox: "fill-box", transformOrigin: "center" }}
             >
-              <path d="M 97.6 36.3 Q 100.1 38.9 102.8 36.2" stroke="#7c2d12" strokeWidth="1.15" strokeLinecap="round" fill="none" />
+              <path d="M 97.6 36.3 Q 100.1 38.9 102.8 36.2" stroke="#4a3a12" strokeWidth="1.15" strokeLinecap="round" fill="none" />
               <path d="M 98.4 36.8 Q 100.1 38.2 102 36.6" stroke="#fff" strokeWidth="0.5" strokeLinecap="round" fill="none" opacity="0.85" />
               <path d="M 99 38.2 Q 100.4 38.5 101.7 37.9" stroke="#e7a87e" strokeWidth="0.45" strokeLinecap="round" fill="none" opacity="0.9" />
             </motion.g>
@@ -531,24 +589,24 @@ export function RiderModel({ phase, tier, waving, headlight, reduced, className 
             <circle cx="103" cy="36" r="0.35" fill="#8a4b2a" opacity="0.55" />
 
             {/* chin strap */}
-            <path d="M 85.2 30.8 Q 85.6 39 92.2 41.4" stroke="#0f1520" strokeWidth="1.7" fill="none" strokeLinecap="round" />
+            <path d="M 85.2 30.8 Q 85.6 39 92.2 41.4" stroke="#14161C" strokeWidth="1.7" fill="none" strokeLinecap="round" />
             <path d="M 85.4 31.4 Q 86 37.8 90.2 40.4" stroke="#334155" strokeWidth="0.45" fill="none" opacity="0.8" />
-            <rect x="86.4" y="36.5" width="2.5" height="1.9" rx="0.6" fill={`url(#${uid}-chrome)`} stroke="#0b0f18" strokeWidth="0.25" transform="rotate(18 87.6 37.4)" />
+            <rect x="86.4" y="36.5" width="2.5" height="1.9" rx="0.6" fill={`url(#${uid}-chrome)`} stroke="#0B0B0F" strokeWidth="0.25" transform="rotate(18 87.6 37.4)" />
           </motion.g>
 
           {/* near arm — grips the bar, lifts to wave */}
           <motion.g
             initial={false}
-            animate={waving ? { rotate: [-6, -38, -22, -38, -6] } : driving ? { rotate: 2 } : { rotate: -3 }}
+            animate={wavingNow ? { rotate: [-6, -38, -22, -38, -6] } : driving ? { rotate: 2 } : { rotate: -3 }}
             transition={
-              waving
+              wavingNow
                 ? { duration: 1.15, repeat: Infinity, ease: "easeInOut" }
                 : { type: "spring", stiffness: 180, damping: 18 }
             }
             style={{ transformBox: "fill-box", transformOrigin: "0% 50%" }}
           >
             <path d="M 82 48 Q 98 56 121 52" stroke={`url(#${uid}-suit)`} strokeWidth="8" strokeLinecap="round" fill="none" />
-            <path d="M 105 55 Q 114 54 121 52" stroke="#1a2130" strokeWidth="6.5" strokeLinecap="round" fill="none" />
+            <path d="M 105 55 Q 114 54 121 52" stroke="#20232B" strokeWidth="6.5" strokeLinecap="round" fill="none" />
             <path d="M 83 46 Q 98 53 118 50" stroke="#ffedd5" strokeWidth="0.9" strokeLinecap="round" fill="none" opacity="0.7" />
             <path d="M 116 51.5 L 121 54" stroke="#f8fafc" strokeWidth="0.45" strokeLinecap="round" opacity="0.6" />
             <rect x="119.6" y="47" width="9" height="7.2" rx="3.2" fill={INK} />
@@ -601,6 +659,47 @@ export function RiderModel({ phase, tier, waving, headlight, reduced, className 
             </g>
           ) : null}
         </motion.g>
+
+        {/* cart-update reaction: a small burst as the parcel settles into the box */}
+        {catching && !reduced ? (
+          <g aria-hidden>
+            {[0, 1, 2, 3].map((index) => (
+              <motion.circle
+                key={`parcel-spark-${index}`}
+                cx={34 + (index - 1.5) * 4}
+                cy={38}
+                r={1.1}
+                fill={index % 2 === 0 ? ORANGE_LIGHT : "#f8f6f2"}
+                initial={{ opacity: 0 }}
+                animate={{
+                  opacity: [0, 0.9, 0],
+                  y: [0, -9 - index * 2],
+                  x: [0, (index - 1.5) * 7],
+                  scale: [0.6, 1, 0.4],
+                }}
+                transition={{ duration: 0.75, delay: index * 0.06, ease: "easeOut" }}
+              />
+            ))}
+          </g>
+        ) : null}
+
+        {/* celebrate / checkout success reaction: champagne confetti */}
+        {celebrating && !reduced ? (
+          <g aria-hidden>
+            {CONFETTI.map((piece, index) => (
+              <motion.circle
+                key={`confetti-${index}`}
+                cx={piece.x}
+                cy={piece.y}
+                r={index % 3 === 0 ? 1.4 : 1}
+                fill={piece.color}
+                initial={{ opacity: 0, x: 0, y: 0, scale: 0.5 }}
+                animate={{ opacity: [0, 1, 0], x: piece.dx, y: piece.dy, scale: [0.5, 1, 0.3] }}
+                transition={{ duration: 1.1, delay: piece.delay, repeat: Infinity, repeatDelay: 0.5, ease: "easeOut" }}
+              />
+            ))}
+          </g>
+        ) : null}
       </motion.g>
     </svg>
   );

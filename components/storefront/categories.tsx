@@ -40,7 +40,7 @@ const ICONS: Record<string, LucideIcon> = {
 const TONES = [
   "from-indigo-500/45 via-indigo-400/10 to-transparent",
   "from-cyan-400/40 via-cyan-300/10 to-transparent",
-  "from-[#f0c46c]/35 via-[#f0c46c]/10 to-transparent",
+  "from-[#D4AF37]/35 via-[#D4AF37]/10 to-transparent",
   "from-violet-500/40 via-violet-400/10 to-transparent",
   "from-emerald-400/35 via-emerald-300/10 to-transparent",
   "from-rose-400/35 via-rose-300/10 to-transparent",
@@ -69,7 +69,7 @@ function CategoryTileCard({ category, index, featured }: { category: CategoryTil
           />
         ) : null}
         <div className={cn("absolute inset-0 bg-gradient-to-br", tone)} />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#05060e] via-[#05060e]/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0F] via-[#0B0B0F]/40 to-transparent" />
 
         <div className="relative z-10 flex items-start justify-between">
           <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/45">

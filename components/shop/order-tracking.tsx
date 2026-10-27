@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -104,14 +105,14 @@ export function OrderTracking({ order }: { order: TrackingOrder }) {
             <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden />
             {tracking.statusLabel}
           </span>
-          <button
+          <Button
             type="button"
             onClick={() => router.refresh()}
             className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--lx-border)] text-[var(--lx-muted)] transition hover:border-[var(--lx-gold)]/40 hover:text-[var(--lx-gold)]"
             aria-label="Refresh tracking"
           >
             <RefreshCw className="h-3.5 w-3.5" aria-hidden />
-          </button>
+          </Button>
         </div>
       </div>
 

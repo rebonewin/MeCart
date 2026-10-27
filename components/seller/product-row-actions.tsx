@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Loader2, Send, Trash2 } from "lucide-react";
@@ -49,17 +50,17 @@ export function SellerProductRowActions({
   return (
     <div className="flex items-center gap-1.5">
       {approvalStatus !== "APPROVED" && (
-        <button
+        <Button
           type="button"
           onClick={submit}
           disabled={pending}
-          className="inline-flex h-8 items-center gap-1.5 rounded-full border border-[#d8b45a]/30 bg-[#d8b45a]/10 px-3 text-[11px] font-semibold text-[#f5dfa2] transition hover:bg-[#d8b45a]/20 disabled:opacity-50"
+          className="inline-flex h-8 items-center gap-1.5 rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-3 text-[11px] font-semibold text-[#E6C768] transition hover:bg-[#D4AF37]/20 disabled:opacity-50"
         >
           {pending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3" />}
           Submit
-        </button>
+        </Button>
       )}
-      <button
+      <Button
         type="button"
         onClick={remove}
         disabled={pending}
@@ -72,7 +73,7 @@ export function SellerProductRowActions({
       >
         <Trash2 className="h-3 w-3" />
         {confirming ? "Confirm" : "Archive"}
-      </button>
+      </Button>
     </div>
   );
 }

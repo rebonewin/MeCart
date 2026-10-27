@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -100,7 +101,7 @@ export function ProfileClient({
           <p className="text-sm text-gray-500">Username: {initialUser.username} | Role: {initialUser.role}</p>
           <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" className="w-full rounded border px-3 py-2 dark:bg-gray-800" />
           <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" type="email" className="w-full rounded border px-3 py-2 dark:bg-gray-800" />
-          <button type="submit" className="rounded-md bg-indigo-600 px-4 py-2 text-sm text-white">Save Profile</button>
+          <Button type="submit" className="rounded-md bg-indigo-600 px-4 py-2 text-sm text-white">Save Profile</Button>
         </form>
       </section>
 
@@ -109,7 +110,7 @@ export function ProfileClient({
         <form onSubmit={submitPassword} className="mt-4 space-y-3">
           <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} placeholder="Current password" className="w-full rounded border px-3 py-2 dark:bg-gray-800" />
           <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="New password" minLength={8} className="w-full rounded border px-3 py-2 dark:bg-gray-800" />
-          <button type="submit" className="rounded-md bg-indigo-600 px-4 py-2 text-sm text-white">Change Password</button>
+          <Button type="submit" className="rounded-md bg-indigo-600 px-4 py-2 text-sm text-white">Change Password</Button>
         </form>
       </section>
 
@@ -123,8 +124,8 @@ export function ProfileClient({
               <div className="flex items-center justify-between">
                 <span className="font-medium">{a.label || "Address"} {a.isDefault && <span className="text-xs text-emerald-600">(Default)</span>}</span>
                 <div className="flex gap-2">
-                  <button onClick={() => { setEditingAddrId(a.id); setAddr({ label: a.label ?? "", name: a.name, phone: a.phone, line1: a.line1, line2: a.line2 ?? "", city: a.city, state: a.state, zip: a.zip, country: a.country, isDefault: a.isDefault }); }} className="text-indigo-600">Edit</button>
-                  <button onClick={() => removeAddress(a.id)} className="text-rose-600">Delete</button>
+                  <Button onClick={() => { setEditingAddrId(a.id); setAddr({ label: a.label ?? "", name: a.name, phone: a.phone, line1: a.line1, line2: a.line2 ?? "", city: a.city, state: a.state, zip: a.zip, country: a.country, isDefault: a.isDefault }); }} className="text-indigo-600">Edit</Button>
+                  <Button onClick={() => removeAddress(a.id)} className="text-rose-600">Delete</Button>
                 </div>
               </div>
               <p>{a.name} - {a.phone}</p>
@@ -152,8 +153,8 @@ export function ProfileClient({
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" checked={addr.isDefault} onChange={(e) => setAddr({ ...addr, isDefault: e.target.checked })} /> Default
           </label>
-          <button type="submit" className="rounded-md bg-indigo-600 px-4 py-2 text-sm text-white">{editingAddrId ? "Update Address" : "Add Address"}</button>
-          {editingAddrId && <button type="button" onClick={() => { setEditingAddrId(null); setAddr({ label: "", name: "", phone: "", line1: "", line2: "", city: "", state: "", zip: "", country: "India", isDefault: false }); }} className="ml-2 rounded-md border px-4 py-2 text-sm">Cancel</button>}
+          <Button type="submit" className="rounded-md bg-indigo-600 px-4 py-2 text-sm text-white">{editingAddrId ? "Update Address" : "Add Address"}</Button>
+          {editingAddrId && <Button type="button" onClick={() => { setEditingAddrId(null); setAddr({ label: "", name: "", phone: "", line1: "", line2: "", city: "", state: "", zip: "", country: "India", isDefault: false }); }} className="ml-2 rounded-md border px-4 py-2 text-sm">Cancel</Button>}
         </form>
       </section>
     </div>

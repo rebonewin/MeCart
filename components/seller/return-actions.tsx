@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Check, Loader2, X } from "lucide-react";
@@ -36,18 +37,18 @@ export function SellerReturnActions({
 
   return (
     <div className="flex flex-wrap items-center justify-end gap-2">
-      <input type="number" min="0" step="0.01" value={refund} onChange={(event) => setRefund(event.target.value)} placeholder="Refund" className="h-8 w-24 rounded-lg border border-white/10 bg-[#07090f] px-2 text-xs text-white outline-none focus:border-[#d8b45a]/40" />
+      <input type="number" min="0" step="0.01" value={refund} onChange={(event) => setRefund(event.target.value)} placeholder="Refund" className="h-8 w-24 rounded-lg border border-white/10 bg-[#101116] px-2 text-xs text-white outline-none focus:border-[#D4AF37]/40" />
       {status === "REQUESTED" && (
         <>
-          <button type="button" onClick={() => run("REJECTED")} disabled={pending} className="inline-flex h-8 items-center gap-1 rounded-full border border-rose-400/20 px-3 text-[10px] text-rose-300 disabled:opacity-50"><X className="h-3 w-3" /> Reject</button>
-          <button type="button" onClick={() => run("APPROVED")} disabled={pending} className="inline-flex h-8 items-center gap-1 rounded-full bg-[#d8b45a] px-3 text-[10px] font-semibold text-[#1e1708] disabled:opacity-50">{pending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />} Approve</button>
+          <Button type="button" onClick={() => run("REJECTED")} disabled={pending} className="inline-flex h-8 items-center gap-1 rounded-full border border-rose-400/20 px-3 text-[10px] text-rose-300 disabled:opacity-50"><X className="h-3 w-3" /> Reject</Button>
+          <Button type="button" onClick={() => run("APPROVED")} disabled={pending} className="inline-flex h-8 items-center gap-1 rounded-full bg-[#D4AF37] px-3 text-[10px] font-semibold text-[#0B0B0F] disabled:opacity-50">{pending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />} Approve</Button>
         </>
       )}
       {status === "APPROVED" && (
-        <button type="button" onClick={() => run("RECEIVED")} disabled={pending} className="inline-flex h-8 items-center gap-1 rounded-full bg-[#d8b45a] px-3 text-[10px] font-semibold text-[#1e1708] disabled:opacity-50">{pending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />} Mark received</button>
+        <Button type="button" onClick={() => run("RECEIVED")} disabled={pending} className="inline-flex h-8 items-center gap-1 rounded-full bg-[#D4AF37] px-3 text-[10px] font-semibold text-[#0B0B0F] disabled:opacity-50">{pending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />} Mark received</Button>
       )}
       {status === "RECEIVED" && (
-        <button type="button" onClick={() => run("REFUNDED")} disabled={pending} className="inline-flex h-8 items-center gap-1 rounded-full bg-[#d8b45a] px-3 text-[10px] font-semibold text-[#1e1708] disabled:opacity-50">{pending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />} Refund</button>
+        <Button type="button" onClick={() => run("REFUNDED")} disabled={pending} className="inline-flex h-8 items-center gap-1 rounded-full bg-[#D4AF37] px-3 text-[10px] font-semibold text-[#0B0B0F] disabled:opacity-50">{pending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />} Refund</Button>
       )}
     </div>
   );

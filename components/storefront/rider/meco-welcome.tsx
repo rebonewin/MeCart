@@ -126,13 +126,13 @@ export function MecoWelcome({ onStart, onDone }: { onStart: () => void; onDone: 
           {/* dim the page base so the arrival feels like a stage */}
           <div
             aria-hidden
-            className="absolute inset-x-0 bottom-0 h-[30vh] bg-gradient-to-t from-[#05060e]/90 via-[#05060e]/40 to-transparent sm:h-[46vh]"
+            className="absolute inset-x-0 bottom-0 h-[30vh] bg-gradient-to-t from-[#0B0B0F]/90 via-[#0B0B0F]/40 to-transparent sm:h-[46vh]"
           />
 
           {/* soft stage light behind the arrival */}
           <motion.div
             aria-hidden
-            className="absolute bottom-[-12%] left-[-8%] h-[62vh] w-[62vw] rounded-full bg-[radial-gradient(circle_at_50%_60%,rgba(249,115,22,0.16),rgba(99,102,241,0.07)_45%,transparent_70%)] blur-2xl"
+            className="absolute bottom-[-12%] left-[-8%] h-[62vh] w-[62vw] rounded-full bg-[radial-gradient(circle_at_50%_60%,rgba(249,115,22,0.16),rgba(212,175,55,0.07)_45%,transparent_70%)] blur-2xl"
             initial={{ opacity: 0 }}
             animate={{ opacity: greeting ? 1 : 0.65 }}
             transition={{ duration: 0.8 }}
@@ -170,7 +170,7 @@ export function MecoWelcome({ onStart, onDone }: { onStart: () => void; onDone: 
                     exit={{ opacity: 0, y: -8, scale: 0.98 }}
                     transition={{ type: "spring", stiffness: 230, damping: 24 }}
                   >
-                    <div className="relative rounded-2xl border border-white/12 bg-[#090b16]/90 p-3 shadow-[0_30px_80px_-24px_rgba(0,0,0,0.95)] backdrop-blur-xl sm:p-4">
+                    <div className="relative rounded-2xl border border-white/12 bg-[#121317]/90 p-3 shadow-[0_30px_80px_-24px_rgba(0,0,0,0.95)] backdrop-blur-xl sm:p-4">
                       <p className="flex items-center gap-1.5 font-mono text-[8px] uppercase tracking-[0.18em] text-[var(--lx-gold)] sm:gap-2 sm:text-[9px] sm:tracking-[0.24em]">
                         <span className="h-1.5 w-1.5 rounded-full bg-[var(--lx-gold)]" aria-hidden />
                         <span>MECO™</span>
@@ -182,11 +182,11 @@ export function MecoWelcome({ onStart, onDone }: { onStart: () => void; onDone: 
                       <p className="mt-1 text-[11px] leading-relaxed text-white/60 sm:text-xs">{GREETING.body}</p>
                       <span
                         aria-hidden
-                        className="absolute -left-1.5 bottom-6 h-3 w-3 rotate-45 border-b border-l border-white/12 bg-[#090b16] sm:hidden"
+                        className="absolute -left-1.5 bottom-6 h-3 w-3 rotate-45 border-b border-l border-white/12 bg-[#121317] sm:hidden"
                       />
                       <span
                         aria-hidden
-                        className="absolute -bottom-1.5 left-[56%] hidden h-3 w-3 rotate-45 border-b border-r border-white/12 bg-[#090b16] sm:block"
+                        className="absolute -bottom-1.5 left-[56%] hidden h-3 w-3 rotate-45 border-b border-r border-white/12 bg-[#121317] sm:block"
                       />
                     </div>
                   </motion.div>
@@ -194,7 +194,7 @@ export function MecoWelcome({ onStart, onDone }: { onStart: () => void; onDone: 
               </AnimatePresence>
 
               <RiderModel
-                phase={greeting ? "idle" : "drive"}
+                phase={greeting ? "wave" : "drive"}
                 tier={1}
                 waving={greeting}
                 headlight={!greeting}

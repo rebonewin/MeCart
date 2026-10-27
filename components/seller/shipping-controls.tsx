@@ -1,12 +1,13 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Loader2, Plus, Truck } from "lucide-react";
 import { toast } from "sonner";
 import { addSellerShippingRate, createSellerShippingProfile } from "@/lib/actions/seller-operations";
 
-const field = "h-10 w-full rounded-xl border border-white/10 bg-[#07090f] px-3 text-xs text-white outline-none placeholder:text-slate-600 focus:border-[#d8b45a]/40";
+const field = "h-10 w-full rounded-xl border border-white/10 bg-[#101116] px-3 text-xs text-white outline-none placeholder:text-slate-600 focus:border-[#D4AF37]/40";
 
 export function SellerShippingControls({ profiles }: { profiles: { id: string; name: string }[] }) {
   const router = useRouter();
@@ -56,16 +57,16 @@ export function SellerShippingControls({ profiles }: { profiles: { id: string; n
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap gap-2">
-        <button type="button" onClick={() => setMode(mode === "rate" ? null : "rate")} disabled={!profiles.length} className="inline-flex h-10 items-center gap-2 rounded-full bg-[#d8b45a] px-5 text-xs font-semibold text-[#1e1708] transition hover:bg-[#e7c778] disabled:opacity-40">
+        <Button type="button" onClick={() => setMode(mode === "rate" ? null : "rate")} disabled={!profiles.length} className="inline-flex h-10 items-center gap-2 rounded-full bg-[#D4AF37] px-5 text-xs font-semibold text-[#0B0B0F] transition hover:bg-[#E6C768] disabled:opacity-40">
           <Plus className="h-3.5 w-3.5" /> Add rate
-        </button>
-        <button type="button" onClick={() => setMode(mode === "profile" ? null : "profile")} className="inline-flex h-10 items-center gap-2 rounded-full border border-white/10 px-4 text-xs font-medium text-slate-300 hover:border-[#d8b45a]/40 hover:text-white">
+        </Button>
+        <Button type="button" onClick={() => setMode(mode === "profile" ? null : "profile")} className="inline-flex h-10 items-center gap-2 rounded-full border border-white/10 px-4 text-xs font-medium text-slate-300 hover:border-[#D4AF37]/40 hover:text-white">
           <Truck className="h-3.5 w-3.5" /> New profile
-        </button>
+        </Button>
       </div>
 
       {mode === "rate" && (
-        <div className="rounded-2xl border border-[#d8b45a]/20 bg-[#d8b45a]/[0.05] p-4">
+        <div className="rounded-2xl border border-[#D4AF37]/20 bg-[#D4AF37]/[0.05] p-4">
           <div className="grid gap-2 sm:grid-cols-2">
             <select value={rate.profileId} onChange={setRateField("profileId")} className={field}>
               {profiles.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
@@ -79,22 +80,22 @@ export function SellerShippingControls({ profiles }: { profiles: { id: string; n
               <input type="number" min="0" value={rate.maxDays} onChange={setRateField("maxDays")} placeholder="Max days" className={field} />
             </div>
           </div>
-          <button type="button" onClick={submitRate} disabled={pending} className="mt-3 inline-flex h-9 items-center gap-1.5 rounded-full bg-[#d8b45a] px-4 text-[11px] font-semibold text-[#1e1708] disabled:opacity-55">
+          <Button type="button" onClick={submitRate} disabled={pending} className="mt-3 inline-flex h-9 items-center gap-1.5 rounded-full bg-[#D4AF37] px-4 text-[11px] font-semibold text-[#0B0B0F] disabled:opacity-55">
             {pending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />} Save rate
-          </button>
+          </Button>
         </div>
       )}
 
       {mode === "profile" && (
-        <div className="rounded-2xl border border-[#d8b45a]/20 bg-[#d8b45a]/[0.05] p-4">
+        <div className="rounded-2xl border border-[#D4AF37]/20 bg-[#D4AF37]/[0.05] p-4">
           <div className="grid gap-2 sm:grid-cols-3">
             <input value={profile.name} onChange={setProfileField("name")} placeholder="Profile name" className={field} />
             <input type="number" min="0" value={profile.processingMinDays} onChange={setProfileField("processingMinDays")} placeholder="Min processing days" className={field} />
             <input type="number" min="0" value={profile.processingMaxDays} onChange={setProfileField("processingMaxDays")} placeholder="Max processing days" className={field} />
           </div>
-          <button type="button" onClick={submitProfile} disabled={pending || !profile.name.trim()} className="mt-3 inline-flex h-9 items-center gap-1.5 rounded-full bg-[#d8b45a] px-4 text-[11px] font-semibold text-[#1e1708] disabled:opacity-55">
+          <Button type="button" onClick={submitProfile} disabled={pending || !profile.name.trim()} className="mt-3 inline-flex h-9 items-center gap-1.5 rounded-full bg-[#D4AF37] px-4 text-[11px] font-semibold text-[#0B0B0F] disabled:opacity-55">
             {pending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />} Create profile
-          </button>
+          </Button>
         </div>
       )}
     </div>

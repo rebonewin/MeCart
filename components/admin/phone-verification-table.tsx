@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -85,7 +86,7 @@ export function PhoneVerificationTable({ users }: { users: AdminPhoneVerificatio
         />
         <div className="flex flex-wrap items-center gap-2">
           {(["all", "verified", "pending", "failed", "blocked"] as const).map((item) => (
-            <button
+            <Button
               key={item}
               onClick={() => setFilter(item)}
               className={`rounded-xl px-3 py-2 text-xs font-semibold capitalize ${
@@ -96,7 +97,7 @@ export function PhoneVerificationTable({ users }: { users: AdminPhoneVerificatio
             >
               {item}
               {item !== "all" ? ` (${counts[item]})` : ` (${users.length})`}
-            </button>
+            </Button>
           ))}
           <a
             href="/api/admin/phone-verification/export"
@@ -146,20 +147,20 @@ export function PhoneVerificationTable({ users }: { users: AdminPhoneVerificatio
                   <td className="p-3">{user.verification_provider ?? "—"}</td>
                   <td className="p-3">
                     <div className="flex gap-2">
-                      <button
+                      <Button
                         onClick={() => runResend(user)}
                         disabled={isBusy || !user.phone_number}
                         className="rounded border px-2 py-1 text-xs disabled:opacity-50"
                       >
                         Resend
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => runDeactivate(user)}
                         disabled={isBusy || user.pending}
                         className="rounded border px-2 py-1 text-xs disabled:opacity-50"
                       >
                         {user.is_active ? "Deactivate" : "Activate"}
-                      </button>
+                      </Button>
                     </div>
                     {user.blocked_until && new Date(user.blocked_until) > new Date() && (
                       <p className="mt-1 text-[10px] text-rose-500">

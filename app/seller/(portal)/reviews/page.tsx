@@ -37,7 +37,7 @@ export default async function SellerReviewsPage() {
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="flex items-center gap-0.5 text-[#f5dfa2]">
+                    <span className="flex items-center gap-0.5 text-[#E6C768]">
                       {Array.from({ length: 5 }).map((_, index) => (
                         <Star key={index} className={`h-3.5 w-3.5 ${index < review.rating ? "fill-current" : "text-slate-700"}`} />
                       ))}
@@ -52,8 +52,8 @@ export default async function SellerReviewsPage() {
               </div>
               {review.body && <p className="mt-3 text-sm leading-6 text-slate-300">{review.body}</p>}
               {review.vendor_reply && (
-                <div className="mt-4 rounded-2xl border border-[#d8b45a]/15 bg-[#d8b45a]/[0.05] p-3.5">
-                  <p className="text-[10px] uppercase tracking-[0.16em] text-[#d8b45a]">Your reply</p>
+                <div className="mt-4 rounded-2xl border border-[#D4AF37]/15 bg-[#D4AF37]/[0.05] p-3.5">
+                  <p className="text-[10px] uppercase tracking-[0.16em] text-[#D4AF37]">Your reply</p>
                   <p className="mt-1 text-xs leading-5 text-slate-300">{review.vendor_reply}</p>
                 </div>
               )}

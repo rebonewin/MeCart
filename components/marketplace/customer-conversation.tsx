@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCheck, Loader2, Send } from "lucide-react";
@@ -65,9 +66,9 @@ export function CustomerConversation({
           <p className="text-sm font-semibold text-[var(--lx-text)]">{subject}</p>
           <p className="mt-0.5 text-[11px] text-[var(--lx-muted)]">{storeName} · {status.toLowerCase()}</p>
         </div>
-        <button type="button" onClick={markRead} disabled={pending} className="rounded-full border border-[var(--lx-border)] px-3 py-1.5 text-[10px] text-[var(--lx-muted)] hover:text-[var(--lx-text)] disabled:opacity-50">
+        <Button type="button" onClick={markRead} disabled={pending} className="rounded-full border border-[var(--lx-border)] px-3 py-1.5 text-[10px] text-[var(--lx-muted)] hover:text-[var(--lx-text)] disabled:opacity-50">
           Mark read
-        </button>
+        </Button>
       </div>
       <div className="flex-1 space-y-4 bg-black/10 p-5">
         {messages.length === 0 && <p className="py-10 text-center text-xs text-[var(--lx-muted)]">No messages yet.</p>}
@@ -102,9 +103,9 @@ export function CustomerConversation({
             placeholder="Write a reply… (Ctrl + Enter to send)"
             className="min-h-[46px] flex-1 resize-none rounded-2xl border border-[var(--lx-border)] bg-white/[0.03] px-4 py-3 text-sm text-[var(--lx-text)] outline-none placeholder:text-[var(--lx-muted)] focus:border-[var(--lx-gold)]/50"
           />
-          <button type="button" onClick={send} disabled={pending || !body.trim()} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--lx-text)] text-[var(--lx-bg)] transition hover:opacity-90 disabled:opacity-40" aria-label="Send message">
+          <Button type="button" onClick={send} disabled={pending || !body.trim()} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--lx-text)] text-[var(--lx-bg)] transition hover:opacity-90 disabled:opacity-40" aria-label="Send message">
             {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-          </button>
+          </Button>
         </div>
         <p className="mt-2 flex items-center gap-1.5 text-[10px] text-[var(--lx-faint)]"><CheckCheck className="h-3 w-3" /> Private to you, the seller and MeCart support.</p>
       </div>

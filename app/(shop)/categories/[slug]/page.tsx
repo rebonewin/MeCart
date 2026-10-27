@@ -75,10 +75,10 @@ export default async function CategoryPage({
               className="object-cover opacity-45"
             />
           ) : null}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#05060e] via-[#05060e]/80 to-[#05060e]/25" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0F] via-[#0B0B0F]/80 to-[#0B0B0F]/25" />
           <div
             aria-hidden
-            className="pointer-events-none absolute -right-24 -top-28 h-80 w-80 rounded-full bg-[radial-gradient(circle_at_center,rgba(240,196,108,0.2),transparent_68%)] blur-3xl"
+            className="pointer-events-none absolute -right-24 -top-28 h-80 w-80 rounded-full bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.2),transparent_68%)] blur-3xl"
           />
 
           <div className="relative z-10 flex flex-col gap-10 p-7 sm:p-10 lg:flex-row lg:items-end lg:justify-between lg:p-14">

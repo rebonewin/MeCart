@@ -36,8 +36,8 @@ export function DeliveryTakeover({ orderNumber }: { orderNumber?: string }) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="absolute inset-0 bg-[#05060e]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_34%,rgba(99,102,241,0.22),transparent_62%)]" />
+          <div className="absolute inset-0 bg-[#0B0B0F]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_34%,rgba(212,175,55,0.22),transparent_62%)]" />
           <div className="lx-grid absolute inset-0 opacity-40" />
 
           <motion.p

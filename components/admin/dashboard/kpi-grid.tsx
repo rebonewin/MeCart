@@ -108,7 +108,7 @@ export function KpiGrid({ items }: { items: KpiItem[] }) {
                 <defs>
                   <linearGradient id="dashboardGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#60a5fa" />
-                    <stop offset="100%" stopColor="#22d3ee" stopOpacity="0.4" />
+                    <stop offset="100%" stopColor="#E6C768" stopOpacity="0.4" />
                   </linearGradient>
                 </defs>
               </svg>

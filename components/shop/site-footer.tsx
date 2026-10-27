@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowUp, Mail } from "lucide-react";
 import { Magnetic } from "@/components/luxe/primitives";
@@ -30,10 +31,10 @@ export function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="lx-dark-scene relative mt-24 overflow-hidden border-t border-white/[0.08] bg-[#05060e] text-[var(--lx-text)]">
+    <footer className="lx-dark-scene relative mt-24 overflow-hidden border-t border-white/[0.08] bg-[#0B0B0F] text-[var(--lx-text)]">
       <div className="lx-hairline-x absolute inset-x-0 top-0 h-px" />
-      <div className="lx-blob lx-drift-b left-[-10%] top-[-30%] h-[26rem] w-[26rem] bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.25),transparent_65%)]" />
-      <div className="lx-blob lx-drift-c right-[-12%] bottom-[-40%] h-[28rem] w-[28rem] bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.18),transparent_65%)]" />
+      <div className="lx-blob lx-drift-b left-[-10%] top-[-30%] h-[26rem] w-[26rem] bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.25),transparent_65%)]" />
+      <div className="lx-blob lx-drift-c right-[-12%] bottom-[-40%] h-[28rem] w-[28rem] bg-[radial-gradient(circle_at_center,rgba(230,199,104,0.18),transparent_65%)]" />
 
       <div className="relative mx-auto max-w-7xl px-4 pb-10 pt-16 sm:px-6 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-[1.3fr_1fr_1fr_1fr]">
@@ -41,7 +42,7 @@ export function SiteFooter() {
             <Link href="/" className="flex items-center gap-2.5">
               <span className="relative flex h-11 w-11 items-center justify-center">
                 <span className="lx-conic-ring absolute inset-0 rounded-[13px] opacity-90" />
-                <span className="relative z-10 flex h-[calc(100%-3px)] w-[calc(100%-3px)] items-center justify-center rounded-[11px] bg-[#05060e] text-base font-black text-white">
+                <span className="relative z-10 flex h-[calc(100%-3px)] w-[calc(100%-3px)] items-center justify-center rounded-[11px] bg-[#0B0B0F] text-base font-black text-white">
                   M
                 </span>
               </span>
@@ -119,14 +120,14 @@ export function SiteFooter() {
             ))}
           </div>
           <Magnetic strength={0.3}>
-            <button
+            <Button
               type="button"
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               aria-label="Back to top"
               className="lx-glass flex h-11 w-11 items-center justify-center rounded-full text-white/80 transition hover:-translate-y-1 hover:bg-white/10 hover:text-white"
             >
               <ArrowUp className="h-4 w-4" aria-hidden />
-            </button>
+            </Button>
           </Magnetic>
         </div>
       </div>

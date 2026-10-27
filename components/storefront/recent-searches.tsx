@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Clock3, X } from "lucide-react";
@@ -33,7 +34,7 @@ export function RecentSearches() {
         <p className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.24em] text-[var(--lx-muted)]">
           <Clock3 className="h-3 w-3" aria-hidden /> Recent searches
         </p>
-        <button
+        <Button
           type="button"
           onClick={() => {
             setRecent([]);
@@ -46,7 +47,7 @@ export function RecentSearches() {
           className="text-[11px] text-[var(--lx-muted)] transition hover:text-[var(--lx-text)]"
         >
           Clear
-        </button>
+        </Button>
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
         {recent.map((term) => (

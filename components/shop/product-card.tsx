@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
@@ -32,7 +33,7 @@ function IconAction({
       aria-label={label}
       title={label}
       className={cn(
-        "flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-[#05060e]/45 text-white/90 shadow-lg shadow-black/20 backdrop-blur-xl transition-colors duration-200 hover:border-white/35 hover:bg-[#05060e]/70 hover:text-white",
+        "flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-[#0B0B0F]/45 text-white/90 shadow-lg shadow-black/20 backdrop-blur-xl transition-colors duration-200 hover:border-white/35 hover:bg-[#0B0B0F]/70 hover:text-white",
         active && "border-[var(--lx-gold)]/60 bg-[var(--lx-gold)]/20 text-[var(--lx-gold)]",
       )}
     >
@@ -111,17 +112,17 @@ export function ProductCard({ product }: { product: StorefrontProduct }) {
               </span>
             </Link>
 
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#05060e]/55 via-transparent to-transparent opacity-80" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0B0B0F]/55 via-transparent to-transparent opacity-80" />
 
             {/* badges */}
             <div className="pointer-events-none absolute left-3 top-3 z-[2] flex flex-col items-start gap-1.5">
               {hasDiscount ? (
-                <span className="rounded-full bg-[var(--lx-gold)] px-2.5 py-1 text-[10px] font-bold tracking-[0.08em] text-[#241a05] shadow-lg shadow-black/20">
+                <span className="rounded-full bg-[var(--lx-gold)] px-2.5 py-1 text-[10px] font-bold tracking-[0.08em] text-[#0B0B0F] shadow-lg shadow-black/20">
                   −{Math.round(product.discountPercent)}%
                 </span>
               ) : null}
               {product.newArrival ? (
-                <span className="rounded-full border border-white/25 bg-[#05060e]/45 px-2.5 py-1 text-[10px] font-bold tracking-[0.08em] text-white backdrop-blur-md">
+                <span className="rounded-full border border-white/25 bg-[#0B0B0F]/45 px-2.5 py-1 text-[10px] font-bold tracking-[0.08em] text-white backdrop-blur-md">
                   NEW
                 </span>
               ) : null}
@@ -130,7 +131,7 @@ export function ProductCard({ product }: { product: StorefrontProduct }) {
                   SOLD OUT
                 </span>
               ) : lowStock ? (
-                <span className="rounded-full border border-white/25 bg-[#05060e]/45 px-2.5 py-1 text-[10px] font-semibold tracking-[0.06em] text-[var(--lx-gold)] backdrop-blur-md">
+                <span className="rounded-full border border-white/25 bg-[#0B0B0F]/45 px-2.5 py-1 text-[10px] font-semibold tracking-[0.06em] text-[var(--lx-gold)] backdrop-blur-md">
                   Only {product.stock} left
                 </span>
               ) : null}
@@ -167,17 +168,17 @@ export function ProductCard({ product }: { product: StorefrontProduct }) {
 
             {/* quick add */}
             <div className="absolute inset-x-3 bottom-3 z-[3] translate-y-0 opacity-100 transition duration-300 lg:translate-y-2 lg:opacity-0 lg:group-hover:translate-y-0 lg:group-hover:opacity-100 lg:group-focus-within:translate-y-0 lg:group-focus-within:opacity-100">
-              <button
+              <Button
                 type="button"
                 onClick={() => void quickAdd()}
                 disabled={outOfStock}
                 className={cn(
                   "flex h-11 w-full items-center justify-center gap-2 rounded-full border text-sm font-semibold shadow-xl shadow-black/20 backdrop-blur-xl transition-all duration-300 active:scale-[0.98]",
                   outOfStock
-                    ? "cursor-not-allowed border-white/10 bg-[#05060e]/40 text-white/45"
+                    ? "cursor-not-allowed border-white/10 bg-[#0B0B0F]/40 text-white/45"
                     : added
-                      ? "border-[var(--lx-gold)] bg-[var(--lx-gold)] text-[#241a05]"
-                      : "border-white/30 bg-white/90 text-[#05060e] hover:-translate-y-0.5 hover:bg-white",
+                      ? "border-[var(--lx-gold)] bg-[var(--lx-gold)] text-[#0B0B0F]"
+                      : "border-white/30 bg-white/90 text-[#0B0B0F] hover:-translate-y-0.5 hover:bg-white",
                 )}
               >
                 {added ? (
@@ -190,7 +191,7 @@ export function ProductCard({ product }: { product: StorefrontProduct }) {
                     {outOfStock ? "Sold out" : "Quick add"}
                   </>
                 )}
-              </button>
+              </Button>
             </div>
 
             <span

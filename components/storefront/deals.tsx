@@ -59,8 +59,8 @@ export function FlashDeals({ products }: { products: StorefrontProduct[] }) {
     <section id="flash-deals" className="relative mx-auto w-full max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
       <Reveal>
         <div className="lx-card relative overflow-hidden rounded-[2rem] p-6 sm:p-10">
-          <div className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-[radial-gradient(circle_at_center,rgba(240,196,108,0.22),transparent_65%)] blur-2xl" />
-          <div className="pointer-events-none absolute -bottom-28 -right-16 h-80 w-80 rounded-full bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.28),transparent_65%)] blur-2xl" />
+          <div className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.22),transparent_65%)] blur-2xl" />
+          <div className="pointer-events-none absolute -bottom-28 -right-16 h-80 w-80 rounded-full bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.28),transparent_65%)] blur-2xl" />
 
           <div className="relative flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-xl">

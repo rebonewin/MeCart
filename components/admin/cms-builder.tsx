@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -221,18 +222,18 @@ export function CmsBuilder({ initialPages }: { initialPages: CmsPageData[] }) {
             <p className="mt-2 text-sm text-slate-300">Build pages visually with reusable sections while preserving routing and content.</p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <button disabled={pending || !selectedPage} className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold transition hover:bg-white/10 disabled:opacity-50" onClick={saveNow}>
+            <Button disabled={pending || !selectedPage} className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold transition hover:bg-white/10 disabled:opacity-50" onClick={saveNow}>
               <Save className="mr-2 inline h-4 w-4" /> Save Changes
-            </button>
-            <button disabled={pending || !selectedPage} className="rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-3 text-sm font-bold text-white shadow-xl shadow-blue-600/20 disabled:opacity-50" onClick={publish}>
+            </Button>
+            <Button disabled={pending || !selectedPage} className="rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-3 text-sm font-bold text-white shadow-xl shadow-blue-600/20 disabled:opacity-50" onClick={publish}>
               Publish Page
-            </button>
-            <button className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold transition hover:bg-white/10" onClick={() => setPreview((value) => !value)}>
+            </Button>
+            <Button className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold transition hover:bg-white/10" onClick={() => setPreview((value) => !value)}>
               {preview ? "Edit Mode" : "Preview Mode"}
-            </button>
-            <button disabled={pending || !selectedPage} onClick={removePage} className="rounded-2xl border border-red-400/20 bg-red-500/10 px-5 py-3 text-sm font-semibold text-red-200 transition hover:bg-red-500/20 disabled:opacity-50">
+            </Button>
+            <Button disabled={pending || !selectedPage} onClick={removePage} className="rounded-2xl border border-red-400/20 bg-red-500/10 px-5 py-3 text-sm font-semibold text-red-200 transition hover:bg-red-500/20 disabled:opacity-50">
               <Trash2 className="mr-2 inline h-4 w-4" /> Delete Page
-            </button>
+            </Button>
           </div>
         </div>
       </motion.section>
@@ -241,7 +242,7 @@ export function CmsBuilder({ initialPages }: { initialPages: CmsPageData[] }) {
         <Panel title="Pages">
           <div className="space-y-2">
             {pages.map((page) => (
-              <button
+              <Button
                 key={page.id}
                 onClick={() => { setSelectedPageId(page.id); setSelectedSectionId(null); }}
                 className={`w-full rounded-2xl border px-4 py-3 text-left transition ${selectedPage?.id === page.id ? "border-blue-400/40 bg-blue-500/10" : "border-white/10 bg-white/[0.04] hover:bg-white/[0.07]"}`}
@@ -251,25 +252,25 @@ export function CmsBuilder({ initialPages }: { initialPages: CmsPageData[] }) {
                   <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${page.status === "Published" ? "bg-emerald-400/10 text-emerald-300" : "bg-amber-400/10 text-amber-300"}`}>{page.status}</span>
                 </div>
                 <p className="mt-1 text-xs text-slate-400">{page.slug}</p>
-              </button>
+              </Button>
             ))}
-            <button onClick={addPage} className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-white/20 bg-white/[0.03] px-4 py-3 text-sm font-semibold transition hover:bg-white/[0.07]">
+            <Button onClick={addPage} className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-white/20 bg-white/[0.03] px-4 py-3 text-sm font-semibold transition hover:bg-white/[0.07]">
               <Plus className="h-4 w-4" /> Add Page
-            </button>
+            </Button>
           </div>
 
           <div className="mt-6">
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Template Library</p>
             <div className="flex flex-wrap gap-2">
               {Object.keys(templateSets).map((templateName) => (
-                <button
+                <Button
                   key={templateName}
                   onClick={() => applyTemplate(templateName)}
                   className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${template === templateName ? "bg-blue-500 text-white" : "bg-white/5 text-slate-300 hover:bg-white/10"}`}
                 >
                   <LayoutTemplate className="mr-1 inline h-3.5 w-3.5" />
                   {templateName}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -296,15 +297,15 @@ export function CmsBuilder({ initialPages }: { initialPages: CmsPageData[] }) {
                   className={`rounded-2xl border p-4 transition ${selectedSectionId === section.id ? "border-blue-400/50 bg-blue-500/10" : "border-white/10 bg-white/[0.04]"}`}
                 >
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <button className="text-left" onClick={() => setSelectedSectionId(section.id)}>
+                    <Button className="text-left" onClick={() => setSelectedSectionId(section.id)}>
                       <p className="font-semibold text-white">{section.title}</p>
                       <p className="text-xs text-slate-400">{section.type} · {section.visible ? "Visible" : "Hidden"}</p>
-                    </button>
+                    </Button>
                     <div className="flex flex-wrap gap-2">
-                      <button onClick={() => moveSection(index, -1)} className="rounded-xl border border-white/10 bg-white/5 p-2 transition hover:bg-white/10"><ArrowUp className="h-4 w-4" /></button>
-                      <button onClick={() => moveSection(index, 1)} className="rounded-xl border border-white/10 bg-white/5 p-2 transition hover:bg-white/10"><ArrowDown className="h-4 w-4" /></button>
-                      <button onClick={() => duplicateSection(section)} className="rounded-xl border border-white/10 bg-white/5 p-2 transition hover:bg-white/10"><Copy className="h-4 w-4" /></button>
-                      <button onClick={() => removeSection(section.id)} className="rounded-xl border border-red-400/20 bg-red-500/10 p-2 text-red-200 transition hover:bg-red-500/20"><Trash2 className="h-4 w-4" /></button>
+                      <Button onClick={() => moveSection(index, -1)} className="rounded-xl border border-white/10 bg-white/5 p-2 transition hover:bg-white/10"><ArrowUp className="h-4 w-4" /></Button>
+                      <Button onClick={() => moveSection(index, 1)} className="rounded-xl border border-white/10 bg-white/5 p-2 transition hover:bg-white/10"><ArrowDown className="h-4 w-4" /></Button>
+                      <Button onClick={() => duplicateSection(section)} className="rounded-xl border border-white/10 bg-white/5 p-2 transition hover:bg-white/10"><Copy className="h-4 w-4" /></Button>
+                      <Button onClick={() => removeSection(section.id)} className="rounded-xl border border-red-400/20 bg-red-500/10 p-2 text-red-200 transition hover:bg-red-500/20"><Trash2 className="h-4 w-4" /></Button>
                     </div>
                   </div>
                   <div className="mt-3">
@@ -322,14 +323,14 @@ export function CmsBuilder({ initialPages }: { initialPages: CmsPageData[] }) {
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Add Sections</p>
             <div className="grid grid-cols-2 gap-2">
               {(Object.keys(sectionPresets) as SectionType[]).map((type) => (
-                <button
+                <Button
                   key={type}
                   onClick={() => addSection(type)}
                   className="rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-3 text-xs font-semibold transition hover:-translate-y-0.5 hover:bg-white/[0.08]"
                 >
                   <Plus className="mr-1 inline h-3.5 w-3.5" />
                   {type.replace("-", " ")}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -364,12 +365,12 @@ export function CmsBuilder({ initialPages }: { initialPages: CmsPageData[] }) {
               </div>
               <label className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm">
                 <span>Visible on page</span>
-                <button
+                <Button
                   onClick={() => updateSection(selectedSection.id, { visible: !selectedSection.visible })}
                   className={`rounded-full px-3 py-1 text-xs font-bold ${selectedSection.visible ? "bg-emerald-400/15 text-emerald-300" : "bg-white/10 text-slate-400"}`}
                 >
                   {selectedSection.visible ? "Visible" : "Hidden"}
-                </button>
+                </Button>
               </label>
               <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-xs text-slate-400">
                 <span>Type</span>

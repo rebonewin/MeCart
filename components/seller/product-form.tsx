@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ImagePlus, Loader2, Plus, Save, Sparkles, Trash2, UploadCloud } from "lucide-react";
@@ -8,7 +9,7 @@ import { createSellerProduct, updateSellerProduct, type SellerProductInput } fro
 import { cn } from "@/lib/cn";
 
 const field =
-  "h-11 w-full rounded-2xl border border-white/10 bg-white/[0.035] px-4 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-[#d8b45a]/45 focus:ring-4 focus:ring-[#d8b45a]/10";
+  "h-11 w-full rounded-2xl border border-white/10 bg-white/[0.035] px-4 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-[#D4AF37]/45 focus:ring-4 focus:ring-[#D4AF37]/10";
 const label = "mb-1.5 block text-xs font-medium text-slate-300";
 
 type Option = { id: string; name: string };
@@ -189,7 +190,7 @@ export function SellerProductForm({
       <div className="space-y-5">
         <section className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-5 sm:p-6">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-[#d8b45a]" />
+            <Sparkles className="h-4 w-4 text-[#D4AF37]" />
             <h3 className="text-sm font-semibold text-white">The piece</h3>
           </div>
           <div className="mt-5 space-y-4">
@@ -242,7 +243,7 @@ export function SellerProductForm({
 
         <section className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-5 sm:p-6">
           <div className="flex items-center gap-2">
-            <ImagePlus className="h-4 w-4 text-[#d8b45a]" />
+            <ImagePlus className="h-4 w-4 text-[#D4AF37]" />
             <h3 className="text-sm font-semibold text-white">Product imagery</h3>
           </div>
           <p className="mt-1.5 text-xs text-slate-500">Up to 8 images. The first image becomes the cover.</p>
@@ -253,28 +254,28 @@ export function SellerProductForm({
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={url} alt="" className="h-full w-full object-cover" />
                 {index === 0 && (
-                  <span className="absolute left-2 top-2 rounded-full bg-[#d8b45a] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[#1e1708]">Cover</span>
+                  <span className="absolute left-2 top-2 rounded-full bg-[#D4AF37] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[#0B0B0F]">Cover</span>
                 )}
-                <button
+                <Button
                   type="button"
                   onClick={() => setForm((current) => ({ ...current, images: current.images.filter((_, position) => position !== index) }))}
                   className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/70 text-white opacity-0 backdrop-blur transition group-hover:opacity-100"
                   aria-label="Remove image"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
-                </button>
+                </Button>
               </div>
             ))}
             {form.images.length < 8 && (
-              <button
+              <Button
                 type="button"
                 onClick={() => fileRef.current?.click()}
                 disabled={uploading}
-                className="flex aspect-[4/5] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-white/15 bg-white/[0.02] text-slate-500 transition hover:border-[#d8b45a]/40 hover:text-[#d8b45a]"
+                className="flex aspect-[4/5] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-white/15 bg-white/[0.02] text-slate-500 transition hover:border-[#D4AF37]/40 hover:text-[#D4AF37]"
               >
                 {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <UploadCloud className="h-5 w-5" />}
                 <span className="text-[10px] font-medium">{uploading ? "Uploading" : "Upload"}</span>
-              </button>
+              </Button>
             )}
           </div>
           <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={(event) => void uploadFiles(event.target.files)} />
@@ -283,11 +284,11 @@ export function SellerProductForm({
               value={imageUrl}
               onChange={(event) => setImageUrl(event.target.value)}
               placeholder="Or paste an image URL"
-              className="h-10 flex-1 rounded-xl border border-white/10 bg-white/[0.03] px-3 text-xs text-white outline-none placeholder:text-slate-600 focus:border-[#d8b45a]/40"
+              className="h-10 flex-1 rounded-xl border border-white/10 bg-white/[0.03] px-3 text-xs text-white outline-none placeholder:text-slate-600 focus:border-[#D4AF37]/40"
             />
-            <button type="button" onClick={addUrl} className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-white/10 px-3 text-xs text-slate-300 hover:border-[#d8b45a]/40">
+            <Button type="button" onClick={addUrl} className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-white/10 px-3 text-xs text-slate-300 hover:border-[#D4AF37]/40">
               <Plus className="h-3.5 w-3.5" /> Add
-            </button>
+            </Button>
           </div>
         </section>
       </div>
@@ -342,7 +343,7 @@ export function SellerProductForm({
             </div>
             <div className="flex items-center justify-between rounded-2xl border border-white/[0.07] bg-white/[0.025] px-4 py-3">
               <span className="text-xs text-slate-500">Customer price</span>
-              <span className="text-lg font-semibold tabular-nums text-[#f5dfa2]">${finalPrice.toFixed(2)}</span>
+              <span className="text-lg font-semibold tabular-nums text-[#E6C768]">${finalPrice.toFixed(2)}</span>
             </div>
             <div>
               <label className={label} htmlFor="stock">Stock on hand</label>
@@ -364,20 +365,20 @@ export function SellerProductForm({
           </div>
         </section>
 
-        <div className={cn("rounded-3xl border border-[#d8b45a]/20 bg-[#d8b45a]/[0.06] p-5", uploading && "opacity-70")}>
-          <p className="text-xs leading-5 text-[#f5dfa2]/80">
+        <div className={cn("rounded-3xl border border-[#D4AF37]/20 bg-[#D4AF37]/[0.06] p-5", uploading && "opacity-70")}>
+          <p className="text-xs leading-5 text-[#E6C768]/80">
             Saving creates a private draft. Use “Submit” on the products page when the imagery,
             price and stock are ready for MeCart review.
           </p>
-          <button
+          <Button
             type="button"
             onClick={submit}
             disabled={pending || uploading}
-            className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#d8b45a] px-6 text-sm font-semibold text-[#1e1708] transition hover:bg-[#e7c778] disabled:opacity-55"
+            className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#D4AF37] px-6 text-sm font-semibold text-[#0B0B0F] transition hover:bg-[#E6C768] disabled:opacity-55"
           >
             {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             {pending ? "Saving…" : initial?.productId ? "Save changes" : "Create draft"}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

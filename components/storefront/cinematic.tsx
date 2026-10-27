@@ -136,7 +136,7 @@ export function LoadingScreen() {
     <AnimatePresence onExitComplete={completeIntro}>
       {visible ? (
         <motion.div
-          className="fixed inset-0 z-[200] flex items-center justify-center bg-[#04050d]"
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-[#0B0B0F]"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0, filter: "blur(18px)" }}
           transition={{ duration: 0.28, ease: "easeOut" }}

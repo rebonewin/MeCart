@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Loader2, Truck } from "lucide-react";
@@ -8,7 +9,7 @@ import { updateSellerFulfillment } from "@/lib/actions/seller-operations";
 import type { VendorFulfillmentStatus } from "@/types/database";
 
 const field =
-  "h-10 w-full rounded-xl border border-white/10 bg-[#07090f] px-3 text-xs text-white outline-none focus:border-[#d8b45a]/40";
+  "h-10 w-full rounded-xl border border-white/10 bg-[#101116] px-3 text-xs text-white outline-none focus:border-[#D4AF37]/40";
 
 export function SellerFulfillmentForm({
   allocationId,
@@ -77,15 +78,15 @@ export function SellerFulfillmentForm({
           <input value={form.trackingUrl} onChange={set("trackingUrl")} className={field} placeholder="https://…" />
         </label>
       </div>
-      <button
+      <Button
         type="button"
         onClick={submit}
         disabled={pending}
-        className="inline-flex h-10 items-center gap-2 rounded-full bg-[#d8b45a] px-5 text-xs font-semibold text-[#1e1708] transition hover:bg-[#e7c778] disabled:opacity-55"
+        className="inline-flex h-10 items-center gap-2 rounded-full bg-[#D4AF37] px-5 text-xs font-semibold text-[#0B0B0F] transition hover:bg-[#E6C768] disabled:opacity-55"
       >
         {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Truck className="h-3.5 w-3.5" />}
         {pending ? "Updating…" : "Update fulfilment"}
-      </button>
+      </Button>
     </div>
   );
 }

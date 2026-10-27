@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { RefreshCcw } from "lucide-react";
 
@@ -27,9 +28,9 @@ export function DashboardHero({ todayRevenue, todayOrders }: { todayRevenue: num
             <p className="text-slate-400">Orders</p>
             <p className="font-bold text-white">{todayOrders.toLocaleString("en-US")}</p>
           </div>
-          <button className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-3 font-bold text-white shadow-xl shadow-blue-600/25 transition hover:-translate-y-0.5">
+          <Button className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-3 font-bold text-white shadow-xl shadow-blue-600/25 transition hover:-translate-y-0.5">
             <RefreshCcw className="h-4 w-4" /> Refresh
-          </button>
+          </Button>
         </div>
       </div>
     </motion.section>

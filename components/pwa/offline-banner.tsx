@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { CloudOff, RefreshCw, WifiOff } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { useOnlineStatus } from "@/lib/hooks/use-online-status";
@@ -27,14 +28,14 @@ export function OfflineBanner() {
             : "Offline mode. Browsing and your bag still work; changes sync when you reconnect."}
         </p>
         {online && cart.pendingSync > 0 ? (
-          <button
+          <Button
             type="button"
             onClick={() => void cart.flushPending()}
             className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[var(--lx-gold)]/30 px-2 py-0.5 font-medium text-[var(--lx-gold)] transition hover:bg-[var(--lx-gold)]/10"
           >
             <CloudOff className="h-3 w-3" aria-hidden />
             Sync now
-          </button>
+          </Button>
         ) : null}
       </div>
     </div>

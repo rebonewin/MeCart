@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -41,6 +42,18 @@ const ProductRecommendations = dynamic(
       (module) => module.ProductRecommendations,
     ),
   { ssr: false },
+);
+
+const ProductViewer = dynamic(
+  () => import("@/components/product/product-viewer").then((module) => module.ProductViewer),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex aspect-[4/5] w-full animate-pulse items-center justify-center rounded-2xl border border-[var(--lx-border)] bg-[var(--lx-surface-2)] text-xs uppercase tracking-[0.2em] text-[var(--lx-muted)]">
+        Preparing studio
+      </div>
+    ),
+  },
 );
 
 function slugify(value: string) {
@@ -86,6 +99,7 @@ export function ProductDetailClient({
           ? [product.coverImage]
           : [];
   const [activeImage, setActiveImage] = useState(0);
+  const [viewMode, setViewMode] = useState<"gallery" | "studio">("gallery");
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
@@ -158,94 +172,137 @@ export function ProductDetailClient({
         <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.06fr)_minmax(0,0.94fr)] lg:gap-14">
           {/* gallery */}
           <div className="lg:sticky lg:top-28">
-            <div className="flex gap-3 sm:gap-4">
-              {gallery.length > 1 ? (
-                <div className="hidden w-[4.5rem] shrink-0 flex-col gap-2 sm:flex">
-                  {gallery.slice(0, 6).map((image, index) => (
-                    <button
-                      key={`${image}-${index}`}
-                      type="button"
-                      onClick={() => setActiveImage(index)}
-                      aria-label={`View image ${index + 1} of ${product.name}`}
-                      aria-pressed={index === activeImage}
-                      className={cn(
-                        "relative aspect-[4/5] overflow-hidden rounded-xl border bg-[var(--lx-surface-2)] transition duration-300",
-                        index === activeImage
-                          ? "border-[var(--lx-gold)] ring-2 ring-[var(--lx-gold)]/20"
-                          : "border-[var(--lx-border)] opacity-65 hover:opacity-100",
-                      )}
-                    >
-                      <Image src={image} alt="" fill sizes="72px" className="object-cover" />
-                    </button>
-                  ))}
-                </div>
-              ) : null}
-
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
               <div
-                ref={imageRef}
-                className="relative min-w-0 flex-1 overflow-hidden rounded-[1.75rem] border border-[var(--lx-border)] bg-[var(--lx-surface-2)]"
+                role="group"
+                aria-label="Product media view"
+                className="inline-flex rounded-full border border-[var(--lx-border)] bg-[var(--lx-surface)]/70 p-1 backdrop-blur"
               >
-                <div className="relative aspect-[4/5]">
-                  <AnimatePresence mode="wait" initial={false}>
-                    {currentImage ? (
-                      <motion.div
-                        key={currentImage}
-                        initial={{ opacity: 0, scale: 1.015 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                        className="absolute inset-0"
-                      >
-                        <Image
-                          src={currentImage}
-                          alt={product.name}
-                          fill
-                          priority
-                          fetchPriority="high"
-                          sizes="(max-width: 1024px) 100vw, 55vw"
-                          className="object-cover"
-                        />
-                      </motion.div>
-                    ) : (
-                      <div className="flex h-full items-center justify-center text-6xl font-black text-[var(--lx-muted)]/30">
-                        {product.name[0]}
-                      </div>
+                {(
+                  [
+                    { id: "gallery", label: "Gallery" },
+                    { id: "studio", label: "3D Studio" },
+                  ] as const
+                ).map((mode) => (
+                  <button
+                    key={mode.id}
+                    type="button"
+                    onClick={() => setViewMode(mode.id)}
+                    aria-pressed={viewMode === mode.id}
+                    className={cn(
+                      "rounded-full px-4 py-1.5 font-mono text-[9px] uppercase tracking-[0.2em] transition-colors duration-300",
+                      viewMode === mode.id
+                        ? "bg-[var(--lx-gold)] text-[#0B0B0F] shadow-[0_8px_22px_-12px_rgba(212,175,55,0.7)]"
+                        : "text-[var(--lx-muted)] hover:text-[var(--lx-text)]",
                     )}
-                  </AnimatePresence>
-                </div>
-
-                <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-4">
-                  <div className="flex flex-col gap-1.5">
-                    {hasDiscount ? (
-                      <span className="rounded-full bg-[var(--lx-gold)] px-3 py-1 text-[10px] font-bold tracking-[0.06em] text-[#241a05] shadow-lg shadow-black/15">
-                        −{Math.round(product.discountPercent)}%
-                      </span>
-                    ) : null}
-                    {product.newArrival ? (
-                      <span className="rounded-full border border-white/25 bg-[#05060e]/45 px-3 py-1 text-[10px] font-bold tracking-[0.08em] text-white backdrop-blur-md">
-                        NEW SEASON
-                      </span>
-                    ) : null}
-                  </div>
-                  <span className="rounded-full border border-white/20 bg-[#05060e]/35 px-3 py-1 font-mono text-[8px] uppercase tracking-[0.2em] text-white/70 backdrop-blur-md">
-                    {activeImage + 1} / {gallery.length || 1}
-                  </span>
-                </div>
-
-                {soldOut ? (
-                  <div className="absolute inset-0 flex items-center justify-center bg-[#05060e]/55 backdrop-blur-[2px]">
-                    <span className="rounded-full border border-white/20 bg-[#05060e]/70 px-6 py-3 text-xs font-semibold uppercase tracking-[0.22em] text-white">
-                      Awaiting restock
-                    </span>
-                  </div>
-                ) : null}
+                  >
+                    {mode.label}
+                  </button>
+                ))}
               </div>
+              <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-[var(--lx-muted)]">
+                {viewMode === "studio"
+                  ? "Rotate · zoom · pan"
+                  : `${gallery.length || 1} ${gallery.length === 1 ? "view" : "views"}`}
+              </span>
             </div>
 
-            {gallery.length > 1 ? (
+            <div ref={imageRef}>
+              {viewMode === "studio" ? (
+                <ProductViewer
+                  name={product.name}
+                  modelUrl={product.modelUrl}
+                  poster={currentImage || product.coverImage}
+                  caption={product.modelCaption}
+                />
+              ) : (
+                <div className="flex gap-3 sm:gap-4">
+                  {gallery.length > 1 ? (
+                    <div className="hidden w-[4.5rem] shrink-0 flex-col gap-2 sm:flex">
+                      {gallery.slice(0, 6).map((image, index) => (
+                        <Button
+                          key={`${image}-${index}`}
+                          type="button"
+                          onClick={() => setActiveImage(index)}
+                          aria-label={`View image ${index + 1} of ${product.name}`}
+                          aria-pressed={index === activeImage}
+                          className={cn(
+                            "relative aspect-[4/5] overflow-hidden rounded-xl border bg-[var(--lx-surface-2)] transition duration-300",
+                            index === activeImage
+                              ? "border-[var(--lx-gold)] ring-2 ring-[var(--lx-gold)]/20"
+                              : "border-[var(--lx-border)] opacity-65 hover:opacity-100",
+                          )}
+                        >
+                          <Image src={image} alt="" fill sizes="72px" className="object-cover" />
+                        </Button>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  <div className="relative min-w-0 flex-1 overflow-hidden rounded-[1.75rem] border border-[var(--lx-border)] bg-[var(--lx-surface-2)]">
+                    <div className="relative aspect-[4/5]">
+                      <AnimatePresence mode="wait" initial={false}>
+                        {currentImage ? (
+                          <motion.div
+                            key={currentImage}
+                            initial={{ opacity: 0, scale: 1.015 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                            className="absolute inset-0"
+                          >
+                            <Image
+                              src={currentImage}
+                              alt={product.name}
+                              fill
+                              priority
+                              fetchPriority="high"
+                              sizes="(max-width: 1024px) 100vw, 55vw"
+                              className="object-cover"
+                            />
+                          </motion.div>
+                        ) : (
+                          <div className="flex h-full items-center justify-center text-6xl font-black text-[var(--lx-muted)]/30">
+                            {product.name[0]}
+                          </div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+
+                    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-4">
+                      <div className="flex flex-col gap-1.5">
+                        {hasDiscount ? (
+                          <span className="rounded-full bg-[var(--lx-gold)] px-3 py-1 text-[10px] font-bold tracking-[0.06em] text-[#0B0B0F] shadow-lg shadow-black/15">
+                            −{Math.round(product.discountPercent)}%
+                          </span>
+                        ) : null}
+                        {product.newArrival ? (
+                          <span className="rounded-full border border-white/25 bg-[#0B0B0F]/45 px-3 py-1 text-[10px] font-bold tracking-[0.08em] text-white backdrop-blur-md">
+                            NEW SEASON
+                          </span>
+                        ) : null}
+                      </div>
+                      <span className="rounded-full border border-white/20 bg-[#0B0B0F]/35 px-3 py-1 font-mono text-[8px] uppercase tracking-[0.2em] text-white/70 backdrop-blur-md">
+                        {activeImage + 1} / {gallery.length || 1}
+                      </span>
+                    </div>
+
+                    {soldOut ? (
+                      <div className="absolute inset-0 flex items-center justify-center bg-[#0B0B0F]/55 backdrop-blur-[2px]">
+                        <span className="rounded-full border border-white/20 bg-[#0B0B0F]/70 px-6 py-3 text-xs font-semibold uppercase tracking-[0.22em] text-white">
+                          Awaiting restock
+                        </span>
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {viewMode === "gallery" && gallery.length > 1 ? (
               <div className="hide-scrollbar mt-3 flex gap-2 overflow-x-auto sm:hidden">
                 {gallery.slice(0, 6).map((image, index) => (
-                  <button
+                  <Button
                     key={`${image}-${index}`}
                     type="button"
                     onClick={() => setActiveImage(index)}
@@ -259,7 +316,7 @@ export function ProductDetailClient({
                     )}
                   >
                     <Image src={image} alt="" fill sizes="56px" className="object-cover" />
-                  </button>
+                  </Button>
                 ))}
               </div>
             ) : null}
@@ -347,7 +404,7 @@ export function ProductDetailClient({
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {product.sizes.map((option) => (
-                    <button
+                    <Button
                       key={option}
                       type="button"
                       onClick={() => setSelectedSize(option)}
@@ -360,7 +417,7 @@ export function ProductDetailClient({
                       )}
                     >
                       {option}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -371,7 +428,7 @@ export function ProductDetailClient({
                 <p className="lx-label mb-0">Colour</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {product.colors.map((option) => (
-                    <button
+                    <Button
                       key={option}
                       type="button"
                       onClick={() => setSelectedColor(option)}
@@ -389,7 +446,7 @@ export function ProductDetailClient({
                         style={{ backgroundColor: option.toLowerCase() }}
                       />
                       {option}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -397,7 +454,7 @@ export function ProductDetailClient({
 
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <div className="flex h-11 items-center rounded-full border border-[var(--lx-border)] bg-[var(--lx-surface)]">
-                <button
+                <Button
                   type="button"
                   onClick={() => setQuantity((value) => Math.max(1, value - 1))}
                   disabled={quantity <= 1}
@@ -405,11 +462,11 @@ export function ProductDetailClient({
                   className="flex h-full w-10 items-center justify-center rounded-l-full text-[var(--lx-muted)] transition hover:bg-[var(--lx-surface-2)] hover:text-[var(--lx-text)] disabled:opacity-35"
                 >
                   <Minus className="h-3.5 w-3.5" aria-hidden />
-                </button>
+                </Button>
                 <span aria-live="polite" className="w-8 text-center text-xs font-semibold tabular-nums text-[var(--lx-text)]">
                   {quantity}
                 </span>
-                <button
+                <Button
                   type="button"
                   onClick={() => setQuantity((value) => Math.min(maxQuantity, value + 1))}
                   disabled={quantity >= maxQuantity || soldOut}
@@ -417,7 +474,7 @@ export function ProductDetailClient({
                   className="flex h-full w-10 items-center justify-center rounded-r-full text-[var(--lx-muted)] transition hover:bg-[var(--lx-surface-2)] hover:text-[var(--lx-text)] disabled:opacity-35"
                 >
                   <Plus className="h-3.5 w-3.5" aria-hidden />
-                </button>
+                </Button>
               </div>
               <span className="text-[11px] text-[var(--lx-muted)]">
                 {soldOut ? "Join the restock list at the atelier" : `${product.stock} units available`}
@@ -446,7 +503,7 @@ export function ProductDetailClient({
                 )}
               </RippleButton>
               <div className="flex gap-2.5">
-                <button
+                <Button
                   type="button"
                   onClick={() =>
                     void wishlist.toggle({
@@ -467,8 +524,8 @@ export function ProductDetailClient({
                   )}
                 >
                   <Heart className={cn("h-4 w-4", inWishlist && "fill-current")} aria-hidden />
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   onClick={() => compare.toggle(snapshotOf(product))}
                   aria-pressed={inCompare}
@@ -481,11 +538,11 @@ export function ProductDetailClient({
                   )}
                 >
                   <Scale className="h-4 w-4" aria-hidden />
-                </button>
+                </Button>
               </div>
             </div>
 
-            <button
+            <Button
               type="button"
               onClick={() => void buyNow()}
               disabled={soldOut || buying}
@@ -497,7 +554,7 @@ export function ProductDetailClient({
                 <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" aria-hidden />
               )}
               Buy now — skip the bag
-            </button>
+            </Button>
 
             <div className="mt-6 grid grid-cols-3 gap-2">
               {[

@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -81,16 +82,16 @@ export default async function StorePage({
             ) : (
               <div
                 className="h-full w-full"
-                style={{ background: `radial-gradient(circle at 20% 20%, ${store.brand_primary_color}, #07090f 72%)` }}
+                style={{ background: `radial-gradient(circle at 20% 20%, ${store.brand_primary_color}, #101116 72%)` }}
               />
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#07090f] via-[#07090f]/30 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#101116] via-[#101116]/30 to-transparent" />
           </div>
 
           <div className="relative px-5 pb-7 sm:px-8 lg:px-10">
             <div className="-mt-12 flex flex-col gap-5 sm:-mt-14 sm:flex-row sm:items-end sm:justify-between">
               <div className="flex items-end gap-4">
-                <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-[1.35rem] border-2 border-[#07090f] bg-[#0b0e16] text-2xl font-bold text-[var(--lx-gold)] shadow-2xl">
+                <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-[1.35rem] border-2 border-[#101116] bg-[#1A1D24] text-2xl font-bold text-[var(--lx-gold)] shadow-2xl">
                   {store.logo_url ? (
                     <Image src={store.logo_url} alt={`${store.name} logo`} width={96} height={96} className="h-full w-full object-cover" />
                   ) : (
@@ -177,7 +178,7 @@ export default async function StorePage({
               className="w-full bg-transparent text-sm text-[var(--lx-text)] outline-none placeholder:text-[var(--lx-muted)]"
             />
             {sort !== "newest" && <input type="hidden" name="sort" value={sort} />}
-            <button type="submit" className="h-8 shrink-0 rounded-full bg-[var(--lx-text)] px-3.5 text-xs font-semibold text-[var(--lx-bg)]">Search</button>
+            <Button type="submit" className="h-8 shrink-0 rounded-full bg-[var(--lx-text)] px-3.5 text-xs font-semibold text-[var(--lx-bg)]">Search</Button>
           </form>
           <div className="flex flex-wrap gap-1.5">
             {[

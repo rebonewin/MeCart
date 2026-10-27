@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -175,7 +176,7 @@ export function CommandPalette() {
                       cursor += 1;
                       const index = cursor;
                       return (
-                        <button
+                        <Button
                           key={command.id}
                           ref={() => undefined}
                           onMouseEnter={() => setActiveIndex(index)}
@@ -186,7 +187,7 @@ export function CommandPalette() {
                         >
                           <Home className="h-4 w-4 shrink-0 text-blue-300" />
                           <span className="flex-1">{command.label}</span>
-                        </button>
+                        </Button>
                       );
                     })}
                   </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useMemo, useState, useTransition } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -187,7 +188,7 @@ export function CustomersTable({
                   <td className="p-3">{formatDate(customer.createdAt)}</td>
                   <td className="p-3">{formatDate(customer.lastLoginAt)}</td>
                   <td className="p-3">
-                    <button
+                    <Button
                       onClick={() =>
                         run(
                           customer,
@@ -202,7 +203,7 @@ export function CustomersTable({
                       className="rounded border px-2 py-1 text-xs disabled:opacity-50"
                     >
                       {customer.isActive ? "Deactivate" : "Activate"}
-                    </button>
+                    </Button>
                   </td>
                 </tr>
               );

@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -49,7 +50,7 @@ export function CouponManager({ initial }: { initial: Coupon[] }) {
         <div className="mt-3 flex flex-wrap gap-3">
           <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="Code" className="rounded border px-3 py-2 dark:bg-gray-800" />
           <input value={percent} onChange={(e) => setPercent(e.target.value)} placeholder="Discount %" type="number" className="rounded border px-3 py-2 dark:bg-gray-800" />
-          <button onClick={submit} disabled={pending} className="rounded-md bg-indigo-600 px-4 py-2 text-sm text-white">Create</button>
+          <Button onClick={submit} disabled={pending} className="rounded-md bg-indigo-600 px-4 py-2 text-sm text-white">Create</Button>
         </div>
       </div>
 
@@ -70,7 +71,7 @@ export function CouponManager({ initial }: { initial: Coupon[] }) {
                 <td className="p-3">{c.discountPercent ? `${c.discountPercent}%` : `$${c.discountAmount}`}</td>
                 <td className="p-3">{c.active ? "Yes" : "No"}</td>
                 <td className="p-3">
-                  <button onClick={() => remove(c.id)} className="text-rose-600 hover:underline">Delete</button>
+                  <Button onClick={() => remove(c.id)} className="text-rose-600 hover:underline">Delete</Button>
                 </td>
               </tr>
             ))}

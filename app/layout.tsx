@@ -19,7 +19,9 @@ const geistMono = Geist_Mono({
 const playfair = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin"],
-  style: ["italic"],
+  style: ["normal", "italic"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -30,7 +32,13 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    apple: [
+      {
+        url: "/icons/apple-touch-icon.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
   },
   appleWebApp: {
     capable: true,
@@ -42,8 +50,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f7f4ed" },
-    { media: "(prefers-color-scheme: dark)", color: "#05060e" },
+    { media: "(prefers-color-scheme: light)", color: "#f8f6f2" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0b0f" },
   ],
   colorScheme: "dark light",
 };
@@ -63,12 +71,29 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} min-h-screen bg-[var(--background)] text-[var(--foreground)] antialiased`}
       >
+        <a className="lx-skip-link" href="#main">
+          Skip to content
+        </a>
         <AppProviders>{children}</AppProviders>
         <Toaster
           position="top-right"
           richColors
+          closeButton
+          duration={4200}
           offset={18}
-          toastOptions={{ className: "font-sans" }}
+          gap={10}
+          visibleToasts={4}
+          toastOptions={{
+            className: "font-sans lx-toast",
+            classNames: {
+              toast: "lx-toast",
+              title: "lx-toast-title",
+              description: "lx-toast-description",
+              actionButton: "lx-toast-action",
+              cancelButton: "lx-toast-cancel",
+              closeButton: "lx-toast-close",
+            },
+          }}
         />
         <ServiceWorkerRegister />
       </body>

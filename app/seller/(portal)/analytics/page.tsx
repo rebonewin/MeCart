@@ -29,7 +29,7 @@ export default async function SellerAnalyticsPage({
         actions={
           <div className="flex gap-1 rounded-2xl border border-white/[0.07] bg-white/[0.025] p-1">
             {[30, 90, 365].map((range) => (
-              <Link key={range} href={`/seller/analytics?range=${range}`} className={`rounded-xl px-3 py-1.5 text-xs ${days === range ? "bg-[#d8b45a] font-semibold text-[#1e1708]" : "text-slate-400 hover:text-white"}`}>
+              <Link key={range} href={`/seller/analytics?range=${range}`} className={`rounded-xl px-3 py-1.5 text-xs ${days === range ? "bg-[#D4AF37] font-semibold text-[#0B0B0F]" : "text-slate-400 hover:text-white"}`}>
                 {range === 365 ? "1Y" : `${range}D`}
               </Link>
             ))}
@@ -55,8 +55,8 @@ export default async function SellerAnalyticsPage({
         <div className="mt-7 flex h-56 items-end gap-3">
           {analytics.series.map((point) => (
             <div key={point.label} className="group relative flex h-full flex-1 items-end">
-              <div className="w-full rounded-t-xl bg-gradient-to-t from-[#6d5119]/50 to-[#e7c778] transition group-hover:to-[#f5dfa2]" style={{ height: `${Math.max(4, Math.round((point.revenue / peak) * 100))}%` }} />
-              <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-lg border border-white/10 bg-[#0b0e16] px-2.5 py-1.5 text-[10px] text-white shadow-xl group-hover:block">
+              <div className="w-full rounded-t-xl bg-gradient-to-t from-[#6d5119]/50 to-[#E6C768] transition group-hover:to-[#E6C768]" style={{ height: `${Math.max(4, Math.round((point.revenue / peak) * 100))}%` }} />
+              <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-lg border border-white/10 bg-[#1A1D24] px-2.5 py-1.5 text-[10px] text-white shadow-xl group-hover:block">
                 {money(point.revenue)} · {point.orders} orders
               </div>
               <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-[9px] text-slate-600">{point.label}</span>
@@ -69,7 +69,7 @@ export default async function SellerAnalyticsPage({
       <div className="grid gap-5 xl:grid-cols-[1.4fr_1fr]">
         <SellerCard className="overflow-hidden p-0">
           <div className="flex items-center gap-2 border-b border-white/[0.07] px-5 py-4">
-            <BarChart3 className="h-4 w-4 text-[#d8b45a]" />
+            <BarChart3 className="h-4 w-4 text-[#D4AF37]" />
             <h3 className="text-sm font-semibold text-white">Best-selling pieces</h3>
           </div>
           {analytics.topProducts.length ? (
@@ -83,7 +83,7 @@ export default async function SellerAnalyticsPage({
                       <p className="text-[10px] text-slate-600">{product.units} units</p>
                     </div>
                   </div>
-                  <span className="shrink-0 text-xs tabular-nums text-[#f5dfa2]">{money(product.revenue)}</span>
+                  <span className="shrink-0 text-xs tabular-nums text-[#E6C768]">{money(product.revenue)}</span>
                 </div>
               ))}
             </div>
@@ -105,7 +105,7 @@ export default async function SellerAnalyticsPage({
                     <span className="text-slate-300">{count}</span>
                   </div>
                   <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
-                    <div className="h-full rounded-full bg-[#d8b45a]" style={{ width: `${Math.round((count / total) * 100)}%` }} />
+                    <div className="h-full rounded-full bg-[#D4AF37]" style={{ width: `${Math.round((count / total) * 100)}%` }} />
                   </div>
                 </div>
               );
@@ -113,7 +113,7 @@ export default async function SellerAnalyticsPage({
           </div>
           <div className="mt-6 rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4">
             <p className="text-[10px] uppercase tracking-[0.16em] text-slate-600">Commission rate</p>
-            <p className="mt-1 text-2xl font-semibold text-[#f5dfa2]">{context.vendor.commission_rate}%</p>
+            <p className="mt-1 text-2xl font-semibold text-[#E6C768]">{context.vendor.commission_rate}%</p>
             <p className="mt-1 text-[11px] text-slate-500">Applied per item at the time of sale.</p>
           </div>
         </SellerCard>

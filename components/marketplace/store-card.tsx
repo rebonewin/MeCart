@@ -15,13 +15,13 @@ export function StoreCard({ store }: { store: PublicStore }) {
             style={{ background: `linear-gradient(135deg, ${store.brand_primary_color}, #10131c 70%)` }}
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#07090f] via-[#07090f]/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#101116] via-[#101116]/20 to-transparent" />
         {store.is_featured && (
           <span className="absolute left-3 top-3 rounded-full border border-white/20 bg-black/40 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-white backdrop-blur">
             Featured
           </span>
         )}
-        <div className="absolute -bottom-6 left-4 flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border-2 border-[#07090f] bg-[#0b0e16] text-lg font-bold text-[#d8b45a]">
+        <div className="absolute -bottom-6 left-4 flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border-2 border-[#101116] bg-[#1A1D24] text-lg font-bold text-[#D4AF37]">
           {store.logo_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={store.logo_url} alt="" className="h-full w-full object-cover" />

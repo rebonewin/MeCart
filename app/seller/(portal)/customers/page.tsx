@@ -36,7 +36,7 @@ export default async function SellerCustomersPage({
 
       <form className="relative max-w-sm">
         <Search className="pointer-events-none absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500" />
-        <input name="q" defaultValue={params.q ?? ""} placeholder="Search name or email" className="h-10 w-full rounded-2xl border border-white/10 bg-white/[0.03] pl-9 pr-4 text-xs text-white outline-none placeholder:text-slate-600 focus:border-[#d8b45a]/40" />
+        <input name="q" defaultValue={params.q ?? ""} placeholder="Search name or email" className="h-10 w-full rounded-2xl border border-white/10 bg-white/[0.03] pl-9 pr-4 text-xs text-white outline-none placeholder:text-slate-600 focus:border-[#D4AF37]/40" />
       </form>
 
       {filtered.length === 0 ? (
@@ -58,7 +58,7 @@ export default async function SellerCustomersPage({
                   <tr key={customer.id} className="border-b border-white/[0.04] last:border-0">
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#d8b45a]/20 bg-[#d8b45a]/10 text-xs font-semibold text-[#f5dfa2]">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#D4AF37]/20 bg-[#D4AF37]/10 text-xs font-semibold text-[#E6C768]">
                           {customer.name.charAt(0).toUpperCase()}
                         </span>
                         <div>
@@ -68,7 +68,7 @@ export default async function SellerCustomersPage({
                       </div>
                     </td>
                     <td className="px-3 py-4 text-slate-300">{customer.orders}</td>
-                    <td className="px-3 py-4 tabular-nums text-[#f5dfa2]">{money(customer.total)}</td>
+                    <td className="px-3 py-4 tabular-nums text-[#E6C768]">{money(customer.total)}</td>
                     <td className="px-5 py-4 text-xs text-slate-500">{dateLabel(customer.lastOrder)}</td>
                   </tr>
                 ))}

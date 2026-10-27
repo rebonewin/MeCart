@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -29,6 +30,7 @@ import {
   X,
 } from "lucide-react";
 import { useAuth } from "@/components/providers/auth-provider";
+import { LiquidStage } from "@/components/luxe/webgl/liquid-stage";
 import { cn } from "@/lib/cn";
 
 const NAV_GROUPS = [
@@ -120,10 +122,11 @@ export function SellerShell({
                   href={item.href}
                   onClick={() => setMobileOpen(false)}
                   title={item.label}
+                  data-active={active(item.href)}
                   className={cn(
-                    "flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition",
+                    "lx-sidebar-link flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition",
                     active(item.href)
-                      ? "bg-gradient-to-r from-[#d8b45a]/20 to-[#d8b45a]/5 text-[#f5dfa2] shadow-lg shadow-black/20 ring-1 ring-[#d8b45a]/25"
+                      ? "bg-gradient-to-r from-[#D4AF37]/20 to-[#D4AF37]/5 text-[#E6C768] shadow-lg shadow-black/20 ring-1 ring-[#D4AF37]/25"
                       : "text-slate-400 hover:bg-white/[0.06] hover:text-white",
                   )}
                 >
@@ -139,50 +142,50 @@ export function SellerShell({
   );
 
   return (
-    <div className="min-h-screen bg-[#07090f] text-slate-100">
+    <div className="lx-dark-scene min-h-screen bg-[var(--lx-bg)] text-slate-100">
       <aside
         className={cn(
-          "fixed left-0 top-0 z-40 hidden h-screen border-r border-white/[0.08] bg-[#0a0d15]/95 backdrop-blur-2xl transition-all duration-300 md:block",
+          "lx-sidebar fixed left-0 top-0 z-40 hidden h-screen border-r border-white/[0.08] backdrop-blur-2xl transition-all duration-300 md:block",
           collapsed ? "w-20" : "w-72",
         )}
       >
         <div className="flex h-16 items-center justify-between px-4">
           {!collapsed && (
             <Link href="/seller" className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#d8b45a] text-[13px] font-black text-[#1e1708]">
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#D4AF37] text-[13px] font-black text-[#0B0B0F]">
                 M
               </span>
               <span className="text-sm font-bold tracking-wide text-white">Seller Atelier</span>
             </Link>
           )}
-          <button
+          <Button
             onClick={() => setCollapsed((value) => !value)}
             className="rounded-xl border border-white/10 p-2 text-slate-400 transition hover:bg-white/10 hover:text-white"
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-          </button>
+          </Button>
         </div>
         {nav}
       </aside>
 
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
-          <button
+          <Button
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
             aria-label="Close menu"
           />
-          <aside className="relative h-full w-72 border-r border-white/10 bg-[#0a0d15] p-4">
+          <aside className="relative h-full w-72 border-r border-white/10 bg-[var(--lx-panel)] p-4">
             <div className="mb-6 flex items-center justify-between">
               <span className="text-sm font-bold text-white">Seller Atelier</span>
-              <button
+              <Button
                 onClick={() => setMobileOpen(false)}
                 className="rounded-xl border border-white/10 p-2 text-slate-300"
                 aria-label="Close menu"
               >
                 <X className="h-4 w-4" />
-              </button>
+              </Button>
             </div>
             {nav}
           </aside>
@@ -190,18 +193,21 @@ export function SellerShell({
       )}
 
       <div className={cn("transition-all duration-300", collapsed ? "md:ml-20" : "md:ml-72")}>
-        <header className="sticky top-0 z-30 border-b border-white/[0.08] bg-[#07090f]/85 backdrop-blur-2xl">
-          <div className="flex min-h-16 flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
+        <header className="relative isolate sticky top-0 z-30 overflow-hidden border-b border-white/[0.08]">
+          <div className="absolute inset-0 bg-[#0B0B0F]" aria-hidden />
+          <LiquidStage variant="ambient" intensity={0.36} className="opacity-80" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0F] via-[#0B0B0F]/88 to-[#0B0B0F]/45" aria-hidden />
+          <div className="relative flex min-h-16 flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
             <div className="flex items-center gap-3">
-              <button
+              <Button
                 onClick={() => setMobileOpen(true)}
                 className="rounded-xl border border-white/10 p-2 text-slate-300 md:hidden"
                 aria-label="Open menu"
               >
                 <Menu className="h-5 w-5" />
-              </button>
+              </Button>
               <div>
-                <p className="text-[10px] uppercase tracking-[0.28em] text-[#d8b45a]">Vendor workspace</p>
+                <p className="text-[10px] uppercase tracking-[0.28em] text-[#D4AF37]">Vendor workspace</p>
                 <div className="flex flex-wrap items-center gap-2">
                   <h1 className="text-lg font-bold text-white">{vendorName}</h1>
                   <span
@@ -224,7 +230,7 @@ export function SellerShell({
               {vendorSlug && (
                 <Link
                   href={`/vendors/${vendorSlug}`}
-                  className="hidden items-center gap-1.5 rounded-full border border-white/10 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-[#d8b45a]/40 hover:text-white sm:flex"
+                  className="hidden items-center gap-1.5 rounded-full border border-white/10 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-[#D4AF37]/40 hover:text-white sm:flex"
                 >
                   View storefront <ArrowUpRight className="h-3.5 w-3.5" />
                 </Link>
@@ -246,13 +252,13 @@ export function SellerShell({
               <div className="hidden rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-medium text-slate-200 sm:block">
                 {username || "Seller"}
               </div>
-              <button
+              <Button
                 onClick={() => void handleSignOut()}
                 className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-slate-400 transition hover:text-white"
                 aria-label="Sign out"
               >
                 <LogOut className="h-4 w-4" />
-              </button>
+              </Button>
             </div>
           </div>
         </header>

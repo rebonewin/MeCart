@@ -54,13 +54,13 @@ export default async function SellerOrderDetailPage({ params }: { params: Promis
             <div className="space-y-2.5 border-t border-white/[0.07] bg-white/[0.015] px-5 py-4 text-sm sm:px-6">
               <div className="flex justify-between text-slate-400"><span>Subtotal</span><span className="tabular-nums">{money(allocation.subtotal)}</span></div>
               <div className="flex justify-between text-slate-500"><span>Marketplace commission ({allocation.commission_rate}%)</span><span className="tabular-nums">-{money(allocation.commission_amount)}</span></div>
-              <div className="flex justify-between border-t border-white/[0.06] pt-2.5 font-semibold text-[#f5dfa2]"><span>Your earnings</span><span className="tabular-nums">{money(allocation.vendor_earnings)}</span></div>
+              <div className="flex justify-between border-t border-white/[0.06] pt-2.5 font-semibold text-[#E6C768]"><span>Your earnings</span><span className="tabular-nums">{money(allocation.vendor_earnings)}</span></div>
             </div>
           </SellerCard>
 
           <SellerCard>
             <div className="flex items-center gap-2">
-              <Receipt className="h-4 w-4 text-[#d8b45a]" />
+              <Receipt className="h-4 w-4 text-[#D4AF37]" />
               <h3 className="text-sm font-semibold text-white">Fulfilment</h3>
             </div>
             <p className="mt-1.5 text-xs leading-5 text-slate-500">
@@ -81,7 +81,7 @@ export default async function SellerOrderDetailPage({ params }: { params: Promis
         <div className="space-y-5">
           <SellerCard>
             <div className="flex items-center gap-2">
-              <User className="h-4 w-4 text-[#d8b45a]" />
+              <User className="h-4 w-4 text-[#D4AF37]" />
               <h3 className="text-sm font-semibold text-white">Customer</h3>
             </div>
             <dl className="mt-4 space-y-3 text-sm">
@@ -93,7 +93,7 @@ export default async function SellerOrderDetailPage({ params }: { params: Promis
 
           <SellerCard>
             <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-[#d8b45a]" />
+              <MapPin className="h-4 w-4 text-[#D4AF37]" />
               <h3 className="text-sm font-semibold text-white">Ship to</h3>
             </div>
             <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-slate-300">{order.shipping_address}</p>

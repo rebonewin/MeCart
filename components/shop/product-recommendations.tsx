@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { RotateCcw } from "lucide-react";
 import { ProductRail } from "@/components/shop/product-rail";
@@ -99,14 +100,14 @@ export function ProductRecommendations({
           }
           description="Kept on this device, so you can pick up exactly where you left off."
           action={
-            <button
+            <Button
               type="button"
               onClick={recentlyViewed.clear}
               className="inline-flex items-center gap-1.5 text-xs text-[var(--lx-muted)] transition hover:text-[var(--lx-text)]"
             >
               <RotateCcw className="h-3.5 w-3.5" aria-hidden />
               Clear
-            </button>
+            </Button>
           }
         />
       ) : null}

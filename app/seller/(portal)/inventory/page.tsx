@@ -39,13 +39,13 @@ export default async function SellerInventoryPage({
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex gap-1 rounded-2xl border border-white/[0.07] bg-white/[0.025] p-1">
-          <Link href="/seller/inventory" className={`rounded-xl px-3.5 py-2 text-xs ${!params.view ? "bg-[#d8b45a] font-semibold text-[#1e1708]" : "text-slate-400 hover:text-white"}`}>All stock</Link>
-          <Link href="/seller/inventory?view=low" className={`rounded-xl px-3.5 py-2 text-xs ${params.view === "low" ? "bg-[#d8b45a] font-semibold text-[#1e1708]" : "text-slate-400 hover:text-white"}`}>Low stock {low.length ? `(${low.length})` : ""}</Link>
+          <Link href="/seller/inventory" className={`rounded-xl px-3.5 py-2 text-xs ${!params.view ? "bg-[#D4AF37] font-semibold text-[#0B0B0F]" : "text-slate-400 hover:text-white"}`}>All stock</Link>
+          <Link href="/seller/inventory?view=low" className={`rounded-xl px-3.5 py-2 text-xs ${params.view === "low" ? "bg-[#D4AF37] font-semibold text-[#0B0B0F]" : "text-slate-400 hover:text-white"}`}>Low stock {low.length ? `(${low.length})` : ""}</Link>
         </div>
         <form className="relative">
           <Search className="pointer-events-none absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500" />
           {params.view && <input type="hidden" name="view" value={params.view} />}
-          <input name="q" defaultValue={params.q ?? ""} placeholder="Find a product or SKU" className="h-10 w-full rounded-2xl border border-white/10 bg-white/[0.03] pl-9 pr-4 text-xs text-white outline-none placeholder:text-slate-600 focus:border-[#d8b45a]/40 sm:w-64" />
+          <input name="q" defaultValue={params.q ?? ""} placeholder="Find a product or SKU" className="h-10 w-full rounded-2xl border border-white/10 bg-white/[0.03] pl-9 pr-4 text-xs text-white outline-none placeholder:text-slate-600 focus:border-[#D4AF37]/40 sm:w-64" />
         </form>
       </div>
 
@@ -68,7 +68,7 @@ export default async function SellerInventoryPage({
                 {filtered.map((product) => (
                   <tr key={product.id} className="border-b border-white/[0.04] last:border-0">
                     <td className="px-5 py-4">
-                      <Link href={`/seller/products/${product.id}/edit`} className="font-medium text-white hover:text-[#f5dfa2]">{product.name}</Link>
+                      <Link href={`/seller/products/${product.id}/edit`} className="font-medium text-white hover:text-[#E6C768]">{product.name}</Link>
                       <p className="mt-0.5 text-[11px] text-slate-600">{product.sku}</p>
                     </td>
                     <td className="px-3 py-4 text-xs text-slate-400">{product.storeName}</td>

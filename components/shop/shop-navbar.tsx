@@ -1,7 +1,9 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowUpRight,
@@ -34,7 +36,14 @@ const NAV_LINKS = [
   { label: "Deals", href: "/#flash-deals" },
   { label: "Rewards", href: "/rewards" },
   { label: "About", href: "/about" },
-];
+] as const;
+
+/** Active-route matching. Hash links ("Deals") never claim the route:
+    they describe a section, not the page the visitor is on. */
+function isNavActive(pathname: string, href: string): boolean {
+  if (href.includes("#")) return false;
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 const QUICK_LINKS = [
   { label: "New in", href: "/products?sort=newest" },
@@ -57,7 +66,7 @@ function Badge({ count, tone }: { count: number; tone: "gold" | "cyan" }) {
           className={cn(
             "absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1 text-[10px] font-bold shadow-lg shadow-black/30",
             tone === "gold"
-              ? "bg-[var(--lx-gold)] text-[#241a05]"
+              ? "bg-[var(--lx-gold)] text-[#0B0B0F]"
               : "bg-[var(--lx-cyan)] text-[#04202a]",
           )}
         >
@@ -84,7 +93,7 @@ function IconButton({
   buttonRef?: React.Ref<HTMLButtonElement>;
 }) {
   return (
-    <button
+    <Button
       ref={buttonRef}
       type="button"
       onClick={onClick}
@@ -96,7 +105,7 @@ function IconButton({
       )}
     >
       {children}
-    </button>
+    </Button>
   );
 }
 
@@ -107,6 +116,7 @@ function readThemeCookie(): string | null {
 }
 
 export function ShopNavbar() {
+  const pathname = usePathname();
   const { user, signOut } = useAuth();
   const { count: cartCount } = useCart();
   const { items: wishlistItems } = useWishlist();
@@ -191,12 +201,17 @@ export function ShopNavbar() {
   const displayName = user?.name || user?.username || "Account";
 
   return (
-    <header className="lx-dark-scene sticky top-0 z-50">
-      {/* atelier service strip */}
-      <div className="hidden border-b border-white/[0.06] bg-[#04050c] lg:block">
-        <div className="mx-auto flex h-8 max-w-7xl items-center justify-between px-8 font-mono text-[9px] uppercase tracking-[0.24em] text-white/42">
+    <header className="lx-dark-scene sticky top-0 z-50 bg-[#0B0B0F]">
+      {/* atelier service strip — collapses with the rail as the visitor scrolls */}
+      <div
+        className={cn(
+          "hidden overflow-hidden border-b border-white/[0.06] bg-[#0B0B0F] transition-all duration-500 lg:block",
+          scrolled ? "max-h-0 border-transparent opacity-0" : "max-h-10 opacity-100",
+        )}
+      >
+        <div className="mx-auto flex h-8 max-w-7xl items-center justify-between px-8 font-mono text-[9px] uppercase tracking-[0.24em] text-white/55">
           <span>Considered objects · live inventory</span>
-          <span className="flex items-center gap-2 text-white/60">
+          <span className="flex items-center gap-2 text-white/65">
             <span className="h-1 w-1 rounded-full bg-[var(--lx-emerald)]" />
             SS26 Atelier drop is live
             <Link href="/products" className="text-[var(--lx-gold)] transition hover:text-white">
@@ -209,21 +224,23 @@ export function ShopNavbar() {
 
       <div
         className={cn(
-          "relative border-b border-white/[0.08] bg-[#05060e]/72 backdrop-blur-2xl transition-all duration-500",
+          "relative border-b border-white/[0.08] bg-[#0B0B0F]/72 backdrop-blur-2xl transition-all duration-500",
           scrolled
-            ? "bg-[#05060e]/90 shadow-[0_24px_60px_-34px_rgba(0,0,0,0.95)]"
+            ? "bg-[#0B0B0F]/90 shadow-[0_24px_60px_-34px_rgba(0,0,0,0.95)]"
             : "shadow-none",
         )}
       >
         <div className="lx-hairline-x pointer-events-none absolute inset-x-0 bottom-0 h-px opacity-35" />
+        {/* Three-rail composition: guaranteed centre em, no column can ever
+            cross the wordmark — the 1fr/auto/1fr grid budgets both wings. */}
         <div
           className={cn(
-            "relative mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 transition-all duration-500 sm:px-6 lg:px-8",
+            "relative mx-auto grid w-full max-w-7xl grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1.5 px-3 transition-all duration-500 sm:px-6 lg:px-8",
             scrolled ? "h-16" : "h-[4.5rem]",
           )}
         >
-          {/* left — primary nav + mobile menu trigger */}
-          <div className="flex flex-1 items-center gap-1">
+          {/* left rail — primary nav + mobile menu trigger */}
+          <div className="flex min-w-0 items-center gap-0.5">
             <IconButton
               label={menuOpen ? "Close menu" : "Open menu"}
               expanded={menuOpen}
@@ -233,42 +250,72 @@ export function ShopNavbar() {
               {menuOpen ? <X className="h-5 w-5" aria-hidden /> : <Menu className="h-5 w-5" aria-hidden />}
             </IconButton>
 
-            <nav className="hidden items-center gap-1 xl:flex" aria-label="Primary">
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="group relative rounded-full px-3.5 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-white/62 transition hover:text-white"
-                >
-                  {link.label}
-                  <span className="absolute inset-x-3.5 -bottom-0.5 h-px scale-x-0 bg-[var(--lx-gold)] transition-transform duration-300 group-hover:scale-x-100" />
-                </Link>
-              ))}
+            <nav className="hidden min-w-0 items-center gap-0.5 xl:flex" aria-label="Primary">
+              {NAV_LINKS.map((link) => {
+                const active = isNavActive(pathname, link.href);
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "group relative rounded-full px-2.5 py-2 text-[10px] font-medium uppercase tracking-[0.16em] transition hover:text-white",
+                      active ? "text-[var(--lx-champagne-warm)]" : "text-white/62",
+                    )}
+                  >
+                    {link.label}
+                    <span
+                      aria-hidden
+                      className={cn(
+                        "absolute inset-x-2.5 -bottom-0.5 h-px origin-left bg-[var(--lx-gold)] transition-transform duration-300",
+                        active ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100",
+                      )}
+                    />
+                  </Link>
+                );
+              })}
             </nav>
           </div>
 
-          {/* centre — MECART wordmark */}
+          {/* centre rail — MECART wordmark */}
           <Link
             href="/"
-            aria-label="MeCart home"
-            className="group absolute left-1/2 top-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 items-center gap-3"
+            className="group relative z-10 flex items-center gap-2.5 justify-self-center"
           >
-            <span className="relative flex h-10 w-10 items-center justify-center">
+            <span
+              aria-hidden
+              className={cn(
+                "relative flex items-center justify-center transition-all duration-500",
+                scrolled ? "h-9 w-9" : "h-10 w-10",
+              )}
+            >
               <span className="lx-conic-ring absolute inset-0 rounded-[13px] opacity-80 transition duration-500 group-hover:opacity-100 group-hover:rotate-180" />
-              <span className="relative z-10 flex h-[calc(100%-3px)] w-[calc(100%-3px)] items-center justify-center rounded-[11px] bg-[#05060e] text-base font-black text-white">
+              <span className="relative z-10 flex h-[calc(100%-3px)] w-[calc(100%-3px)] items-center justify-center rounded-[11px] bg-[#0B0B0F] text-base font-black text-white">
                 M
               </span>
             </span>
             <span className="hidden flex-col leading-none sm:flex">
-              <span className="text-[17px] font-semibold tracking-[0.22em] text-white">MECART</span>
-              <span className="mt-1 font-mono text-[7px] uppercase tracking-[0.46em] text-[var(--lx-muted)]">
+              <span
+                className={cn(
+                  "font-semibold tracking-[0.22em] text-white transition-all duration-500",
+                  scrolled ? "text-[15px]" : "text-[17px]",
+                )}
+              >
+                MECART
+              </span>
+              <span
+                className={cn(
+                  "mt-1 font-mono text-[7px] uppercase tracking-[0.46em] text-[var(--lx-muted)] transition-opacity duration-300",
+                  scrolled && "opacity-0",
+                )}
+              >
                 Maison · Atelier
               </span>
             </span>
           </Link>
 
-          {/* right — actions */}
-          <div className="flex flex-1 items-center justify-end gap-0.5 sm:gap-1">
+          {/* right rail — atelier services */}
+          <div className="flex min-w-0 items-center justify-end gap-0.5 sm:gap-1">
             <IconButton
               label="Search (Command K)"
               expanded={searchOpen}
@@ -292,18 +339,22 @@ export function ShopNavbar() {
               <Badge count={wishlistItems.length} tone="gold" />
             </Link>
 
-            {/* rider + cart */}
+            {/* MECO lives inside the bag capsule — the courier hands you
+                your cart. One object, one motion, no orphaned app icon. */}
             <div
-              className="relative flex items-center"
+              className="relative flex items-center rounded-full border border-white/10 bg-white/[0.045] pr-1 backdrop-blur-xl transition duration-300 hover:border-[var(--lx-gold)]/35 hover:bg-white/[0.07]"
               onMouseEnter={() => setCartHover(true)}
               onMouseLeave={() => setCartHover(false)}
             >
-              <RiderMascot cartHovered={cartHover} className="mr-0.5 inline-flex" />
+              <span className="mr-0.5 hidden sm:block">
+                <RiderMascot cartHovered={cartHover} compact className="inline-flex" />
+              </span>
               <Link
                 id="mecart-cart-anchor"
                 href="/cart"
                 aria-label={`Cart (${cartCount})`}
-                className="relative flex h-10 w-10 items-center justify-center rounded-full text-white/65 transition duration-300 hover:bg-white/[0.06] hover:text-white"
+                data-cursor-label={cartCount > 0 ? `Bag · ${cartCount}` : "Bag"}
+                className="relative flex h-9 w-9 items-center justify-center rounded-full text-white/65 transition duration-300 hover:bg-white/[0.07] hover:text-white"
               >
                 <motion.span
                   animate={cartHover ? { scale: 1.12, rotate: -6 } : { scale: 1, rotate: 0 }}
@@ -331,7 +382,7 @@ export function ShopNavbar() {
 
             {authed ? (
               <div ref={accountRef} className="relative">
-                <button
+                <Button
                   type="button"
                   onClick={() => setAccountOpen((open) => !open)}
                   aria-expanded={accountOpen}
@@ -344,7 +395,7 @@ export function ShopNavbar() {
                   <span className="hidden max-w-[7rem] truncate text-[11px] font-medium text-white 2xl:block">
                     {displayName}
                   </span>
-                </button>
+                </Button>
 
                 <AnimatePresence>
                   {accountOpen ? (
@@ -408,7 +459,7 @@ export function ShopNavbar() {
                         ) : null}
                       </div>
                       <div className="mx-2 my-1 h-px bg-white/10" />
-                      <button
+                      <Button
                         type="button"
                         role="menuitem"
                         onClick={() => {
@@ -418,23 +469,20 @@ export function ShopNavbar() {
                         className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm text-[var(--lx-rose)] transition hover:bg-[var(--lx-rose)]/10"
                       >
                         <LogOut className="h-4 w-4" aria-hidden /> Sign out
-                      </button>
+                      </Button>
                     </motion.div>
                   ) : null}
                 </AnimatePresence>
               </div>
             ) : (
-              <div className="hidden items-center gap-2 xl:flex">
+              <div className="hidden items-center gap-1.5 xl:flex">
                 <Link
                   href="/login"
-                  className="whitespace-nowrap rounded-full px-4 py-2 text-[11px] font-medium uppercase tracking-[0.14em] text-white/65 transition hover:text-white"
+                  className="rounded-full px-3 py-2 text-[10px] font-medium uppercase tracking-[0.18em] text-white/65 transition hover:text-white"
                 >
                   Sign in
                 </Link>
-                <Link
-                  href="/register"
-                  className="flex h-10 items-center whitespace-nowrap rounded-full bg-gradient-to-r from-[#f5d08a] via-[#f0c46c] to-[#e0a84e] px-5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#241a05] shadow-[0_14px_40px_-18px_rgba(240,196,108,0.6)] transition duration-300 hover:-translate-y-0.5 hover:brightness-105"
-                >
+                <Link href="/register" className="lx-btn lx-btn--brand lx-btn--sm lx-btn--navcta">
                   Create account
                 </Link>
               </div>
@@ -451,12 +499,12 @@ export function ShopNavbar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.22 }}
-            className="fixed inset-0 z-[90] overflow-y-auto bg-[#04050c]/84 backdrop-blur-2xl"
+            className="fixed inset-0 z-[90] overflow-y-auto bg-[#0B0B0F]/84 backdrop-blur-2xl"
             role="dialog"
             aria-modal="true"
             aria-label="Search MeCart"
           >
-            <button
+            <Button
               type="button"
               aria-label="Close search"
               onClick={closeSearch}
@@ -478,14 +526,14 @@ export function ShopNavbar() {
                     Search the live catalogue, brands and collections.
                   </p>
                 </div>
-                <button
+                <Button
                   type="button"
                   onClick={closeSearch}
                   aria-label="Close search"
                   className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-white/70 transition hover:border-white/25 hover:bg-white/5 hover:text-white"
                 >
                   <X className="h-4 w-4" aria-hidden />
-                </button>
+                </Button>
               </div>
 
               <LiveSearch size="lg" autoFocus inline onNavigate={closeSearch} />
@@ -523,7 +571,10 @@ export function ShopNavbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-x-0 bottom-0 top-[4.5rem] z-[85] overflow-y-auto border-t border-white/[0.08] bg-[#05060e]/97 backdrop-blur-2xl xl:hidden"
+            className={cn(
+              "fixed inset-x-0 bottom-0 z-[85] overflow-y-auto border-t border-white/[0.08] bg-[#0B0B0F]/97 backdrop-blur-2xl xl:hidden",
+              scrolled ? "top-16" : "top-[4.5rem] lg:top-[6.5rem]",
+            )}
           >
             <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
               <LiveSearch size="lg" placeholder="Search the atelier…" onNavigate={() => setMenuOpen(false)} />
@@ -576,7 +627,7 @@ export function ShopNavbar() {
                   <Link
                     href="/register"
                     onClick={() => setMenuOpen(false)}
-                    className="flex h-12 flex-1 items-center justify-center rounded-full bg-gradient-to-r from-[#f5d08a] via-[#f0c46c] to-[#e0a84e] text-sm font-semibold text-[#241a05]"
+                    className="lx-btn lx-btn--brand lx-btn--md flex-1"
                   >
                     Create account
                   </Link>

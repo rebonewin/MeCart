@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -94,14 +95,14 @@ export function EmailVerificationTable({ users }: { users: UserRow[] }) {
         />
         <div className="flex gap-2">
           {(["all", "verified", "pending", "failed"] as const).map((item) => (
-            <button
+            <Button
               key={item}
               onClick={() => setFilter(item)}
               aria-pressed={filter === item}
               className={`rounded-xl px-3 py-2 text-xs font-semibold capitalize ${filter === item ? "bg-indigo-600 text-white" : "border border-gray-200 text-gray-600 dark:border-gray-700 dark:text-gray-300"}`}
             >
               {item} · {counts[item]}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -151,12 +152,12 @@ export function EmailVerificationTable({ users }: { users: UserRow[] }) {
                   </td>
                   <td className="p-3">
                     <div className="flex gap-2">
-                      <button onClick={() => runResend(user)} disabled={isBusy} className="rounded border px-2 py-1 text-xs disabled:opacity-50">
+                      <Button onClick={() => runResend(user)} disabled={isBusy} className="rounded border px-2 py-1 text-xs disabled:opacity-50">
                         Resend
-                      </button>
-                      <button onClick={() => runDeactivate(user)} disabled={isBusy} className="rounded border px-2 py-1 text-xs disabled:opacity-50">
+                      </Button>
+                      <Button onClick={() => runDeactivate(user)} disabled={isBusy} className="rounded border px-2 py-1 text-xs disabled:opacity-50">
                         {user.is_active ? "Deactivate" : "Activate"}
-                      </button>
+                      </Button>
                     </div>
                   </td>
                 </tr>

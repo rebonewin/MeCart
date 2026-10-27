@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useState, useTransition } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -142,7 +143,7 @@ export function UsersTable({
                 </td>
                 <td className="p-3">{member.lastLoginLabel ?? "Never"}</td>
                 <td className="p-3">
-                  <button
+                  <Button
                     onClick={() =>
                       run(
                         member,
@@ -155,7 +156,7 @@ export function UsersTable({
                     className="rounded border px-2 py-1 text-xs disabled:opacity-50"
                   >
                     {member.isActive ? "Deactivate" : "Activate"}
-                  </button>
+                  </Button>
                 </td>
               </tr>
             );

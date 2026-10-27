@@ -44,6 +44,10 @@ export type Product = {
   brandName: string;
   coverImage: string;
   images: string[];
+  /** Optional interactive 3D asset (GLB/GLTF). Falls back to studio photography. */
+  modelUrl?: string;
+  /** Optional caption for the 3D viewer, e.g. "glTF · 4.2 MB". */
+  modelCaption?: string;
   createdAt: string;
   storeName?: string;
   storeSlug?: string;

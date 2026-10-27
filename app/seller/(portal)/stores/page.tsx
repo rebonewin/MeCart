@@ -32,11 +32,11 @@ export default async function SellerStoresPage() {
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={store.banner_url} alt="" className="h-full w-full object-cover opacity-70" />
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0b0e16] to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1A1D24] to-transparent" />
               </div>
               <div className="relative px-5 pb-5">
                 <div className="-mt-7 flex items-end justify-between gap-3">
-                  <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-[#0b0e16] text-[#d8b45a]">
+                  <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-[#1A1D24] text-[#D4AF37]">
                     {store.logo_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={store.logo_url} alt="" className="h-full w-full object-cover" />
@@ -55,7 +55,7 @@ export default async function SellerStoresPage() {
                         <ArrowUpRight className="h-3.5 w-3.5" />
                       </Link>
                     )}
-                    <Link href={`/seller/stores/${store.id}`} className="inline-flex h-8 items-center rounded-full border border-[#d8b45a]/25 bg-[#d8b45a]/10 px-3 text-[10px] font-semibold text-[#f5dfa2]">
+                    <Link href={`/seller/stores/${store.id}`} className="inline-flex h-8 items-center rounded-full border border-[#D4AF37]/25 bg-[#D4AF37]/10 px-3 text-[10px] font-semibold text-[#E6C768]">
                       Manage
                     </Link>
                   </div>
