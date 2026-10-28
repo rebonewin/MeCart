@@ -309,6 +309,73 @@
   color: var(--lx-text);
 }
 
+/* ============================================================
+   MECO assistant surfaces
+   Theme-aware glass that inherits the active storefront token set.
+   No fixed dark scene: the panel follows both light and dark mode.
+   ============================================================ */
+
+.meco-glass {
+  background: var(--lx-panel);
+  background: color-mix(in srgb, var(--lx-panel) 92%, transparent);
+  border-color: var(--lx-glass-border);
+  color: var(--lx-text);
+  -webkit-backdrop-filter: blur(26px) saturate(140%);
+  backdrop-filter: blur(26px) saturate(140%);
+}
+
+.meco-glass-soft {
+  background: var(--lx-surface);
+  background: color-mix(in srgb, var(--lx-surface) 72%, transparent);
+  border-color: var(--lx-glass-border);
+  color: var(--lx-text);
+  -webkit-backdrop-filter: blur(18px) saturate(130%);
+  backdrop-filter: blur(18px) saturate(130%);
+}
+
+.meco-bubble {
+  background: var(--lx-surface);
+  background: color-mix(in srgb, var(--lx-surface) 76%, transparent);
+  border-color: var(--lx-glass-border);
+  color: var(--lx-text);
+}
+
+.meco-bubble-guest {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--lx-gold) 24%, transparent),
+    color-mix(in srgb, var(--lx-gold) 9%, transparent)
+  );
+  color: var(--lx-text);
+}
+
+.meco-composer {
+  background: var(--lx-surface);
+  background: color-mix(in srgb, var(--lx-surface) 68%, transparent);
+  border-color: var(--lx-border);
+}
+
+.meco-footer {
+  background: var(--lx-panel);
+  background: color-mix(in srgb, var(--lx-ink) 10%, transparent);
+}
+
+.meco-scroll {
+  scrollbar-color: color-mix(in srgb, var(--lx-muted) 40%, transparent)
+    transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .meco-glass,
+  .meco-glass-soft,
+  .meco-bubble,
+  .meco-bubble-guest,
+  .meco-composer {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
 html,
 body {
   height: 100%;

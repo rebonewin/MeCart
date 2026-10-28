@@ -1,79 +1,25 @@
-export type AssistantProduct = {
-  id: string;
-  name: string;
-  slug: string;
-  price: number;
-  originalPrice: number;
-  image: string | null;
-  brandName: string;
-  categoryName: string;
-  subCategoryName: string;
-  description: string;
-  material: string;
-  colors: string[];
-  sizes: string[];
-  rating: number;
-  reviewCount: number;
-  stock: number;
-  bestSeller: boolean;
-  newArrival: boolean;
-};
+import {
+  categorySuggestions,
+  firstName,
+  matchProducts,
+  normalize,
+  topProducts,
+} from "./search";
+import type {
+  AssistantCatalog,
+  AssistantContext,
+  AssistantReply,
+} from "./types";
 
-export type AssistantCategory = {
-  id: string;
-  name: string;
-  slug: string;
-  productCount: number;
-};
-
-export type AssistantCatalog = {
-  products: AssistantProduct[];
-  categories: AssistantCategory[];
-};
-
-export type AssistantIntent =
-  | "greeting"
-  | "recommend"
-  | "search"
-  | "cart"
-  | "checkout"
-  | "order"
-  | "faq"
-  | "gift"
-  | "contact"
-  | "thanks"
-  | "smalltalk";
-
-export type AssistantAction = {
-  label: string;
-  href: string;
-};
-
-export type AssistantReply = {
-  intent: AssistantIntent;
-  text: string;
-  products?: AssistantProduct[];
-  categories?: AssistantCategory[];
-  actions?: AssistantAction[];
-  suggestions?: string[];
-  orderLookup?: boolean;
-  orderNumber?: string;
-};
-
-export type AssistantContext = {
-  name?: string | null;
-  cartCount: number;
-  cartSubtotal: number;
-  cartItems: { name: string; quantity: number; price: number }[];
-  wishlistCount: number;
-};
-
-const STOP_WORDS = new Set([
-  "the", "and", "for", "with", "that", "this", "from", "have", "looking", "want",
-  "need", "some", "something", "please", "show", "find", "about", "into", "your",
-  "you", "can", "could", "would", "help", "me", "my", "a", "an", "to", "of", "in",
-  "on", "is", "are", "best", "good", "nice", "new",
-]);
+export type {
+  AssistantAction,
+  AssistantCatalog,
+  AssistantCategory,
+  AssistantContext,
+  AssistantIntent,
+  AssistantProduct,
+  AssistantReply,
+} from "./types";
 
 const FAQS: { keywords: string[]; reply: Omit<AssistantReply, "intent"> }[] = [
   {
@@ -159,120 +105,27 @@ const FAQS: { keywords: string[]; reply: Omit<AssistantReply, "intent"> }[] = [
   },
 ];
 
-function normalize(value: string) {
-  return value.toLowerCase().replace(/\s+/g, " ").trim();
-}
-
-function firstName(name?: string | null) {
-  const clean = name?.trim();
-  if (!clean) return null;
-  return clean.split(" ")[0] ?? null;
-}
-
-function tokensOf(value: string) {
-  return normalize(value)
-    .split(/[^a-z0-9]+/)
-    .filter((token) => token.length > 1 && !STOP_WORDS.has(token));
-}
-
-function productText(product: AssistantProduct) {
-  return normalize(
-    [
-      product.name,
-      product.brandName,
-      product.categoryName,
-      product.subCategoryName,
-      product.description,
-      product.material,
-      ...product.colors,
-      ...product.sizes,
-    ].join(" "),
-  );
-}
-
-function priceLimit(message: string) {
-  const under = message.match(/(?:under|below|less than|max(?:imum)?|budget(?: of)?)\s*\$?\s*(\d+(?:\.\d+)?)/i);
-  const over = message.match(/(?:over|above|more than|from)\s*\$?\s*(\d+(?:\.\d+)?)/i);
-  return {
-    max: under ? Number(under[1]) : undefined,
-    min: over ? Number(over[1]) : undefined,
-  };
-}
-
-function matchProducts(
-  message: string,
-  catalog: AssistantCatalog,
-  options: { limit?: number; categorySlug?: string } = {},
-) {
-  const queryTokens = tokensOf(message);
-  const normalized = normalize(message);
-  const limits = priceLimit(message);
-  const categoryHit = catalog.categories.find(
-    (category) =>
-      normalized.includes(normalize(category.name)) ||
-      normalized.includes(normalize(category.slug)),
-  );
-  const categorySlug = options.categorySlug ?? categoryHit?.slug;
-
-  const scored = catalog.products
-    .filter((product) => !limits.max || product.price <= limits.max)
-    .filter((product) => !limits.min || product.price >= limits.min)
-    .filter(
-      (product) =>
-        !categorySlug ||
-        normalize(product.categoryName).replace(/\s+/g, "-") === normalize(categorySlug) ||
-        normalize(product.categoryName) === normalize(categoryHit?.name ?? ""),
-    )
-    .map((product) => {
-      const text = productText(product);
-      let score = product.rating * 7 + Math.min(product.reviewCount, 200) * 0.12;
-      if (product.bestSeller) score += 4;
-      if (product.newArrival) score += 2;
-      for (const token of queryTokens) {
-        if (text.includes(token)) score += 12;
-      }
-      if (normalized.includes(normalize(product.name))) score += 30;
-      if (normalized.includes(normalize(product.brandName))) score += 18;
-      for (const color of product.colors) {
-        if (normalized.includes(normalize(color))) score += 10;
-      }
-      return { product, score };
-    })
-    .filter((entry) => queryTokens.length === 0 || entry.score > 10)
-    .sort((a, b) => b.score - a.score);
-
-  return scored.slice(0, options.limit ?? 4).map((entry) => entry.product);
-}
-
-function categorySuggestions(catalog: AssistantCatalog, limit = 4) {
-  return catalog.categories
-    .filter((category) => category.productCount > 0)
-    .slice(0, limit);
-}
-
-function topProducts(catalog: AssistantCatalog, limit = 4) {
-  return catalog.products
-    .slice()
-    .sort(
-      (a, b) =>
-        b.rating * 20 + Math.min(b.reviewCount, 200) * 0.25 -
-        (a.rating * 20 + Math.min(a.reviewCount, 200) * 0.25),
-    )
-    .slice(0, limit);
-}
+const EMPTY_CATALOG: AssistantCatalog = { products: [], categories: [] };
 
 export function mecoInitialReply(
   context: AssistantContext,
   catalog: AssistantCatalog | null,
 ): AssistantReply {
   const name = firstName(context.name);
+  const liveCategories = catalog
+    ? catalog.categories.filter((category) => category.productCount > 0).length
+    : 0;
   const cacheNote = catalog
-    ? `The atelier currently has ${catalog.products.length} live pieces across ${categorySuggestions(catalog).length} collections.`
+    ? `The atelier currently has ${catalog.products.length} live pieces across ${liveCategories} collections.`
     : "I can help with the bag, checkout, delivery and order questions right away.";
+  const recent = context.recentlyViewed?.[0];
+  const recentNote = recent?.name
+    ? ` I can also continue from your recent look at ${recent.name}.`
+    : "";
 
   return {
     intent: "greeting",
-    text: `${name ? `Welcome back, ${name}.` : "Welcome to MeCart."} I'm MECO, your atelier companion. ${cacheNote} Tell me what you're looking for, or pick a starting point below.`,
+    text: `${name ? `Welcome back, ${name}.` : "Welcome to MeCart."} I'm MECO, your MeCart AI shopping concierge. ${cacheNote}${recentNote} Tell me what you're looking for, or pick a starting point below.`,
     products: catalog ? topProducts(catalog, 2) : undefined,
     categories: catalog ? categorySuggestions(catalog) : undefined,
     actions: [
@@ -289,8 +142,11 @@ export function mecoInitialReply(
 }
 
 /**
- * Rule-based assistant engine with provider-agnostic inputs. A future model can
- * replace `answerMeco` and keep the same reply contract and UI.
+ * Local, provider-independent assistant engine.
+ *
+ * It powers the instant greeting, offline mode, and the graceful fallback when
+ * the hosted AI is unavailable. The hosted MECO uses the same catalogue and
+ * reply contract, so the UI never has to know which engine answered.
  */
 export function answerMeco(
   message: string,
@@ -298,8 +154,9 @@ export function answerMeco(
   catalog: AssistantCatalog | null,
 ): AssistantReply {
   const normalized = normalize(message);
-  const products = catalog?.products ?? [];
-  const categories = catalog?.categories ?? [];
+  const safeCatalog = catalog ?? EMPTY_CATALOG;
+  const products = safeCatalog.products;
+  const categories = safeCatalog.categories;
 
   if (!normalized) {
     return {
@@ -422,10 +279,8 @@ export function answerMeco(
   }
 
   if (/\b(gift|present|anniversary|birthday|wedding|occasion)\b/.test(normalized)) {
-    const candidates = matchProducts(message, catalog ?? { products: [], categories: [] }, {
-      limit: 4,
-    });
-    const picks = candidates.length ? candidates : topProducts(catalog ?? { products: [], categories: [] }, 4);
+    const candidates = matchProducts(message, safeCatalog, { limit: 4 });
+    const picks = candidates.length ? candidates : topProducts(safeCatalog, 4);
     return {
       intent: "gift",
       text: picks.length
@@ -448,12 +303,14 @@ export function answerMeco(
     return { intent: "faq", ...faq.reply };
   }
 
-  if (/\b(recommend|suggest|looking for|show me|i want|i need|interested|browse|trending|popular|new|best seller)\b/.test(normalized)) {
+  if (
+    /\b(recommend|suggest|looking for|show me|i want|i need|interested|browse|trending|popular|new|best seller)\b/.test(
+      normalized,
+    )
+  ) {
     const wantsNew = /\b(new|new arrival|new arrivals)\b/.test(normalized);
     const wantsBest = /\b(best|popular|best seller|best sellers)\b/.test(normalized);
-    const matches = matchProducts(message, catalog ?? { products: [], categories: [] }, {
-      limit: 4,
-    });
+    const matches = matchProducts(message, safeCatalog, { limit: 4 });
     let picks = matches;
     if (!picks.length && wantsNew) {
       picks = products.filter((product) => product.newArrival).slice(0, 4);
@@ -461,7 +318,7 @@ export function answerMeco(
     if (!picks.length && wantsBest) {
       picks = products.filter((product) => product.bestSeller).slice(0, 4);
     }
-    if (!picks.length) picks = topProducts(catalog ?? { products: [], categories: [] }, 4);
+    if (!picks.length) picks = topProducts(safeCatalog, 4);
 
     return {
       intent: picks.length ? "recommend" : "search",
@@ -475,9 +332,7 @@ export function answerMeco(
     };
   }
 
-  const matches = matchProducts(message, catalog ?? { products: [], categories: [] }, {
-    limit: 4,
-  });
+  const matches = matchProducts(message, safeCatalog, { limit: 4 });
   if (matches.length) {
     return {
       intent: "search",
@@ -494,7 +349,7 @@ export function answerMeco(
   return {
     intent: "smalltalk",
     text: `I'm not certain I caught that${firstName(context.name) ? `, ${firstName(context.name)}` : ""}. I can help with products and categories, your bag, checkout, delivery and returns, or an order lookup.`,
-    categories: categories.length ? categorySuggestions(catalog ?? { products: [], categories: [] }) : undefined,
+    categories: categories.length ? categorySuggestions(safeCatalog) : undefined,
     products: catalog ? topProducts(catalog, 2) : undefined,
     actions: [
       { label: "Browse products", href: "/products" },
