@@ -3,11 +3,13 @@ import {
   firstName,
   matchProducts,
   normalize,
+  priceLimit,
   topProducts,
 } from "./search";
 import type {
   AssistantCatalog,
   AssistantContext,
+  AssistantProduct,
   AssistantReply,
 } from "./types";
 
@@ -157,6 +159,13 @@ export function answerMeco(
   const safeCatalog = catalog ?? EMPTY_CATALOG;
   const products = safeCatalog.products;
   const categories = safeCatalog.categories;
+  const limits = priceLimit(message);
+  const withinBudget = (list: AssistantProduct[]) =>
+    list.filter(
+      (product) =>
+        (limits.max === undefined || product.price <= limits.max) &&
+        (limits.min === undefined || product.price >= limits.min),
+    );
 
   if (!normalized) {
     return {
@@ -279,13 +288,17 @@ export function answerMeco(
   }
 
   if (/\b(gift|present|anniversary|birthday|wedding|occasion)\b/.test(normalized)) {
-    const candidates = matchProducts(message, safeCatalog, { limit: 4 });
-    const picks = candidates.length ? candidates : topProducts(safeCatalog, 4);
+    const candidates = withinBudget(matchProducts(message, safeCatalog, { limit: 4 }));
+    const picks = candidates.length
+      ? candidates
+      : withinBudget(topProducts(safeCatalog, 4));
     return {
       intent: "gift",
       text: picks.length
         ? "A few considered gifts from the live edit. Tell me the budget, the recipient's style or the occasion and I can narrow it further."
-        : "I can shape a gift edit as soon as the catalogue is available. In the meantime, the atelier's care team can help at care@mecart.store.",
+        : products.length
+          ? "Nothing in the live edit currently fits that price range. Tell me a different budget and I'll look again."
+          : "I can shape a gift edit as soon as the catalogue is available. In the meantime, the atelier's care team can help at care@mecart.store.",
       products: picks,
       categories: catalog ? categorySuggestions(catalog) : undefined,
       actions: [
@@ -310,21 +323,27 @@ export function answerMeco(
   ) {
     const wantsNew = /\b(new|new arrival|new arrivals)\b/.test(normalized);
     const wantsBest = /\b(best|popular|best seller|best sellers)\b/.test(normalized);
-    const matches = matchProducts(message, safeCatalog, { limit: 4 });
+    const matches = withinBudget(matchProducts(message, safeCatalog, { limit: 4 }));
     let picks = matches;
     if (!picks.length && wantsNew) {
-      picks = products.filter((product) => product.newArrival).slice(0, 4);
+      picks = withinBudget(
+        products.filter((product) => product.newArrival).slice(0, 4),
+      );
     }
     if (!picks.length && wantsBest) {
-      picks = products.filter((product) => product.bestSeller).slice(0, 4);
+      picks = withinBudget(
+        products.filter((product) => product.bestSeller).slice(0, 4),
+      );
     }
-    if (!picks.length) picks = topProducts(safeCatalog, 4);
+    if (!picks.length) picks = withinBudget(topProducts(safeCatalog, 4));
 
     return {
       intent: picks.length ? "recommend" : "search",
       text: picks.length
         ? "Here's the edit I'd bring to you from the live catalogue. You can open a piece, add it to your bag, or ask me to go narrower."
-        : "I couldn't reach the catalogue just now. I can still help with the bag, checkout, delivery or an order — or you can browse the full collection.",
+        : products.length
+          ? "Nothing in the live catalogue currently fits that price range. Tell me a different budget and I'll look again."
+          : "I couldn't reach the catalogue just now. I can still help with the bag, checkout, delivery or an order — or you can browse the full collection.",
       products: picks,
       categories: catalog ? categorySuggestions(catalog) : undefined,
       actions: [{ label: "View the full collection", href: "/products" }],

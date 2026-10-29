@@ -53,16 +53,37 @@ function productText(product: AssistantProduct) {
   );
 }
 
+function parseMoney(value: string | undefined) {
+  if (!value) return undefined;
+  const parsed = Number(value.replace(/,/g, ""));
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
+}
+
+/**
+ * Extract an explicit price ceiling/floor from a shopper message.
+ * Handles "under $1,500", "up to 500", "within $500" and "between X and Y".
+ */
 export function priceLimit(message: string) {
+  const range = message.match(
+    /\bbetween\s*\$?\s*([\d,]+(?:\.\d+)?)\s*(?:and|to|-)\s*\$?\s*([\d,]+(?:\.\d+)?)/i,
+  );
+  if (range) {
+    const first = parseMoney(range[1]);
+    const second = parseMoney(range[2]);
+    if (first !== undefined && second !== undefined) {
+      return { max: Math.max(first, second), min: Math.min(first, second) };
+    }
+  }
+
   const under = message.match(
-    /(?:under|below|less than|max(?:imum)?|budget(?: of)?)\s*\$?\s*(\d+(?:\.\d+)?)/i,
+    /(?:under|below|less than|up to|within|max(?:imum)?|budget(?: of)?)\s*\$?\s*([\d,]+(?:\.\d+)?)/i,
   );
   const over = message.match(
-    /(?:over|above|more than|from)\s*\$?\s*(\d+(?:\.\d+)?)/i,
+    /(?:over|above|more than|from)\s*\$?\s*([\d,]+(?:\.\d+)?)/i,
   );
   return {
-    max: under ? Number(under[1]) : undefined,
-    min: over ? Number(over[1]) : undefined,
+    max: parseMoney(under?.[1]),
+    min: parseMoney(over?.[1]),
   };
 }
 

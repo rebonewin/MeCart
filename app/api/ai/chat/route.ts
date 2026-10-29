@@ -6,6 +6,7 @@ import {
   dedupeProducts,
   matchProducts,
   mentionedProducts,
+  priceLimit,
   topProducts,
   firstName,
 } from "@/lib/ai/search";
@@ -14,6 +15,7 @@ import type {
   AiChatStreamEvent,
   AssistantCatalog,
   AssistantContext,
+  AssistantProduct,
   AssistantReply,
 } from "@/lib/ai/types";
 import { getAssistantCatalog } from "@/lib/ai/server/catalog";
@@ -88,8 +90,26 @@ function selectReplyProducts(input: {
   const { catalog, local, latestUserMessage, text, cartCount } = input;
   if (!catalog) return undefined;
 
-  const mentioned = mentionedProducts(text, catalog, 4);
+  const limits = priceLimit(latestUserMessage);
+  const withinBudget = (products: AssistantProduct[]) =>
+    products.filter(
+      (product) =>
+        (limits.max === undefined || product.price <= limits.max) &&
+        (limits.min === undefined || product.price >= limits.min),
+    );
+
+  // A refusal or safety answer must never be decorated with unrelated product
+  // cards. Check this before falling back to catalogue picks.
+  const refuses =
+    /\b(can(?:not|'t) (?:reveal|share|provide|disclose)|system prompt|environment variables|api key)\b/i.test(
+      text,
+    );
+
+  const mentioned = refuses
+    ? []
+    : withinBudget(mentionedProducts(text, catalog, 4));
   if (mentioned.length) return mentioned;
+  if (refuses) return undefined;
 
   const wantsCards =
     local.intent === "recommend" ||
@@ -105,12 +125,16 @@ function selectReplyProducts(input: {
     );
   if (saysNoMatch) return undefined;
 
-  const searched = matchProducts(latestUserMessage, catalog, { limit: 4 });
-  const picks = dedupeProducts([
-    ...(local.products ?? []),
-    ...searched,
-    ...topProducts(catalog, 4),
-  ]).slice(0, 4);
+  const searched = withinBudget(
+    matchProducts(latestUserMessage, catalog, { limit: 4 }),
+  );
+  const picks = withinBudget(
+    dedupeProducts([
+      ...(local.products ?? []),
+      ...searched,
+      ...topProducts(catalog, 4),
+    ]),
+  ).slice(0, 4);
 
   return picks.length ? picks : undefined;
 }
