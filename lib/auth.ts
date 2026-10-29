@@ -30,6 +30,9 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
     } = await supabase.auth.getUser();
 
     if (!user) return null;
+    // Anonymous Supabase sessions back guest carts/wishlists. They are not
+    // accounts: never let them satisfy a server-side auth check.
+    if (user.is_anonymous) return null;
 
     const { data: profile } = await supabase
       .from("profiles")
